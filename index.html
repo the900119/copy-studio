@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>餅妹文案工廠</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f5; color: #333; }
+    .header { background: #1a1a2e; color: white; padding: 20px 32px; }
+    .header h1 { font-size: 22px; font-weight: 700; }
+    .header p { font-size: 13px; opacity: 0.6; margin-top: 4px; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 24px 20px; }
+    .input-section { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+    .card { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+    .card h2 { font-size: 15px; font-weight: 600; margin-bottom: 16px; color: #1a1a2e; }
+    .card-tag { display: inline-block; background: #f0f0ff; color: #5b5bd6; font-size: 11px; padding: 2px 8px; border-radius: 20px; margin-bottom: 12px; }
+    input[type="text"], textarea { width: 100%; border: 1.5px solid #e0e0e0; border-radius: 8px; padding: 10px 14px; font-size: 14px; outline: none; transition: border 0.2s; font-family: inherit; }
+    input[type="text"]:focus, textarea:focus { border-color: #5b5bd6; }
+    .platform-toggle { display: flex; gap: 8px; margin-bottom: 12px; }
+    .platform-btn { flex: 1; padding: 8px; border: 1.5px solid #e0e0e0; background: white; border-radius: 8px; cursor: pointer; font-size: 13px; transition: all 0.2s; font-family: inherit; }
+    .platform-btn.active { border-color: #5b5bd6; background: #f0f0ff; color: #5b5bd6; font-weight: 600; }
+    .btn { width: 100%; padding: 12px; background: #5b5bd6; color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 12px; transition: background 0.2s; font-family: inherit; }
+    .btn:hover { background: #4a4ab8; }
+    .btn:disabled { background: #aaa; cursor: not-allowed; }
+    .btn-success { background: #16a34a; }
+    .btn-success:hover { background: #15803d; }
+    .search-results { margin-top: 16px; display: none; }
+    .result-item { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid #f0f0f0; }
+    .result-item:last-child { border-bottom: none; }
+    .result-item input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; flex-shrink: 0; }
+    .result-meta { flex: 1; min-width: 0; }
+    .result-title { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .result-sub { font-size: 11px; color: #888; margin-top: 2px; }
+    .drafts-section { display: none; }
+    .drafts-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-top: 16px; }
+    .draft-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+    .draft-card h3 { font-size: 14px; font-weight: 600; margin-bottom: 12px; color: #1a1a2e; }
+    .draft-card textarea { min-height: 400px; font-size: 13px; line-height: 1.7; resize: vertical; }
+    .confirm-bar { text-align: center; margin-top: 20px; padding: 20px; background: white; border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+    .loading { text-align: center; padding: 40px; color: #888; display: none; }
+    .spinner { display: inline-block; width: 32px; height: 32px; border: 3px solid #f0f0f0; border-top-color: #5b5bd6; border-radius: 50%; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .status-msg { margin-top: 12px; font-size: 13px; }
+    .status-msg.success { color: #16a34a; }
+    .status-msg.error { color: #dc2626; }
+    .char-count { font-size: 11px; color: #aaa; text-align: right; margin-top: 4px; }
+    @media (max-width: 768px) {
+      .input-section, .drafts-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🏭 餅妹文案工廠</h1>
+  <p>輸入參考內容 → 自動生成 Threads / 小紅書 / 短影音腳本三版文案，存入飛書語料庫</p>
+</div>
+
+<div class="container">
+
+  <!-- 輸入區 -->
+  <div class="input-section">
+
+    <!-- 欄一：創作者搜尋 -->
+    <div class="card">
+      <span class="card-tag">🔍 搜尋模式</span>
+      <h2>搜尋創作者熱門內容</h2>
+      <div class="platform-toggle">
+        <button class="platform-btn active" onclick="selectPlatform('search','yt',this)">YouTube</button>
+        <button class="platform-btn" onclick="selectPlatform('search','xhs',this)">小紅書</button>
+      </div>
+      <input type="text" id="search-input" placeholder="頻道 URL 或 @handle（如 @MrBeast）">
+      <button class="btn" onclick="doSearch()">🔍 找半年內 Top 10</button>
+      <div class="search-results" id="search-results">
+        <div id="results-list"></div>
+        <button class="btn" style="margin-top:12px" onclick="generateFromSelected()">✨ 生成選中文案</button>
+      </div>
+    </div>
+
+    <!-- 欄二：指定 URL -->
+    <div class="card">
+      <span class="card-tag">🔗 指定模式</span>
+      <h2>指定貼文 / 影片</h2>
+      <div class="platform-toggle">
+        <button class="platform-btn active" onclick="selectPlatform('direct','yt',this)">YouTube</button>
+        <button class="platform-btn" onclick="selectPlatform('direct','xhs',this)">小紅書</button>
+        <button class="platform-btn" onclick="selectPlatform('direct','text',this)">貼文字</button>
+      </div>
+      <div id="direct-url-area">
+        <input type="text" id="direct-url" placeholder="https://www.youtube.com/watch?v=...">
+      </div>
+      <div id="direct-text-area" style="display:none">
+        <textarea id="direct-text" rows="5" placeholder="直接貼入影片文案或逐字稿..."></textarea>
+      </div>
+      <button class="btn" onclick="generateDirect()">⚡ 直接生成文案</button>
+      <p style="font-size:11px;color:#aaa;margin-top:8px;text-align:center">YT/XHS 約 45-90 秒，手動文字約 30 秒</p>
+    </div>
+
+  </div>
+
+  <!-- Loading -->
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+    <p style="margin-top:16px" id="loading-msg">正在抓取內容並生成文案（約 30-60 秒）...</p>
+  </div>
+
+  <!-- 草稿區 -->
+  <div class="drafts-section" id="drafts-section">
+    <div class="drafts-grid">
+      <div class="draft-card">
+        <h3>📝 Threads / FB 長文</h3>
+        <textarea id="draft-threads" oninput="updateCount(this,'threads-count')"></textarea>
+        <div class="char-count" id="threads-count">0 字</div>
+      </div>
+      <div class="draft-card">
+        <h3>📸 小紅書圖文</h3>
+        <textarea id="draft-xhs" oninput="updateCount(this,'xhs-count')"></textarea>
+        <div class="char-count" id="xhs-count">0 字</div>
+      </div>
+      <div class="draft-card">
+        <h3>🎬 短影音腳本</h3>
+        <textarea id="draft-video" oninput="updateCount(this,'video-count')"></textarea>
+        <div class="char-count" id="video-count">0 字</div>
+      </div>
+    </div>
+    <div class="confirm-bar">
+      <p style="font-size:13px;color:#666;margin-bottom:12px">可直接編輯上方草稿後再存入語料庫</p>
+      <button class="btn btn-success" style="max-width:320px" onclick="confirmSave()">✅ 確認存入語料庫</button>
+      <div class="status-msg" id="confirm-status"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const N8N_BASE = 'https://eglobal.app.n8n.cloud/webhook';
+  const WEBHOOK_SEARCH   = N8N_BASE + '/copy-studio-search';
+  const WEBHOOK_GENERATE = N8N_BASE + '/copy-studio-generate';
+  const WEBHOOK_CONFIRM  = N8N_BASE + '/copy-studio-confirm';
+
+  let searchPlatform = 'yt';
+  let directPlatform = 'yt';
+  let currentRecordId = '';
+  let currentTitle = '';
+
+  function selectPlatform(mode, platform, btn) {
+    const group = btn.parentElement;
+    group.querySelectorAll('.platform-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    if (mode === 'search') {
+      searchPlatform = platform;
+    } else {
+      directPlatform = platform;
+      document.getElementById('direct-url-area').style.display = platform === 'text' ? 'none' : 'block';
+      document.getElementById('direct-text-area').style.display = platform === 'text' ? 'block' : 'none';
+    }
+  }
+
+  function showLoading(msg) {
+    document.getElementById('loading').style.display = 'block';
+    document.getElementById('loading-msg').textContent = msg || '處理中...';
+    document.getElementById('drafts-section').style.display = 'none';
+  }
+
+  function hideLoading() {
+    document.getElementById('loading').style.display = 'none';
+  }
+
+  function updateCount(ta, countId) {
+    document.getElementById(countId).textContent = ta.value.length + ' 字';
+  }
+
+  function showDrafts(data) {
+    hideLoading();
+    currentRecordId = data.record_id || '';
+    currentTitle = data.title || '';
+    const threads = data.threads_copy || '';
+    const xhs = data.xhs_copy || '';
+    const video = data.video_script || '';
+    document.getElementById('draft-threads').value = threads;
+    document.getElementById('draft-xhs').value = xhs;
+    document.getElementById('draft-video').value = video;
+    document.getElementById('threads-count').textContent = threads.length + ' 字';
+    document.getElementById('xhs-count').textContent = xhs.length + ' 字';
+    document.getElementById('video-count').textContent = video.length + ' 字';
+    document.getElementById('drafts-section').style.display = 'block';
+    document.getElementById('confirm-status').textContent = '';
+    document.getElementById('confirm-status').className = 'status-msg';
+    document.getElementById('drafts-section').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  async function doSearch() {
+    const input = document.getElementById('search-input').value.trim();
+    if (!input) { alert('請輸入頻道 URL 或 handle'); return; }
+    showLoading('正在搜尋半年內熱門內容（約 60-120 秒）...');
+    try {
+      const res = await fetch(WEBHOOK_SEARCH, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ platform: searchPlatform, url: input })
+      });
+      const data = await res.json();
+      hideLoading();
+      renderSearchResults(data.results || []);
+    } catch(e) {
+      hideLoading();
+      alert('搜尋失敗：' + e.message);
+    }
+  }
+
+  function renderSearchResults(results) {
+    const container = document.getElementById('results-list');
+    const section = document.getElementById('search-results');
+    if (!results.length) { alert('找不到結果（可能頻道無近期影片或 Apify 超時）'); return; }
+    container.innerHTML = results.map((v, i) => `
+      <div class="result-item">
+        <input type="checkbox" id="r${i}" value="${escHtml(v.url)}" data-title="${escHtml(v.title)}">
+        <div class="result-meta">
+          <label for="r${i}" style="cursor:pointer;display:block">
+            <div class="result-title" title="${escHtml(v.title)}">${escHtml(v.title)}</div>
+            <div class="result-sub">👀 ${(v.views||0).toLocaleString()} 觀看 · ${v.date || ''}</div>
+          </label>
+        </div>
+      </div>
+    `).join('');
+    section.style.display = 'block';
+  }
+
+  function escHtml(str) {
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  async function generateFromSelected() {
+    const checked = Array.from(document.querySelectorAll('#results-list input:checked'));
+    if (!checked.length) { alert('請先勾選要生成的影片'); return; }
+    const url = checked[0].value;
+    showLoading(`正在生成文案（約 45-90 秒）...`);
+    try {
+      const res = await fetch(WEBHOOK_GENERATE, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ platform: searchPlatform, url: url, text: '' })
+      });
+      const data = await res.json();
+      showDrafts(data);
+    } catch(e) {
+      hideLoading();
+      alert('生成失敗：' + e.message);
+    }
+  }
+
+  async function generateDirect() {
+    let url = '', text = '';
+    if (directPlatform === 'text') {
+      text = document.getElementById('direct-text').value.trim();
+      if (!text) { alert('請輸入文字內容'); return; }
+    } else {
+      url = document.getElementById('direct-url').value.trim();
+      if (!url) { alert('請輸入 URL'); return; }
+    }
+    showLoading('正在抓取並生成文案（約 30-60 秒）...');
+    try {
+      const res = await fetch(WEBHOOK_GENERATE, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ platform: directPlatform, url, text })
+      });
+      const data = await res.json();
+      showDrafts(data);
+    } catch(e) {
+      hideLoading();
+      alert('生成失敗：' + e.message);
+    }
+  }
+
+  async function confirmSave() {
+    const statusEl = document.getElementById('confirm-status');
+    statusEl.textContent = '存入中...';
+    statusEl.className = 'status-msg';
+    try {
+      const res = await fetch(WEBHOOK_CONFIRM, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({
+          record_id: currentRecordId,
+          title: currentTitle,
+          threads_copy: document.getElementById('draft-threads').value,
+          xhs_copy: document.getElementById('draft-xhs').value,
+          video_script: document.getElementById('draft-video').value
+        })
+      });
+      const data = await res.json();
+      statusEl.textContent = '✅ 已存入語料庫！飛書 Bitable 狀態已更新為「已確認」。';
+      statusEl.className = 'status-msg success';
+    } catch(e) {
+      statusEl.textContent = '❌ 存入失敗：' + e.message;
+      statusEl.className = 'status-msg error';
+    }
+  }
+</script>
+
+</body>
+</html>
