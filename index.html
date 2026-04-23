@@ -920,7 +920,7 @@ function selectPlatform(mode, platform, btn) {
   if (mode === 'search') {
     searchPlatform = platform;
     const inp = document.getElementById('search-input');
-    inp.placeholder = platform === 'xhs' ? '輸入小紅書創作者暱稱（如 班長跨境）' : '頻道 URL 或 @handle（如 @MrBeast）';
+    inp.placeholder = platform === 'xhs' ? '輸入小紅書號（如 644895069）' : '頻道 URL 或 @handle（如 @MrBeast）';
   } else {
     directPlatform = platform;
     document.getElementById('direct-url-area').style.display  = platform === 'text' ? 'none' : 'block';
@@ -956,7 +956,7 @@ async function doSearch() {
   document.getElementById('search-drafts').style.display  = 'none';
   try {
     if (searchPlatform === 'xhs') {
-      const r = await fetch(WH_XHS_SEARCH, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ creator: input }) });
+      const r = await fetch(WH_XHS_SEARCH, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ red_id: input }) });
       const d = await r.json(); hideLoad('search-loading');
       renderXHSResults(d);
     } else {
