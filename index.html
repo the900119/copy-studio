@@ -4,8 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>餅妹內容中控台</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Serif+TC:wght@400;500;600;700&family=LXGW+WenKai+TC&display=swap" rel="stylesheet">
   <style>
     :root {
+      --font-body: -apple-system, BlinkMacSystemFont, 'Noto Sans TC', sans-serif;
       --bg: #0D0D0D;
       --bg-card: #1A1A1A;
       --border: #2A2A2A;
@@ -18,7 +21,18 @@
       --error-color: #f87171;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans TC', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+    body { font-family: var(--font-body); background: var(--bg); color: var(--text); min-height: 100vh; }
+    .font-picker { display: flex; gap: 4px; align-items: center; margin-left: auto; }
+    .font-chip { font-size: 11px; padding: 3px 10px; border-radius: 12px; border: 1px solid var(--border); background: transparent; color: var(--text-muted); cursor: pointer; font-family: inherit; transition: all 0.15s; white-space: nowrap; }
+    .font-chip:hover { border-color: var(--gold-dim); color: var(--gold); }
+    .font-chip.active { border-color: var(--gold); color: var(--gold); background: rgba(212,168,67,0.08); }
+    /* Creator favorites */
+    .creator-fav-item { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 6px; background: #0e0e0e; cursor: pointer; transition: border-color 0.15s; }
+    .creator-fav-item:hover { border-color: var(--gold-dim); }
+    .creator-fav-badge { font-size: 10px; padding: 2px 6px; border-radius: 8px; background: rgba(212,168,67,0.08); color: var(--gold-dim); border: 1px solid rgba(212,168,67,0.18); flex-shrink: 0; }
+    .creator-fav-name { font-size: 12px; color: var(--text); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .creator-fav-del { font-size: 11px; color: var(--text-muted); background: transparent; border: none; cursor: pointer; padding: 2px 5px; border-radius: 4px; flex-shrink: 0; }
+    .creator-fav-del:hover { color: #e74c3c; }
 
     /* ── Header ── */
     .header { background: #080808; border-bottom: 1px solid var(--border); padding: 12px 24px; display: flex; align-items: center; gap: 10px; }
@@ -255,7 +269,14 @@
   <div class="header-diamond">◆</div>
   <div>
     <h1>餅妹內容中控台</h1>
-    <p>安先生工作流 · 從定位到腳本</p>
+    <p>IP 定位 · 選題 · 腳本生成</p>
+  </div>
+  <div class="font-picker">
+    <span style="font-size:10px;color:var(--text-muted);margin-right:4px">字體</span>
+    <button class="font-chip active" onclick="setFont('system',this)">無印</button>
+    <button class="font-chip" onclick="setFont('sans',this)" style="font-family:'Noto Sans TC'">黑體</button>
+    <button class="font-chip" onclick="setFont('serif',this)" style="font-family:'Noto Serif TC'">宋體</button>
+    <button class="font-chip" onclick="setFont('kai',this)" style="font-family:'LXGW WenKai TC'">楷書</button>
   </div>
 </div>
 
@@ -345,28 +366,36 @@
     <div class="tab-panel" id="tab-search">
       <div class="container">
 
-        <!-- 🔥 抖音熱搜 -->
-        <div class="card mb-16">
-          <span class="card-tag">🔥 抖音熱搜</span>
-          <h2>抖音熱搜靈感挖掘</h2>
-          <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px">AI 從即時抖音熱搜中，篩選出與你賽道相關的靈感角度</p>
-          <div style="display:flex;gap:10px;align-items:flex-end">
-            <div style="flex:1">
-              <label class="field-label">你的賽道方向</label>
-              <input type="text" id="douyin-niche" placeholder="如：珠寶跨境、工廠老闆、AI創業">
+        <!-- 🔥 抖音熱搜 + 收藏創作者 -->
+        <div class="mb-16" style="display:grid;grid-template-columns:1fr 260px;gap:16px;align-items:start">
+
+          <div class="card">
+            <span class="card-tag">🔥 抖音熱搜</span>
+            <h2>抖音熱搜靈感挖掘</h2>
+            <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px">AI 從即時抖音熱搜中，篩選出與你賽道相關的靈感角度</p>
+            <div style="display:flex;gap:10px;align-items:flex-end">
+              <div style="flex:1">
+                <label class="field-label">你的賽道方向</label>
+                <input type="text" id="douyin-niche" placeholder="如：珠寶跨境、工廠老闆、AI創業">
+              </div>
+              <button class="btn btn-sm" style="margin-top:0;white-space:nowrap" onclick="searchDouyin()">🔥 抓熱搜靈感</button>
             </div>
-            <button class="btn btn-sm" style="margin-top:0;white-space:nowrap" onclick="searchDouyin()">🔥 抓熱搜靈感</button>
-          </div>
-          <div class="loading" id="douyin-loading" style="padding:24px"><div class="spinner"></div><p class="loading-msg">正在抓取抖音熱搜並 AI 篩選（約 15–25 秒）...</p></div>
-          <div id="douyin-results" style="display:none">
-            <div class="divider"></div>
-            <p style="font-size:11px;color:var(--text-muted);margin-bottom:12px">AI 篩選結果 — 勾選感興趣的角度，存入選題庫；或點「帶入生成」直接生成腳本</p>
-            <div id="douyin-list"></div>
-            <div style="display:flex;gap:10px;margin-top:12px;align-items:center">
-              <button class="btn btn-success btn-sm" style="margin-top:0" onclick="saveSelectedTopics()">✅ 存入選題庫</button>
-              <div class="status-msg" id="douyin-save-status" style="margin:0"></div>
+            <div class="loading" id="douyin-loading" style="padding:24px"><div class="spinner"></div><p class="loading-msg">正在抓取抖音熱搜並 AI 篩選（約 15–25 秒）...</p></div>
+            <div id="douyin-results" style="display:none">
+              <div class="divider"></div>
+              <p style="font-size:11px;color:var(--text-muted);margin-bottom:12px">AI 篩選結果 — 點「＋暫存」加入選題庫，或「帶入生成」直接到第四步</p>
+              <div id="douyin-list"></div>
             </div>
           </div>
+
+          <div class="card">
+            <h2 style="margin-bottom:10px">收藏創作者</h2>
+            <p style="font-size:11px;color:var(--text-muted);margin-bottom:12px">搜尋過的 YT／小紅書創作者自動收藏，點擊快速搜尋</p>
+            <div id="creator-fav-list">
+              <p style="font-size:11px;color:var(--text-muted);text-align:center;padding:20px 0">暫無收藏<br>搜尋創作者後自動儲存</p>
+            </div>
+          </div>
+
         </div>
 
         <!-- YT / XHS 搜尋 -->
@@ -449,12 +478,11 @@
       <div class="container">
 
         <div class="card">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
             <h2 style="margin:0">選題暫存區</h2>
             <span id="inbox-count-badge" style="font-size:11px;padding:2px 10px;border-radius:10px;background:rgba(212,168,67,0.08);color:var(--gold-dim);border:1px solid rgba(212,168,67,0.18)">0 / 20</span>
-            <button class="btn btn-sm" style="margin-left:auto;margin-top:0;font-size:11px;padding:6px 14px" onclick="saveAllInboxToFeishu()">📤 全部存飛書選題庫</button>
           </div>
-          <p style="font-size:12px;color:var(--text-muted);margin-bottom:14px">在靈感收集（Step 02）任一結果點「＋暫存」加入，最多 20 條。選好後點「帶入生成」跳到第四步驟產出腳本。</p>
+          <p style="font-size:12px;color:var(--text-muted);margin-bottom:14px">在靈感收集（Step 02）點「＋暫存」加入，最多 20 條。選一篇點「帶入生成」→ 跳到第四步驟，生成後再存飛書。</p>
           <div id="inbox-list"></div>
         </div>
 
@@ -907,7 +935,7 @@ function renderDouyinResults(topics) {
         ${t.reason ? `<div class="douyin-reason">🤖 ${esc(t.reason)}</div>` : ''}
       </div>
       <div style="display:flex;flex-direction:column;gap:5px;flex-shrink:0">
-        <button class="add-inbox-btn" onclick="addToInbox('${esc(t.angle||t.word)}','${esc(t.word)}',${t.hot||0},'抖音熱搜')">＋暫存</button>
+        <button class="add-inbox-btn" onclick="addToInbox('${esc(t.angle||t.word)}','${esc(t.word)}',${t.hot||0},'抖音熱搜','${esc((t.angle||'')+(t.reason?'\\n'+t.reason:''))}')">＋暫存</button>
         <button class="btn btn-sm btn-outline" style="margin-top:0;font-size:11px;padding:5px 10px;white-space:nowrap"
                 onclick="useDouyinTopic('${esc(t.word)}','${esc(t.angle||'')}')">帶入生成</button>
       </div>
@@ -1002,6 +1030,9 @@ async function doSearch() {
 
 function renderResults(list) {
   if (!list.length) { alert('找不到結果'); return; }
+  // Auto-save creator to favorites
+  const ytInput = document.getElementById('search-input').value.trim();
+  if (ytInput) saveFav('YT', ytInput, ytInput);
   document.getElementById('results-list').innerHTML = list.map((v, i) => `
     <div class="result-item">
       <input type="checkbox" id="r${i}" value="${esc(v.url)}" data-title="${esc(v.title)}">
@@ -1009,7 +1040,7 @@ function renderResults(list) {
         <div class="result-title" title="${esc(v.title)}">${esc(v.title)}</div>
         <div class="result-sub">👀 ${(v.views||0).toLocaleString()} · ${v.date||''}</div>
       </label>
-      <button class="add-inbox-btn" onclick="addToInbox('${esc(v.title)}','${esc(v.title)}',${v.views||0},'YouTube')">＋暫存</button>
+      <button class="add-inbox-btn" onclick="addToInbox('${esc(v.title)}','${esc(v.title)}',${v.views||0},'YouTube','${esc(v.title)}')">＋暫存</button>
     </div>`).join('');
   document.getElementById('search-results').style.display = 'block';
 }
@@ -1053,8 +1084,8 @@ function renderXHSResults(data, inputRedId) {
   if (!notes.length) { alert('找不到創作者或高讚貼文，請確認名字是否正確'); return; }
   const creator = data.creator || '';
   const redId = inputRedId || data.red_id || data.userId || '';
-  // Save to history
-  if (creator && redId) saveXHSHistory(redId, creator);
+  // Save to history + fav
+  if (creator && redId) { saveXHSHistory(redId, creator); saveFav('XHS', creator, redId); }
   document.getElementById('results-list').innerHTML =
     `<p style="font-size:11px;color:var(--gold-dim);margin-bottom:8px">創作者：${esc(creator)} · 共 ${notes.length} 篇高讚貼文</p>` +
     notes.map((n, i) => `
@@ -1064,7 +1095,7 @@ function renderXHSResults(data, inputRedId) {
         <div class="result-title" title="${esc(n.title)}">${esc(n.title)}</div>
         <div class="result-sub">❤️ ${(n.likes||0).toLocaleString()} · ${n.note_type === 'video' ? '🎬 影片' : '📸 圖文'}</div>
       </label>
-      <button class="add-inbox-btn" onclick="addToInbox('${esc(n.title)}','${esc(n.title)}',${n.likes||0},'小紅書')">＋暫存</button>
+      <button class="add-inbox-btn" onclick="addToInbox('${esc(n.title)}','${esc(n.title)}',${n.likes||0},'小紅書','${esc(n.title+(n.note_type?' ['+n.note_type+']':''))}')">＋暫存</button>
     </div>`).join('');
   document.getElementById('search-results').style.display = 'block';
 }
@@ -1330,11 +1361,11 @@ function loadInbox() {
   try { return JSON.parse(localStorage.getItem(INBOX_KEY) || '[]'); } catch(e) { return []; }
 }
 
-function addToInbox(angle, word, hot, source) {
+function addToInbox(angle, word, hot, source, content) {
   let list = loadInbox();
-  if (list.length >= 20) { alert('暫存區已滿（上限 20 條），請先清除或存入飛書'); return; }
+  if (list.length >= 20) { alert('暫存區已滿（上限 20 條），請先清除已有選題'); return; }
   const id = Date.now() + '_' + Math.random().toString(36).slice(2,6);
-  list.unshift({ id, angle, word: word || angle, hot: hot || 0, source, ts: Date.now() });
+  list.unshift({ id, angle, word: word || angle, hot: hot || 0, source, content: content || '', ts: Date.now() });
   localStorage.setItem(INBOX_KEY, JSON.stringify(list));
   renderInbox();
   if (event && event.currentTarget) {
@@ -1370,15 +1401,20 @@ function renderInbox() {
         ${item.word && item.word !== item.angle ? `<div class="inbox-sub">詞：${esc(item.word)}${item.hot ? ' · 🔥' + Number(item.hot).toLocaleString() : ''}</div>` : (item.hot ? `<div class="inbox-sub">🔥 ${Number(item.hot).toLocaleString()}</div>` : '')}
       </div>
       <div class="inbox-actions">
-        <button class="inbox-btn primary" onclick="useInboxTopic('${esc(item.angle)}')">帶入生成</button>
-        <button class="inbox-btn" onclick="saveOneToFeishu('${esc(item.id)}')">存飛書</button>
+        <button class="inbox-btn primary" onclick="useInboxTopic('${esc(item.id)}')">帶入生成 →</button>
         <button class="inbox-btn del" onclick="removeFromInbox('${esc(item.id)}')">✕</button>
       </div>
     </div>`).join('');
 }
 
-function useInboxTopic(angle) {
-  document.getElementById('pro-topic').value = angle;
+function useInboxTopic(id) {
+  const item = loadInbox().find(i => i.id === id);
+  if (!item) return;
+  document.getElementById('pro-topic').value = item.angle;
+  if (item.content) {
+    const extra = document.getElementById('pro-extra');
+    if (extra && !extra.value) extra.value = item.content;
+  }
   switchTab('pro');
   setTimeout(() => document.getElementById('pro-topic').focus(), 100);
 }
@@ -1405,6 +1441,76 @@ async function saveAllInboxToFeishu() {
   } catch(e) { alert('失敗：' + e.message); }
 }
 
+// ── Font picker ──────────────────────────────────────────
+const FONTS = {
+  system: "-apple-system, BlinkMacSystemFont, 'Noto Sans TC', sans-serif",
+  sans:   "'Noto Sans TC', sans-serif",
+  serif:  "'Noto Serif TC', serif",
+  kai:    "'LXGW WenKai TC', 'LXGW WenKai', cursive"
+};
+function setFont(key, btn) {
+  document.documentElement.style.setProperty('--font-body', FONTS[key]);
+  localStorage.setItem('copy_studio_font', key);
+  document.querySelectorAll('.font-chip').forEach(c => c.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+}
+(function initFont() {
+  const saved = localStorage.getItem('copy_studio_font');
+  if (saved && FONTS[saved]) {
+    document.documentElement.style.setProperty('--font-body', FONTS[saved]);
+    const chips = document.querySelectorAll('.font-chip');
+    chips.forEach(c => {
+      if (c.textContent.trim() === {system:'無印',sans:'黑體',serif:'宋體',kai:'楷書'}[saved]) {
+        c.classList.add('active');
+      } else { c.classList.remove('active'); }
+    });
+  }
+})();
+
+// ── Creator favorites ─────────────────────────────────────
+const FAV_KEY = 'copy_studio_creator_favs';
+function loadFavs() { try { return JSON.parse(localStorage.getItem(FAV_KEY)||'[]'); } catch(e) { return []; } }
+function saveFav(platform, name, handle) {
+  let list = loadFavs();
+  if (list.find(f => f.handle === handle && f.platform === platform)) return;
+  list.unshift({ id: Date.now()+'', platform, name, handle, ts: Date.now() });
+  if (list.length > 20) list = list.slice(0, 20);
+  localStorage.setItem(FAV_KEY, JSON.stringify(list));
+  renderFavs();
+}
+function removeFav(id) {
+  let list = loadFavs().filter(f => f.id !== id);
+  localStorage.setItem(FAV_KEY, JSON.stringify(list));
+  renderFavs();
+}
+function renderFavs() {
+  const el = document.getElementById('creator-fav-list');
+  if (!el) return;
+  const list = loadFavs();
+  if (!list.length) {
+    el.innerHTML = '<p style="font-size:11px;color:var(--text-muted);text-align:center;padding:20px 0">暫無收藏<br>搜尋創作者後自動儲存</p>';
+    return;
+  }
+  el.innerHTML = list.map(f => `
+    <div class="creator-fav-item" onclick="quickSearchCreator('${esc(f.platform)}','${esc(f.handle)}','${esc(f.name)}')">
+      <span class="creator-fav-badge">${esc(f.platform)}</span>
+      <span class="creator-fav-name" title="${esc(f.name)}">${esc(f.name)}</span>
+      <button class="creator-fav-del" onclick="event.stopPropagation();removeFav('${esc(f.id)}')">✕</button>
+    </div>`).join('');
+}
+function quickSearchCreator(platform, handle, name) {
+  switchTab('search');
+  const input = document.getElementById('search-input');
+  if (!input) return;
+  if (platform === 'XHS') {
+    selectPlatform('search','xhs', document.querySelector('.platform-btn'));
+  } else {
+    selectPlatform('search','yt', document.querySelector('.platform-btn'));
+  }
+  input.value = handle;
+  doSearch();
+}
+
 // ── Boot ─────────────────────────────────────────────────
 // Move pillar + topic-ideas cards from Step 03 hidden area → Step 04
 (function() {
@@ -1426,6 +1532,7 @@ async function saveAllInboxToFeishu() {
 })();
 initPositioning();
 renderInbox();
+renderFavs();
 </script>
 </body>
 </html>
