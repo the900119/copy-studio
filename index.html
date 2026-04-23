@@ -115,6 +115,10 @@
 
     /* ── Platform toggle ── */
     .platform-toggle { display: flex; gap: 8px; margin-bottom: 12px; }
+    .history-chip { display: inline-flex; align-items: center; gap: 5px; background: rgba(212,168,67,0.06); border: 1px solid rgba(212,168,67,0.2); color: var(--gold-dim); font-size: 11px; padding: 4px 10px; border-radius: 20px; cursor: pointer; transition: all .15s; }
+    .history-chip:hover { background: rgba(212,168,67,0.12); color: var(--gold); border-color: var(--gold-dim); }
+    .history-chip-del { opacity: .5; font-size: 10px; margin-left: 2px; }
+    .history-chip-del:hover { opacity: 1; }
     .platform-btn { flex: 1; padding: 8px; border: 1.5px solid var(--border); background: transparent; border-radius: 8px; cursor: pointer; font-size: 13px; transition: all 0.2s; font-family: inherit; color: var(--text-muted); }
     .platform-btn.active { border-color: var(--gold-dim); background: rgba(212,168,67,0.07); color: var(--gold); font-weight: 600; }
 
@@ -363,6 +367,10 @@
               <button class="platform-btn"        onclick="selectPlatform('search','xhs',this)">小紅書</button>
             </div>
             <input type="text" id="search-input" placeholder="頻道 URL 或 @handle（如 @MrBeast）">
+            <div id="xhs-history" style="display:none;margin:8px 0 4px">
+              <div style="font-size:10px;color:var(--text-muted);margin-bottom:6px;letter-spacing:.5px">最近搜尋</div>
+              <div id="xhs-history-chips" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+            </div>
             <button class="btn" onclick="doSearch()">🔍 找半年內 Top 10</button>
             <div class="search-results" id="search-results">
               <div id="results-list"></div>
@@ -921,6 +929,9 @@ function selectPlatform(mode, platform, btn) {
     searchPlatform = platform;
     const inp = document.getElementById('search-input');
     inp.placeholder = platform === 'xhs' ? '輸入小紅書號（如 644895069）' : '頻道 URL 或 @handle（如 @MrBeast）';
+    // Show/hide XHS history
+    if (platform === 'xhs') renderXHSHistory();
+    else document.getElementById('xhs-history').style.display = 'none';
   } else {
     directPlatform = platform;
     document.getElementById('direct-url-area').style.display  = platform === 'text' ? 'none' : 'block';
@@ -958,7 +969,7 @@ async function doSearch() {
     if (searchPlatform === 'xhs') {
       const r = await fetch(WH_XHS_SEARCH, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ red_id: input }) });
       const d = await r.json(); hideLoad('search-loading');
-      renderXHSResults(d);
+      renderXHSResults(d, input);
     } else {
       const r = await fetch(WH_SEARCH, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ platform: searchPlatform, url: input }) });
       const d = await r.json(); hideLoad('search-loading'); renderResults(d.results || []);
@@ -979,10 +990,47 @@ function renderResults(list) {
   document.getElementById('search-results').style.display = 'block';
 }
 
-function renderXHSResults(data) {
+// ── XHS 創作者搜尋歷史（localStorage）────────────────────
+function loadXHSHistory() {
+  try { return JSON.parse(localStorage.getItem('xhs_creator_history') || '[]'); } catch(e) { return []; }
+}
+function saveXHSHistory(redId, creatorName) {
+  let list = loadXHSHistory();
+  list = list.filter(h => h.redId !== redId);
+  list.unshift({ redId, creatorName, ts: Date.now() });
+  if (list.length > 8) list = list.slice(0, 8);
+  localStorage.setItem('xhs_creator_history', JSON.stringify(list));
+  renderXHSHistory();
+}
+function removeXHSHistory(redId) {
+  let list = loadXHSHistory().filter(h => h.redId !== redId);
+  localStorage.setItem('xhs_creator_history', JSON.stringify(list));
+  renderXHSHistory();
+}
+function renderXHSHistory() {
+  const list = loadXHSHistory();
+  const wrap = document.getElementById('xhs-history');
+  const chips = document.getElementById('xhs-history-chips');
+  if (!list.length) { wrap.style.display = 'none'; return; }
+  wrap.style.display = 'block';
+  chips.innerHTML = list.map(h => `
+    <span class="history-chip" onclick="loadXHSCreator('${esc(h.redId)}')">
+      ${esc(h.creatorName || h.redId)}
+      <span class="history-chip-del" onclick="event.stopPropagation();removeXHSHistory('${esc(h.redId)}')">✕</span>
+    </span>`).join('');
+}
+function loadXHSCreator(redId) {
+  document.getElementById('search-input').value = redId;
+  doSearch();
+}
+
+function renderXHSResults(data, inputRedId) {
   const notes = data.notes || [];
   if (!notes.length) { alert('找不到創作者或高讚貼文，請確認名字是否正確'); return; }
   const creator = data.creator || '';
+  const redId = inputRedId || data.red_id || data.userId || '';
+  // Save to history
+  if (creator && redId) saveXHSHistory(redId, creator);
   document.getElementById('results-list').innerHTML =
     `<p style="font-size:11px;color:var(--gold-dim);margin-bottom:8px">創作者：${esc(creator)} · 共 ${notes.length} 篇高讚貼文</p>` +
     notes.map((n, i) => `
