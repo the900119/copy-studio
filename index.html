@@ -3,302 +3,954 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>餅妹文案工廠</title>
+  <title>餅妹內容中控台</title>
   <style>
+    :root {
+      --bg: #0D0D0D;
+      --bg-card: #1A1A1A;
+      --border: #2A2A2A;
+      --gold: #D4A843;
+      --gold-light: #E8C97E;
+      --gold-dim: #7A5C1A;
+      --text: #CCCCCC;
+      --text-muted: #606060;
+      --success-color: #4ade80;
+      --error-color: #f87171;
+    }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f5; color: #333; }
-    .header { background: #1a1a2e; color: white; padding: 20px 32px; }
-    .header h1 { font-size: 22px; font-weight: 700; }
-    .header p { font-size: 13px; opacity: 0.6; margin-top: 4px; }
-    .container { max-width: 1200px; margin: 0 auto; padding: 24px 20px; }
-    .input-section { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
-    .card { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
-    .card h2 { font-size: 15px; font-weight: 600; margin-bottom: 16px; color: #1a1a2e; }
-    .card-tag { display: inline-block; background: #f0f0ff; color: #5b5bd6; font-size: 11px; padding: 2px 8px; border-radius: 20px; margin-bottom: 12px; }
-    input[type="text"], textarea { width: 100%; border: 1.5px solid #e0e0e0; border-radius: 8px; padding: 10px 14px; font-size: 14px; outline: none; transition: border 0.2s; font-family: inherit; }
-    input[type="text"]:focus, textarea:focus { border-color: #5b5bd6; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans TC', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+    /* ── Header ── */
+    .header { background: #080808; border-bottom: 1px solid var(--border); padding: 14px 28px; display: flex; align-items: center; gap: 12px; }
+    .header-diamond { color: var(--gold); font-size: 20px; line-height: 1; }
+    .header h1 { font-size: 18px; font-weight: 700; color: var(--gold); letter-spacing: 0.5px; }
+    .header p { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+    /* ── Tab Nav ── */
+    .tab-nav { background: #080808; border-bottom: 1px solid var(--border); display: flex; padding: 0 20px; overflow-x: auto; scrollbar-width: none; }
+    .tab-nav::-webkit-scrollbar { display: none; }
+    .tab-btn { padding: 13px 18px; font-size: 13px; font-weight: 500; color: var(--text-muted); border: none; background: transparent; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; white-space: nowrap; font-family: inherit; }
+    .tab-btn:hover { color: var(--gold-light); }
+    .tab-btn.active { color: var(--gold); border-bottom-color: var(--gold); }
+
+    /* ── Container ── */
+    .container { max-width: 1200px; margin: 0 auto; padding: 22px 20px; }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ── Cards ── */
+    .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 20px; }
+    .card h2 { font-size: 14px; font-weight: 600; color: var(--gold-light); margin-bottom: 14px; }
+    .card-tag { display: inline-block; background: rgba(212,168,67,0.08); color: var(--gold); font-size: 11px; padding: 2px 9px; border-radius: 20px; margin-bottom: 10px; border: 1px solid rgba(212,168,67,0.2); }
+
+    /* ── Layout ── */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+    .mb-16 { margin-bottom: 16px; }
+
+    /* ── Form ── */
+    input[type="text"], textarea, select {
+      width: 100%; background: #0F0F0F; border: 1.5px solid var(--border); border-radius: 8px;
+      padding: 10px 13px; font-size: 14px; outline: none; transition: border 0.2s;
+      font-family: inherit; color: var(--text);
+    }
+    input[type="text"]:focus, textarea:focus, select:focus { border-color: var(--gold-dim); }
+    select option { background: #1A1A1A; color: var(--text); }
+    label.field-label { font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    /* ── Buttons ── */
+    .btn { width: 100%; padding: 11px; background: var(--gold); color: #0D0D0D; border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; margin-top: 12px; transition: background 0.2s; font-family: inherit; }
+    .btn:hover { background: var(--gold-light); }
+    .btn:disabled { background: #2A2A2A; color: var(--text-muted); cursor: not-allowed; }
+    .btn-outline { background: transparent; border: 1.5px solid var(--gold-dim); color: var(--gold); }
+    .btn-outline:hover { background: rgba(212,168,67,0.07); }
+    .btn-success { background: #1a5e36; color: var(--success-color); border: 1px solid #2a7a4a; }
+    .btn-success:hover { background: #22733f; }
+    .btn-sm { width: auto; padding: 7px 16px; font-size: 12px; margin-top: 0; }
+
+    /* ── Platform toggle ── */
     .platform-toggle { display: flex; gap: 8px; margin-bottom: 12px; }
-    .platform-btn { flex: 1; padding: 8px; border: 1.5px solid #e0e0e0; background: white; border-radius: 8px; cursor: pointer; font-size: 13px; transition: all 0.2s; font-family: inherit; }
-    .platform-btn.active { border-color: #5b5bd6; background: #f0f0ff; color: #5b5bd6; font-weight: 600; }
-    .btn { width: 100%; padding: 12px; background: #5b5bd6; color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 12px; transition: background 0.2s; font-family: inherit; }
-    .btn:hover { background: #4a4ab8; }
-    .btn:disabled { background: #aaa; cursor: not-allowed; }
-    .btn-success { background: #16a34a; }
-    .btn-success:hover { background: #15803d; }
-    .search-results { margin-top: 16px; display: none; }
-    .result-item { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid #f0f0f0; }
+    .platform-btn { flex: 1; padding: 8px; border: 1.5px solid var(--border); background: transparent; border-radius: 8px; cursor: pointer; font-size: 13px; transition: all 0.2s; font-family: inherit; color: var(--text-muted); }
+    .platform-btn.active { border-color: var(--gold-dim); background: rgba(212,168,67,0.07); color: var(--gold); font-weight: 600; }
+
+    /* ── Results ── */
+    .search-results { margin-top: 14px; display: none; }
+    .result-item { display: flex; align-items: center; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--border); }
     .result-item:last-child { border-bottom: none; }
-    .result-item input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; flex-shrink: 0; }
+    .result-item input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; flex-shrink: 0; accent-color: var(--gold); }
     .result-meta { flex: 1; min-width: 0; }
     .result-title { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .result-sub { font-size: 11px; color: #888; margin-top: 2px; }
-    .drafts-section { display: none; }
-    .drafts-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-top: 16px; }
-    .draft-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
-    .draft-card h3 { font-size: 14px; font-weight: 600; margin-bottom: 12px; color: #1a1a2e; }
-    .draft-card textarea { min-height: 400px; font-size: 13px; line-height: 1.7; resize: vertical; }
-    .confirm-bar { text-align: center; margin-top: 20px; padding: 20px; background: white; border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
-    .loading { text-align: center; padding: 40px; color: #888; display: none; }
-    .spinner { display: inline-block; width: 32px; height: 32px; border: 3px solid #f0f0f0; border-top-color: #5b5bd6; border-radius: 50%; animation: spin 0.8s linear infinite; }
+    .result-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+    /* ── Drafts ── */
+    .drafts-section { display: none; margin-top: 16px; }
+    .draft-card textarea { min-height: 360px; font-size: 13px; line-height: 1.75; resize: vertical; margin-top: 0; }
+    .char-count { font-size: 11px; color: var(--text-muted); text-align: right; margin-top: 4px; }
+
+    /* ── Loading ── */
+    .loading { text-align: center; padding: 36px; display: none; }
+    .spinner { display: inline-block; width: 28px; height: 28px; border: 3px solid var(--border); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
-    .status-msg { margin-top: 12px; font-size: 13px; }
-    .status-msg.success { color: #16a34a; }
-    .status-msg.error { color: #dc2626; }
-    .char-count { font-size: 11px; color: #aaa; text-align: right; margin-top: 4px; }
+    .loading-msg { margin-top: 12px; font-size: 13px; color: var(--text-muted); }
+
+    /* ── Status ── */
+    .status-msg { font-size: 13px; margin-top: 10px; }
+    .status-msg.success { color: var(--success-color); }
+    .status-msg.error { color: var(--error-color); }
+
+    /* ── Confirm bar ── */
+    .confirm-bar { text-align: center; margin-top: 16px; padding: 18px 20px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; }
+    .confirm-bar p { font-size: 13px; color: var(--text-muted); margin-bottom: 12px; }
+
+    /* ── Divider ── */
+    .divider { height: 1px; background: var(--border); margin: 16px 0; }
+
+    /* ════ Tab 2: 選題庫 ════ */
+    .pillar-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
+    .pillar-tab { padding: 7px 16px; border: 1.5px solid var(--border); background: transparent; border-radius: 20px; font-size: 13px; color: var(--text-muted); cursor: pointer; font-family: inherit; transition: all 0.2s; }
+    .pillar-tab.active { border-color: var(--gold-dim); background: rgba(212,168,67,0.07); color: var(--gold); font-weight: 600; }
+    .keyword-section { display: none; }
+    .keyword-section.active { display: block; }
+    .keyword-tier { margin-bottom: 18px; }
+    .keyword-tier h4 { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 10px; }
+    .keyword-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .keyword-chip { padding: 7px 14px; background: #111; border: 1.5px solid var(--border); border-radius: 8px; font-size: 13px; color: var(--text); cursor: pointer; transition: all 0.2s; line-height: 1.4; }
+    .keyword-chip:hover { border-color: var(--gold-dim); color: var(--gold); background: rgba(212,168,67,0.05); }
+    .keyword-chip .angle { font-size: 11px; color: var(--text-muted); display: block; margin-top: 2px; }
+    .keyword-chip:hover .angle { color: var(--gold-dim); }
+
+    /* ════ Tab 3: Pro ════ */
+    .selector-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+    .persona-tag { display: inline-block; padding: 4px 12px; background: rgba(212,168,67,0.07); border: 1px solid rgba(212,168,67,0.18); border-radius: 4px; font-size: 12px; color: var(--gold-light); margin: 0 4px 6px 0; }
+    .pro-output { display: none; margin-top: 16px; }
+
+    /* ════ Tab 4: 故事庫 ════ */
+    .story-field { margin-bottom: 14px; }
+
+    /* ════ Tab 5: IP定位 ════ */
+    .pos-progress { display: flex; gap: 5px; margin-bottom: 20px; align-items: center; }
+    .pos-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border); transition: all 0.3s; }
+    .pos-dot.done { background: var(--gold); }
+    .pos-dot.current { background: var(--gold-light); box-shadow: 0 0 7px rgba(212,168,67,0.5); width: 10px; height: 10px; }
+    .q-layer { font-size: 10px; color: var(--gold-dim); text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 7px; }
+    .q-text { font-size: 17px; font-weight: 600; color: var(--gold-light); margin-bottom: 6px; line-height: 1.5; }
+    .q-hint { font-size: 13px; color: var(--text-muted); margin-bottom: 16px; line-height: 1.6; }
+    .option-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+    .option-btn { padding: 12px 16px; background: #111; border: 1.5px solid var(--border); border-radius: 8px; color: var(--text); cursor: pointer; text-align: left; font-family: inherit; font-size: 14px; transition: all 0.2s; }
+    .option-btn:hover { border-color: var(--gold-dim); background: rgba(212,168,67,0.05); }
+    .option-btn.selected { border-color: var(--gold); background: rgba(212,168,67,0.1); color: var(--gold-light); }
+
+    /* ── Mobile ── */
     @media (max-width: 768px) {
-      .input-section, .drafts-grid { grid-template-columns: 1fr; }
+      .grid-2, .grid-3, .selector-row { grid-template-columns: 1fr; }
+      .header { padding: 12px 16px; }
+      .container { padding: 14px; }
     }
   </style>
 </head>
 <body>
 
 <div class="header">
-  <h1>🏭 餅妹文案工廠</h1>
-  <p>輸入參考內容 → 自動生成 Threads / 小紅書 / 短影音腳本三版文案，存入飛書語料庫</p>
+  <div class="header-diamond">◆</div>
+  <div>
+    <h1>餅妹內容中控台</h1>
+    <p>流量內容 · 一站管理</p>
+  </div>
 </div>
 
-<div class="container">
+<div class="tab-nav">
+  <button class="tab-btn active" onclick="switchTab('search',this)">🔍 靈感搜索</button>
+  <button class="tab-btn"        onclick="switchTab('topics',this)">📚 選題庫</button>
+  <button class="tab-btn"        onclick="switchTab('pro',this)">⚡ 腳本生成器 Pro</button>
+  <button class="tab-btn"        onclick="switchTab('story',this)">📖 故事庫</button>
+  <button class="tab-btn"        onclick="switchTab('positioning',this)">🎯 IP 定位助手</button>
+</div>
 
-  <!-- 輸入區 -->
-  <div class="input-section">
+<!-- ════ Tab 1: 靈感搜索 ════ -->
+<div class="tab-panel active" id="tab-search">
+  <div class="container">
+    <div class="grid-2 mb-16">
 
-    <!-- 欄一：創作者搜尋 -->
+      <div class="card">
+        <span class="card-tag">🔍 搜尋模式</span>
+        <h2>搜尋創作者熱門內容</h2>
+        <div class="platform-toggle">
+          <button class="platform-btn active" onclick="selectPlatform('search','yt',this)">YouTube</button>
+          <button class="platform-btn"        onclick="selectPlatform('search','xhs',this)">小紅書</button>
+        </div>
+        <input type="text" id="search-input" placeholder="頻道 URL 或 @handle（如 @MrBeast）">
+        <button class="btn" onclick="doSearch()">🔍 找半年內 Top 10</button>
+        <div class="search-results" id="search-results">
+          <div id="results-list"></div>
+          <button class="btn" style="margin-top:12px" onclick="generateFromSelected()">✨ 生成選中文案</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <span class="card-tag">🔗 指定模式</span>
+        <h2>指定貼文 / 影片</h2>
+        <div class="platform-toggle">
+          <button class="platform-btn active" onclick="selectPlatform('direct','yt',this)">YouTube</button>
+          <button class="platform-btn"        onclick="selectPlatform('direct','xhs',this)">小紅書</button>
+          <button class="platform-btn"        onclick="selectPlatform('direct','text',this)">貼文字</button>
+        </div>
+        <div id="direct-url-area">
+          <input type="text" id="direct-url" placeholder="https://www.youtube.com/watch?v=...">
+        </div>
+        <div id="direct-text-area" style="display:none">
+          <textarea id="direct-text" rows="5" placeholder="直接貼入影片文案或逐字稿..."></textarea>
+        </div>
+        <button class="btn" onclick="generateDirect()">⚡ 直接生成文案</button>
+        <p style="font-size:11px;color:var(--text-muted);margin-top:8px;text-align:center">YT/XHS 約 45–90 秒，手動文字約 30 秒</p>
+      </div>
+
+    </div>
+
+    <div class="loading" id="search-loading">
+      <div class="spinner"></div>
+      <p class="loading-msg" id="search-loading-msg">處理中...</p>
+    </div>
+
+    <div class="drafts-section" id="search-drafts">
+      <div class="grid-3">
+        <div class="card draft-card">
+          <h2>📝 Threads / FB 長文</h2>
+          <textarea id="draft-threads" oninput="updateCount(this,'cnt-threads')"></textarea>
+          <div class="char-count" id="cnt-threads">0 字</div>
+        </div>
+        <div class="card draft-card">
+          <h2>📸 小紅書圖文</h2>
+          <textarea id="draft-xhs" oninput="updateCount(this,'cnt-xhs')"></textarea>
+          <div class="char-count" id="cnt-xhs">0 字</div>
+        </div>
+        <div class="card draft-card">
+          <h2>🎬 短影音腳本</h2>
+          <textarea id="draft-video" oninput="updateCount(this,'cnt-video')"></textarea>
+          <div class="char-count" id="cnt-video">0 字</div>
+        </div>
+      </div>
+      <div class="confirm-bar">
+        <p>可直接編輯上方草稿後再存入語料庫</p>
+        <button class="btn btn-success" style="max-width:300px" onclick="confirmSave()">✅ 確認存入語料庫</button>
+        <div class="status-msg" id="search-save-status"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ Tab 2: 選題庫 ════ -->
+<div class="tab-panel" id="tab-topics">
+  <div class="container">
+
+    <div class="card mb-16">
+      <h2>五大話題柱</h2>
+      <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px">點擊任一關鍵詞 → 自動帶入腳本生成器 Pro</p>
+
+      <div class="pillar-tabs">
+        <button class="pillar-tab active" onclick="switchPillar('factory',this)">🏭 工廠跨境</button>
+        <button class="pillar-tab"        onclick="switchPillar('ai',this)">🤖 AI工具實戰</button>
+        <button class="pillar-tab"        onclick="switchPillar('jewelry',this)">💍 珠寶跨境</button>
+        <button class="pillar-tab"        onclick="switchPillar('taiwan',this)">🗺️ 台灣視角</button>
+        <button class="pillar-tab"        onclick="switchPillar('freedom',this)">🦋 自由/超級個體</button>
+      </div>
+
+      <div class="keyword-section active" id="pillar-factory">
+        <div class="keyword-tier">
+          <h4>核心詞（流量入口）</h4>
+          <div class="keyword-chips">
+            <div class="keyword-chip" onclick="useKeyword(this)">工廠跨境<span class="angle">工廠做跨境到底值不值</span></div>
+            <div class="keyword-chip" onclick="useKeyword(this)">實體轉型跨境<span class="angle">轉型三步走</span></div>
+          </div>
+        </div>
+        <div class="keyword-tier">
+          <h4>中層詞（精準篩選）</h4>
+          <div class="keyword-chips">
+            <div class="keyword-chip" onclick="useKeyword(this)">工廠老闆做亞馬遜<span class="angle">有貨有廠，缺的是這三件事</span></div>
+            <div class="keyword-chip" onclick="useKeyword(this)">工廠二代跨境<span class="angle">二代接班 vs 自己跑跨境</span></div>
+            <div class="keyword-chip" onclick="useKeyword(this)">深圳工廠賣歐美<span class="angle">實際操作第一步</span></div>
+          </div>
+        </div>
+        <div class="keyword-tier">
+          <h4>長尾詞（高轉化）</h4>
+          <div class="keyword-chips">
+            <div class="keyword-chip" onclick="useKeyword(this)">工廠庫存清海外<span class="angle">滯銷品的出路</span></div>
+            <div class="keyword-chip" onclick="useKeyword(this)">跨境踩坑經歷<span class="angle">我踩過的坑你不要踩</span></div>
+            <div class="keyword-chip" onclick="useKeyword(this)">跨境電商失敗原因<span class="angle">失敗故事 → 引發共鳴</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="keyword-section" id="pillar-ai">
+        <div class="keyword-tier">
+          <h4>核心詞</h4>
+          <div class="keyword-chips">
+            <div class="keyword-chip" onclick="useKeyword(this)">AI跨境電商<span class="angle">AI時代不懂這個你會被淘汰</span></div>
+            <div class="keyword-chip" onclick="useKeyword(this)">AI做生意<span class="angle">一個人管多個業務</span></div>
+          </div>
+        </div>
+        <div class="keyword-tier">
+          <h4>中層詞</h4>
+          <div class="keyword-chips">
+            <div class="keyword-chip" onclick="useKeyword(this)">AI選品工具<span class="angle">具體工具拆解（可收藏）</span></div>
+            <div class="keyword-chip" onclick="useKeyword(this)">AI客服跨境<span class="angle">24小時不用人力</span></div>
+            <div class="keyword-chip" onclick="useKeyword(this)">ChatGPT跨境實戰<span class="angle">我每天怎麼用的</span></div>
+          </div>
+        </div>
+        <div class="keyword-tier">
+          <h4>長尾詞</h4>
+          <div class="keyword-chips">
+            <div class="keyword-chip" onclick="useKeyword(this)">AI幫老闆管公司<span class="angle">超級個體怎麼用AI當團隊</span></div>
+            <div class="keyword-chip" onclick="useKeyword(this)">AI時代女老闆<span class="angle">人設強化</span></div>
+            <div class="keyword-chip" onclick="useKeyword(this)">一個人管多個業務<span class="angle">AI替代了什麼崗位</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="keyword-section" id="pillar-jewelry">
+        <div class="keyword-tier">
+          <h4>核心詞</h4>
+          <div class="keyword-chips">
+            <div class="keyword-chip" onclick="useKeyword(this)">珠寶跨境<span class="angle">珠寶跨境的利潤空間</span></div>
+            <div class="keyword-chip" onclick="useKeyword(this)">首飾出海<span class="angle">首飾為什麼適合賣海外</span></div>
+          </div>
+        </div>
+        <div class="keyword-tier">
+          <h4>中層詞</h4>
+          <div class="keyword-chips">
+            <div class="keyword-chip" onclick="useKeyword(this)">珠寶歐洲市場<span class="angle">歐洲人買什麼珠寶</span></div>
+            <div class="keyword-chip" onclick="useKeyword(this)">西班牙電商市場<span class="angle">為什麼選歐洲不選美國</span></div>
+            <div class="keyword-chip" onclick="useKeyword(this)">珠寶工廠做獨立站<span class="angle">獨立站 vs 平台的真實對比</span></div>
+          </div>
+        </div>
+        <div class="keyword-tier">
+          <h4>差異詞（護城河）</h4>
+          <div class="keyword-chips">
+            <div class="keyword-chip" onclick="useKeyword(this)">西班牙倉儲<span class="angle">為什麼在西班牙建倉</span></div>
+            <div class="keyword-chip" onclick="useKeyword(this)">歐洲本地倉跨境<span class="angle">本地倉的成本和優勢</span></div>
+            <div class="keyword-chip" onclick="useKeyword(this)">珠寶選品歐美<span class="angle">哪些款式在歐美賣得動</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="keyword-section" id="pillar-taiwan">
+        <div class="keyword-tier">
+          <h4>核心詞</h4>
+          <div class="keyword-chips">
+            <div class="keyword-chip" onclick="useKeyword(this)">台灣人做跨境<span class="angle">台灣人做跨境的隱形優勢</span></div>
+            <div class="keyword-chip" onclick="useKeyword(this)">台灣跨境電商<span class="angle">台灣視角看跨境</span></div>
+          </div>
+        </div>
+        <div class="keyword-tier">
+          <h4>中層詞</h4>
+          <div class="keyword-chips">
+            <div class="keyword-chip" onclick="useKeyword(this)">跨境收款海外金流<span class="angle">台灣人怎麼收海外的錢</span></div>
+            <div class="keyword-chip" onclick="useKeyword(this)">Stripe跨境收款<span class="angle">最實用的收款工具</span></div>
+            <div class="keyword-chip" onclick="useKeyword(this)">不在大陸怎麼做生意<span class="angle">遠端操盤實際怎麼做</span></div>
+          </div>
+        </div>
+        <div class="keyword-tier">
+          <h4>長尾詞（信息差）</h4>
+          <div class="keyword-chips">
+            <div class="keyword-chip" onclick="useKeyword(this)">愛沙尼亞公司開設<span class="angle">海外架構第一步</span></div>
+            <div class="keyword-chip" onclick="useKeyword(this)">歐盟VAT申請<span class="angle">做歐洲必知的稅務</span></div>
+            <div class="keyword-chip" onclick="useKeyword(this)">海外信息差跨境<span class="angle">台灣人知道但大陸人不知道的事</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="keyword-section" id="pillar-freedom">
+        <div class="keyword-tier">
+          <h4>核心詞</h4>
+          <div class="keyword-chips">
+            <div class="keyword-chip" onclick="useKeyword(this)">超級個體<span class="angle">AI時代最有效的工作模式</span></div>
+            <div class="keyword-chip" onclick="useKeyword(this)">AI個人創業<span class="angle">一個人頂一個團隊</span></div>
+          </div>
+        </div>
+        <div class="keyword-tier">
+          <h4>中層詞</h4>
+          <div class="keyword-chips">
+            <div class="keyword-chip" onclick="useKeyword(this)">女老闆創業<span class="angle">女性創業的真實困難</span></div>
+            <div class="keyword-chip" onclick="useKeyword(this)">30歲後創業<span class="angle">30歲轉型晚嗎</span></div>
+            <div class="keyword-chip" onclick="useKeyword(this)">醫療轉行創業<span class="angle">格格不入的反差人設</span></div>
+          </div>
+        </div>
+        <div class="keyword-tier">
+          <h4>情感詞（普世共鳴）</h4>
+          <div class="keyword-chips">
+            <div class="keyword-chip" onclick="useKeyword(this)">財務自由<span class="angle">自由是需要旅費的</span></div>
+            <div class="keyword-chip" onclick="useKeyword(this)">地點自由生活<span class="angle">在哪裡工作都一樣</span></div>
+            <div class="keyword-chip" onclick="useKeyword(this)">時間自由創業<span class="angle">不被排班控制的生活</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="card">
-      <span class="card-tag">🔍 搜尋模式</span>
-      <h2>搜尋創作者熱門內容</h2>
-      <div class="platform-toggle">
-        <button class="platform-btn active" onclick="selectPlatform('search','yt',this)">YouTube</button>
-        <button class="platform-btn" onclick="selectPlatform('search','xhs',this)">小紅書</button>
+      <h2>選題靈感快速生成</h2>
+      <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px">點擊上方關鍵詞帶入，或自己輸入方向，AI 生成 5 個選題角度</p>
+      <div style="display:flex;gap:10px;align-items:flex-end">
+        <div style="flex:1"><input type="text" id="topic-seed" placeholder="關鍵詞或方向（如：工廠老闆跨境）"></div>
+        <button class="btn btn-sm" style="margin-top:0;white-space:nowrap" onclick="generateTopicIdeas()">生成選題</button>
       </div>
-      <input type="text" id="search-input" placeholder="頻道 URL 或 @handle（如 @MrBeast）">
-      <button class="btn" onclick="doSearch()">🔍 找半年內 Top 10</button>
-      <div class="search-results" id="search-results">
-        <div id="results-list"></div>
-        <button class="btn" style="margin-top:12px" onclick="generateFromSelected()">✨ 生成選中文案</button>
+      <div class="loading" id="topic-loading" style="padding:20px"><div class="spinner"></div></div>
+      <div id="topic-ideas-output" style="display:none;margin-top:14px">
+        <div class="divider"></div>
+        <div id="topic-ideas-content" style="font-size:13px;line-height:1.9;color:var(--text)"></div>
       </div>
-    </div>
-
-    <!-- 欄二：指定 URL -->
-    <div class="card">
-      <span class="card-tag">🔗 指定模式</span>
-      <h2>指定貼文 / 影片</h2>
-      <div class="platform-toggle">
-        <button class="platform-btn active" onclick="selectPlatform('direct','yt',this)">YouTube</button>
-        <button class="platform-btn" onclick="selectPlatform('direct','xhs',this)">小紅書</button>
-        <button class="platform-btn" onclick="selectPlatform('direct','text',this)">貼文字</button>
-      </div>
-      <div id="direct-url-area">
-        <input type="text" id="direct-url" placeholder="https://www.youtube.com/watch?v=...">
-      </div>
-      <div id="direct-text-area" style="display:none">
-        <textarea id="direct-text" rows="5" placeholder="直接貼入影片文案或逐字稿..."></textarea>
-      </div>
-      <button class="btn" onclick="generateDirect()">⚡ 直接生成文案</button>
-      <p style="font-size:11px;color:#aaa;margin-top:8px;text-align:center">YT/XHS 約 45-90 秒，手動文字約 30 秒</p>
     </div>
 
   </div>
+</div>
 
-  <!-- Loading -->
-  <div class="loading" id="loading">
-    <div class="spinner"></div>
-    <p style="margin-top:16px" id="loading-msg">正在抓取內容並生成文案（約 30-60 秒）...</p>
-  </div>
+<!-- ════ Tab 3: 腳本生成器 Pro ════ -->
+<div class="tab-panel" id="tab-pro">
+  <div class="container">
+    <div class="grid-2 mb-16">
 
-  <!-- 草稿區 -->
-  <div class="drafts-section" id="drafts-section">
-    <div class="drafts-grid">
-      <div class="draft-card">
-        <h3>📝 Threads / FB 長文</h3>
-        <textarea id="draft-threads" oninput="updateCount(this,'threads-count')"></textarea>
-        <div class="char-count" id="threads-count">0 字</div>
+      <div class="card">
+        <h2>腳本設定</h2>
+        <div class="story-field">
+          <label class="field-label">選題 / 主題</label>
+          <input type="text" id="pro-topic" placeholder="從選題庫點擊帶入，或自己輸入">
+        </div>
+        <div class="selector-row">
+          <div>
+            <label class="field-label">Hook 類型</label>
+            <select id="pro-hook">
+              <option value="">自動選擇（推薦）</option>
+              <option value="01">01｜不平衡情緒登場（最強留人）</option>
+              <option value="02">02｜完形心理（並置陌生事物）</option>
+              <option value="03">03｜與我有關（精準點名人群）</option>
+              <option value="04">04｜否定性力量（損失厭惡）</option>
+              <option value="05">05｜社會身份的敏感（站隊/挑釁）</option>
+              <option value="06">06｜動物性慾望（感官刺激）</option>
+              <option value="07">07｜圍觀與熱鬧</option>
+              <option value="08">08｜偷窺（內幕/自我暴露）</option>
+              <option value="09">09｜反差與反常</option>
+              <option value="10">10｜特殊消息（獨家/新概念）</option>
+              <option value="11">11｜強節奏（BGM/排比）</option>
+              <option value="12">12｜人間美好</option>
+              <option value="13">13｜新奇有趣</option>
+            </select>
+          </div>
+          <div>
+            <label class="field-label">骨架類型</label>
+            <select id="pro-skeleton">
+              <option value="">自動選擇（推薦）</option>
+              <option value="interest">興趣點推進（冷啟動首選）</option>
+              <option value="drama">戲劇性推進（高評論互動）</option>
+              <option value="resonance">共鳴型推進（感同身受）</option>
+              <option value="logic">理性邏輯型（知識IP首選）</option>
+              <option value="rhythm">節奏型推進（洗腦感）</option>
+            </select>
+          </div>
+        </div>
+        <div class="selector-row">
+          <div>
+            <label class="field-label">目標平台</label>
+            <select id="pro-platform">
+              <option value="both">視頻號 + 小紅書（兩版）</option>
+              <option value="wechat">視頻號</option>
+              <option value="xhs">小紅書</option>
+            </select>
+          </div>
+          <div>
+            <label class="field-label">腳本長度</label>
+            <select id="pro-length">
+              <option value="30">短｜30秒 / 約150字</option>
+              <option value="60" selected>中｜60秒 / 約300字</option>
+              <option value="90">長｜90秒 / 約500字</option>
+            </select>
+          </div>
+        </div>
+        <div class="story-field">
+          <label class="field-label">今日素材補充（可選）</label>
+          <textarea id="pro-extra" rows="3" placeholder="今天有什麼新故事？想強調什麼真實細節？有沒有剛踩的坑？"></textarea>
+        </div>
+        <button class="btn" onclick="generatePro()">⚡ 生成人設感腳本</button>
       </div>
-      <div class="draft-card">
-        <h3>📸 小紅書圖文</h3>
-        <textarea id="draft-xhs" oninput="updateCount(this,'xhs-count')"></textarea>
-        <div class="char-count" id="xhs-count">0 字</div>
+
+      <div class="card">
+        <h2>人設快速預覽</h2>
+        <p style="font-size:12px;color:var(--text-muted);margin-bottom:12px">腳本生成時自動帶入以下資料（在故事庫編輯）</p>
+        <div style="margin-bottom:12px">
+          <span class="persona-tag">醫療出身</span>
+          <span class="persona-tag">科技PM</span>
+          <span class="persona-tag">珠寶跨境</span>
+          <span class="persona-tag">台灣視角</span>
+          <span class="persona-tag">西班牙倉</span>
+          <span class="persona-tag">AI管理</span>
+          <span class="persona-tag">同行者</span>
+        </div>
+        <div class="divider"></div>
+        <p style="font-size:11px;color:var(--text-muted);margin-bottom:5px">定位一句話</p>
+        <p style="font-size:13px;color:var(--gold-light);line-height:1.7;margin-bottom:14px" id="pro-positioning-preview">「醫療出身、用 AI 管珠寶跨境的台灣女老闆，帶深圳工廠主從供應鏈優勢跨出去——我就在路上，把親歷的坑和機會第一時間告訴你。」</p>
+        <div class="divider"></div>
+        <p style="font-size:11px;color:var(--text-muted);margin-bottom:5px">核心立場</p>
+        <p style="font-size:13px;color:var(--text);line-height:1.6;margin-bottom:14px">反對限制性信念。資源給願意行動的人，不浪費在藉口上。</p>
+        <div class="divider"></div>
+        <p style="font-size:11px;color:var(--text-muted);margin-bottom:5px">與觀眾關係</p>
+        <p style="font-size:13px;color:var(--text)">同行者——我在路上，把學到的分享給你</p>
+        <button class="btn btn-outline" style="margin-top:16px" onclick="gotoStory()">編輯故事庫 →</button>
       </div>
-      <div class="draft-card">
-        <h3>🎬 短影音腳本</h3>
-        <textarea id="draft-video" oninput="updateCount(this,'video-count')"></textarea>
-        <div class="char-count" id="video-count">0 字</div>
+
+    </div>
+
+    <div class="loading" id="pro-loading">
+      <div class="spinner"></div>
+      <p class="loading-msg">正在生成有人設感的腳本（約 30–45 秒）...</p>
+    </div>
+
+    <div class="pro-output" id="pro-output">
+      <div class="grid-2" id="pro-drafts-grid"></div>
+      <div class="confirm-bar">
+        <p>可直接編輯後存入語料庫</p>
+        <button class="btn btn-success" style="max-width:280px" onclick="confirmProSave()">✅ 存入語料庫</button>
+        <div class="status-msg" id="pro-save-status"></div>
       </div>
     </div>
-    <div class="confirm-bar">
-      <p style="font-size:13px;color:#666;margin-bottom:12px">可直接編輯上方草稿後再存入語料庫</p>
-      <button class="btn btn-success" style="max-width:320px" onclick="confirmSave()">✅ 確認存入語料庫</button>
-      <div class="status-msg" id="confirm-status"></div>
+  </div>
+</div>
+
+<!-- ════ Tab 4: 故事庫 ════ -->
+<div class="tab-panel" id="tab-story">
+  <div class="container">
+    <div class="grid-2">
+
+      <div>
+        <div class="card mb-16">
+          <h2>核心身份</h2>
+          <div class="story-field">
+            <label class="field-label">定位一句話</label>
+            <textarea id="s-positioning" rows="3">醫療出身、用 AI 管珠寶跨境的台灣女老闆，帶深圳工廠主從供應鏈優勢跨出去——我就在路上，把親歷的坑和機會第一時間告訴你。</textarea>
+          </div>
+          <div class="story-field">
+            <label class="field-label">核心驅動力</label>
+            <textarea id="s-driver" rows="2">自由——貫穿所有人生選擇的唯一主題。「自由是需要旅費的，我得要賺錢。」</textarea>
+          </div>
+          <div class="story-field">
+            <label class="field-label">核心立場（你堅決反對什麼）</label>
+            <textarea id="s-stance" rows="3">反對限制性信念——知道現狀不好，卻拒絕改變，滿是藉口的人。「救不了就讓他爛掉好了」——資源給願意行動的人。</textarea>
+          </div>
+          <div class="story-field">
+            <label class="field-label">與觀眾關係</label>
+            <textarea id="s-relationship" rows="2">同行者——我在路上，把我學到的分享給你。不裝已成功，真實且耐打。</textarea>
+          </div>
+          <div class="story-field">
+            <label class="field-label">情緒基調</label>
+            <textarea id="s-tone" rows="1">大剌剌不拐彎（天然狀態，不是設計出來的）</textarea>
+          </div>
+        </div>
+
+        <div class="card mb-16">
+          <h2>最與眾不同的能力</h2>
+          <div class="story-field">
+            <label class="field-label">三合一核心能力</label>
+            <textarea id="s-skills" rows="4">1. 快速搭建系統 + 調動夥伴落地——想到就能建，建了就能跑
+2. 數據分析能力——看得懂數字背後的意思
+3. 業務洞察 + 談大單——能感受到機會在哪，能把機會談成合約</textarea>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="card mb-16">
+          <h2>人生時間軸（格格不入素材）</h2>
+          <div class="story-field">
+            <label class="field-label">起點：台灣小鄉鎮</label>
+            <textarea id="s-origin" rows="3">周圍的人純樸，但從小感覺自己「不屬於這裡」。天生帶著野心，想去城市、想離開台灣、想去遠方。別人玩鬧時她在學習，因為「我知道我總是要離開這裡的」。</textarea>
+          </div>
+          <div class="story-field">
+            <label class="field-label">醫療期：聽力師</label>
+            <textarea id="s-medical" rows="4">念醫學院，主修聽力師（台灣稀缺醫療行業）。搬到台北天母——「終於感受自由的空氣」。學拳擊、話劇、鏡頭表演、瑜伽、空環、鋼管、自由潛水。當外拍模特、Youtuber、接業配。頓悟：「我不屬於只能走 SOP 的醫療業。」</textarea>
+          </div>
+          <div class="story-field">
+            <label class="field-label">科技期：健康科技業 PM</label>
+            <textarea id="s-tech" rows="3">進健康科技業做 PM，日本美國台灣三地跑。積累跨國談單技術、開創跨國專案的流程能力。</textarea>
+          </div>
+          <div class="story-field">
+            <label class="field-label">現在：知識付費 + 珠寶跨境 + 海外</label>
+            <textarea id="s-now" rows="4">咬牙離開大資本健康科技業。把醫療 SOP 嚴謹性 + 專案談單技術 + 跨國流程能力帶進知識付費，成為營運長。現在在海外，做跨境電商（珠寶）+ 用 AI 管理公司。</textarea>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>差異化護城河</h2>
+          <div class="story-field">
+            <label class="field-label">對標帳號</label>
+            <textarea id="s-competitor" rows="2">班長跨境——已落地美區，理想型，是目標狀態的參照</textarea>
+          </div>
+          <div class="story-field">
+            <label class="field-label">我的護城河（別人很難複製）</label>
+            <textarea id="s-moat" rows="4">1. 珠寶供應鏈——垂直品類，不是泛跨境
+2. 西班牙渠道 + 倉儲——歐洲切入點，稀缺
+3. 台灣金流優勢——跨境收付款靈活，海外資訊掌握快
+競爭策略：借（台灣視角）+ 跨（醫療→跨境第一人）</textarea>
+          </div>
+          <div class="story-field">
+            <label class="field-label">想帶觀眾去哪裡（3個月後）</label>
+            <textarea id="s-destination" rows="3">理解 AI 能突破所有技術門檻 → 相信自己所想及可達 → 每個人都能走向自由理想的生活</textarea>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="confirm-bar" style="margin-top:16px">
+      <p>編輯後同步到飛書，腳本生成時自動帶入</p>
+      <button class="btn" style="max-width:280px" onclick="syncStory()">☁️ 同步到飛書</button>
+      <div class="status-msg" id="story-save-status"></div>
     </div>
   </div>
+</div>
 
+<!-- ════ Tab 5: IP 定位助手 ════ -->
+<div class="tab-panel" id="tab-positioning">
+  <div class="container">
+    <div style="max-width:700px;margin:0 auto">
+
+      <div class="card mb-16" id="pos-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+          <h2 style="margin:0">IP 定位引導問答</h2>
+          <span style="font-size:12px;color:var(--text-muted)" id="pos-progress-text">第 1 題 / 共 7 題</span>
+        </div>
+        <div class="pos-progress" id="pos-dots"></div>
+        <div id="pos-question-area"></div>
+        <div style="display:flex;gap:10px;margin-top:16px" id="pos-nav">
+          <button class="btn btn-outline" style="width:auto;padding:10px 20px;font-size:14px;margin-top:0" onclick="posBack()" id="pos-back-btn">← 上一題</button>
+          <button class="btn" style="flex:1;margin-top:0" onclick="posNext()" id="pos-next-btn">下一題 →</button>
+        </div>
+      </div>
+
+      <div id="pos-result" style="display:none">
+        <div class="card mb-16">
+          <h2>🎯 你的定位整合報告</h2>
+          <div id="pos-result-content" style="font-size:13px;line-height:1.9"></div>
+        </div>
+        <div class="confirm-bar">
+          <button class="btn" style="max-width:280px;margin-bottom:8px" onclick="savePosResult()">☁️ 存入飛書故事庫</button>
+          <br>
+          <button class="btn btn-outline btn-sm" onclick="resetPositioning()" style="margin-top:8px">重新定位</button>
+          <div class="status-msg" id="pos-save-status"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
 </div>
 
 <script>
-  const N8N_BASE = 'https://eglobal.app.n8n.cloud/webhook';
-  const WEBHOOK_SEARCH   = N8N_BASE + '/copy-studio-search';
-  const WEBHOOK_GENERATE = N8N_BASE + '/copy-studio-generate';
-  const WEBHOOK_CONFIRM  = N8N_BASE + '/copy-studio-confirm';
+// ── Webhooks ─────────────────────────────────────────────
+const N8N = 'https://eglobal.app.n8n.cloud/webhook';
+const WH_SEARCH      = N8N + '/copy-studio-search';
+const WH_GENERATE    = N8N + '/copy-studio-generate';
+const WH_CONFIRM     = N8N + '/copy-studio-confirm';
+const WH_PRO         = N8N + '/copy-studio-generate-pro';   // 需在 n8n 建立
+const WH_STORY_SYNC  = N8N + '/copy-studio-story-sync';     // 需在 n8n 建立
+const WH_TOPIC_IDEAS = N8N + '/copy-studio-topic-ideas';    // 需在 n8n 建立
 
-  let searchPlatform = 'yt';
-  let directPlatform = 'yt';
-  let currentRecordId = '';
-  let currentTitle = '';
+let searchPlatform = 'yt', directPlatform = 'yt';
+let currentRecordId = '', currentTitle = '', proRecordId = '';
 
-  function selectPlatform(mode, platform, btn) {
-    const group = btn.parentElement;
-    group.querySelectorAll('.platform-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    if (mode === 'search') {
-      searchPlatform = platform;
-    } else {
-      directPlatform = platform;
-      document.getElementById('direct-url-area').style.display = platform === 'text' ? 'none' : 'block';
-      document.getElementById('direct-text-area').style.display = platform === 'text' ? 'block' : 'none';
-    }
+// ── Tabs ─────────────────────────────────────────────────
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  if (btn) btn.classList.add('active');
+}
+function gotoStory() { switchTab('story', document.querySelectorAll('.tab-btn')[3]); }
+
+// ── Utilities ────────────────────────────────────────────
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function updateCount(ta, id) { document.getElementById(id).textContent = ta.value.length + ' 字'; }
+function setStatus(id, msg, type) { const el = document.getElementById(id); el.textContent = msg; el.className = 'status-msg' + (type ? ' '+type : ''); }
+function showLoad(id, msg) { const el = document.getElementById(id); el.style.display = 'block'; const p = el.querySelector('p'); if (p && msg) p.textContent = msg; }
+function hideLoad(id) { document.getElementById(id).style.display = 'none'; }
+
+function getPersona() {
+  return {
+    positioning:  document.getElementById('s-positioning').value,
+    driver:       document.getElementById('s-driver').value,
+    stance:       document.getElementById('s-stance').value,
+    relationship: document.getElementById('s-relationship').value,
+    tone:         document.getElementById('s-tone').value,
+    skills:       document.getElementById('s-skills').value,
+    moat:         document.getElementById('s-moat').value,
+    destination:  document.getElementById('s-destination').value,
+    origin:       document.getElementById('s-origin').value,
+    now:          document.getElementById('s-now').value
+  };
+}
+
+// ── Tab 1 ────────────────────────────────────────────────
+function selectPlatform(mode, platform, btn) {
+  btn.parentElement.querySelectorAll('.platform-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (mode === 'search') { searchPlatform = platform; }
+  else {
+    directPlatform = platform;
+    document.getElementById('direct-url-area').style.display  = platform === 'text' ? 'none' : 'block';
+    document.getElementById('direct-text-area').style.display = platform === 'text' ? 'block' : 'none';
   }
+}
 
-  function showLoading(msg) {
-    document.getElementById('loading').style.display = 'block';
-    document.getElementById('loading-msg').textContent = msg || '處理中...';
-    document.getElementById('drafts-section').style.display = 'none';
-  }
+function showDrafts(data) {
+  hideLoad('search-loading');
+  currentRecordId = data.record_id || ''; currentTitle = data.title || '';
+  const t = data.threads_copy || '', x = data.xhs_copy || '', v = data.video_script || '';
+  document.getElementById('draft-threads').value = t;
+  document.getElementById('draft-xhs').value = x;
+  document.getElementById('draft-video').value = v;
+  document.getElementById('cnt-threads').textContent = t.length + ' 字';
+  document.getElementById('cnt-xhs').textContent = x.length + ' 字';
+  document.getElementById('cnt-video').textContent = v.length + ' 字';
+  setStatus('search-save-status', '', '');
+  document.getElementById('search-drafts').style.display = 'block';
+  document.getElementById('search-drafts').scrollIntoView({ behavior: 'smooth' });
+}
 
-  function hideLoading() {
-    document.getElementById('loading').style.display = 'none';
-  }
+async function doSearch() {
+  const input = document.getElementById('search-input').value.trim();
+  if (!input) { alert('請輸入頻道 URL 或 handle'); return; }
+  showLoad('search-loading', '正在搜尋半年內熱門內容（約 60–120 秒）...');
+  document.getElementById('search-results').style.display = 'none';
+  document.getElementById('search-drafts').style.display  = 'none';
+  try {
+    const r = await fetch(WH_SEARCH, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ platform: searchPlatform, url: input }) });
+    const d = await r.json(); hideLoad('search-loading'); renderResults(d.results || []);
+  } catch(e) { hideLoad('search-loading'); alert('搜尋失敗：' + e.message); }
+}
 
-  function updateCount(ta, countId) {
-    document.getElementById(countId).textContent = ta.value.length + ' 字';
-  }
+function renderResults(list) {
+  if (!list.length) { alert('找不到結果'); return; }
+  document.getElementById('results-list').innerHTML = list.map((v, i) => `
+    <div class="result-item">
+      <input type="checkbox" id="r${i}" value="${esc(v.url)}" data-title="${esc(v.title)}">
+      <label for="r${i}" class="result-meta" style="cursor:pointer">
+        <div class="result-title" title="${esc(v.title)}">${esc(v.title)}</div>
+        <div class="result-sub">👀 ${(v.views||0).toLocaleString()} · ${v.date||''}</div>
+      </label>
+    </div>`).join('');
+  document.getElementById('search-results').style.display = 'block';
+}
 
-  function showDrafts(data) {
-    hideLoading();
-    currentRecordId = data.record_id || '';
-    currentTitle = data.title || '';
-    const threads = data.threads_copy || '';
-    const xhs = data.xhs_copy || '';
-    const video = data.video_script || '';
-    document.getElementById('draft-threads').value = threads;
-    document.getElementById('draft-xhs').value = xhs;
-    document.getElementById('draft-video').value = video;
-    document.getElementById('threads-count').textContent = threads.length + ' 字';
-    document.getElementById('xhs-count').textContent = xhs.length + ' 字';
-    document.getElementById('video-count').textContent = video.length + ' 字';
-    document.getElementById('drafts-section').style.display = 'block';
-    document.getElementById('confirm-status').textContent = '';
-    document.getElementById('confirm-status').className = 'status-msg';
-    document.getElementById('drafts-section').scrollIntoView({ behavior: 'smooth' });
-  }
+async function generateFromSelected() {
+  const checked = [...document.querySelectorAll('#results-list input:checked')];
+  if (!checked.length) { alert('請先勾選要生成的影片'); return; }
+  showLoad('search-loading', '正在生成文案（約 45–90 秒）...');
+  try {
+    const r = await fetch(WH_GENERATE, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ platform: searchPlatform, url: checked[0].value, text: '' }) });
+    showDrafts(await r.json());
+  } catch(e) { hideLoad('search-loading'); alert('生成失敗：' + e.message); }
+}
 
-  async function doSearch() {
-    const input = document.getElementById('search-input').value.trim();
-    if (!input) { alert('請輸入頻道 URL 或 handle'); return; }
-    showLoading('正在搜尋半年內熱門內容（約 60-120 秒）...');
-    try {
-      const res = await fetch(WEBHOOK_SEARCH, {
-        method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({ platform: searchPlatform, url: input })
-      });
-      const data = await res.json();
-      hideLoading();
-      renderSearchResults(data.results || []);
-    } catch(e) {
-      hideLoading();
-      alert('搜尋失敗：' + e.message);
-    }
-  }
+async function generateDirect() {
+  let url = '', text = '';
+  if (directPlatform === 'text') { text = document.getElementById('direct-text').value.trim(); if (!text) { alert('請輸入文字內容'); return; } }
+  else { url = document.getElementById('direct-url').value.trim(); if (!url) { alert('請輸入 URL'); return; } }
+  showLoad('search-loading', '正在生成文案（約 30–60 秒）...');
+  try {
+    const r = await fetch(WH_GENERATE, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ platform: directPlatform, url, text }) });
+    showDrafts(await r.json());
+  } catch(e) { hideLoad('search-loading'); alert('生成失敗：' + e.message); }
+}
 
-  function renderSearchResults(results) {
-    const container = document.getElementById('results-list');
-    const section = document.getElementById('search-results');
-    if (!results.length) { alert('找不到結果（可能頻道無近期影片或 Apify 超時）'); return; }
-    container.innerHTML = results.map((v, i) => `
-      <div class="result-item">
-        <input type="checkbox" id="r${i}" value="${escHtml(v.url)}" data-title="${escHtml(v.title)}">
-        <div class="result-meta">
-          <label for="r${i}" style="cursor:pointer;display:block">
-            <div class="result-title" title="${escHtml(v.title)}">${escHtml(v.title)}</div>
-            <div class="result-sub">👀 ${(v.views||0).toLocaleString()} 觀看 · ${v.date || ''}</div>
-          </label>
-        </div>
-      </div>
-    `).join('');
-    section.style.display = 'block';
-  }
+async function confirmSave() {
+  setStatus('search-save-status', '存入中...', '');
+  try {
+    await fetch(WH_CONFIRM, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ record_id: currentRecordId, title: currentTitle, threads_copy: document.getElementById('draft-threads').value, xhs_copy: document.getElementById('draft-xhs').value, video_script: document.getElementById('draft-video').value }) });
+    setStatus('search-save-status', '✅ 已存入語料庫！', 'success');
+  } catch(e) { setStatus('search-save-status', '❌ 失敗：' + e.message, 'error'); }
+}
 
-  function escHtml(str) {
-    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-  }
+// ── Tab 2 ────────────────────────────────────────────────
+function switchPillar(id, btn) {
+  document.querySelectorAll('.pillar-tab').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.keyword-section').forEach(s => s.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('pillar-' + id).classList.add('active');
+}
 
-  async function generateFromSelected() {
-    const checked = Array.from(document.querySelectorAll('#results-list input:checked'));
-    if (!checked.length) { alert('請先勾選要生成的影片'); return; }
-    const url = checked[0].value;
-    showLoading(`正在生成文案（約 45-90 秒）...`);
-    try {
-      const res = await fetch(WEBHOOK_GENERATE, {
-        method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({ platform: searchPlatform, url: url, text: '' })
-      });
-      const data = await res.json();
-      showDrafts(data);
-    } catch(e) {
-      hideLoading();
-      alert('生成失敗：' + e.message);
-    }
-  }
+function useKeyword(chip) {
+  const kw = chip.childNodes[0].textContent.trim();
+  document.getElementById('pro-topic').value  = kw;
+  document.getElementById('topic-seed').value = kw;
+  switchTab('pro', document.querySelectorAll('.tab-btn')[2]);
+  setTimeout(() => document.getElementById('pro-topic').focus(), 100);
+}
 
-  async function generateDirect() {
-    let url = '', text = '';
-    if (directPlatform === 'text') {
-      text = document.getElementById('direct-text').value.trim();
-      if (!text) { alert('請輸入文字內容'); return; }
-    } else {
-      url = document.getElementById('direct-url').value.trim();
-      if (!url) { alert('請輸入 URL'); return; }
-    }
-    showLoading('正在抓取並生成文案（約 30-60 秒）...');
-    try {
-      const res = await fetch(WEBHOOK_GENERATE, {
-        method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({ platform: directPlatform, url, text })
-      });
-      const data = await res.json();
-      showDrafts(data);
-    } catch(e) {
-      hideLoading();
-      alert('生成失敗：' + e.message);
-    }
-  }
+async function generateTopicIdeas() {
+  const seed = document.getElementById('topic-seed').value.trim();
+  if (!seed) { alert('請輸入關鍵詞'); return; }
+  document.getElementById('topic-loading').style.display = 'block';
+  document.getElementById('topic-ideas-output').style.display = 'none';
+  try {
+    const r = await fetch(WH_TOPIC_IDEAS, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ seed, persona: getPersona() }) });
+    const d = await r.json();
+    document.getElementById('topic-ideas-content').innerHTML = (d.ideas || '').replace(/\n/g,'<br>');
+    document.getElementById('topic-ideas-output').style.display = 'block';
+  } catch(e) {
+    document.getElementById('topic-ideas-content').textContent = '⚠️ 需在 n8n 建立 webhook: copy-studio-topic-ideas';
+    document.getElementById('topic-ideas-output').style.display = 'block';
+  } finally { document.getElementById('topic-loading').style.display = 'none'; }
+}
 
-  async function confirmSave() {
-    const statusEl = document.getElementById('confirm-status');
-    statusEl.textContent = '存入中...';
-    statusEl.className = 'status-msg';
-    try {
-      const res = await fetch(WEBHOOK_CONFIRM, {
-        method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({
-          record_id: currentRecordId,
-          title: currentTitle,
-          threads_copy: document.getElementById('draft-threads').value,
-          xhs_copy: document.getElementById('draft-xhs').value,
-          video_script: document.getElementById('draft-video').value
-        })
-      });
-      const data = await res.json();
-      statusEl.textContent = '✅ 已存入語料庫！飛書 Bitable 狀態已更新為「已確認」。';
-      statusEl.className = 'status-msg success';
-    } catch(e) {
-      statusEl.textContent = '❌ 存入失敗：' + e.message;
-      statusEl.className = 'status-msg error';
-    }
+// ── Tab 3 ────────────────────────────────────────────────
+async function generatePro() {
+  const topic = document.getElementById('pro-topic').value.trim();
+  if (!topic) { alert('請輸入選題 / 主題'); return; }
+  document.getElementById('pro-loading').style.display = 'block';
+  document.getElementById('pro-output').style.display  = 'none';
+  try {
+    const r = await fetch(WH_PRO, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ topic, hook: document.getElementById('pro-hook').value, skeleton: document.getElementById('pro-skeleton').value, platform: document.getElementById('pro-platform').value, length: document.getElementById('pro-length').value, extra: document.getElementById('pro-extra').value, persona: getPersona() }) });
+    const d = await r.json(); proRecordId = d.record_id || ''; renderProDrafts(d);
+  } catch(e) { document.getElementById('pro-loading').style.display = 'none'; alert('需在 n8n 建立 webhook: copy-studio-generate-pro\n\n' + e.message); }
+}
+
+function renderProDrafts(data) {
+  document.getElementById('pro-loading').style.display = 'none';
+  const platform = document.getElementById('pro-platform').value;
+  let html = '';
+  if (platform === 'both' || platform === 'wechat') {
+    const t = data.wechat_script || data.video_script || '';
+    html += `<div class="card draft-card"><h2>📱 視頻號腳本</h2><textarea id="pro-wechat" oninput="updateCount(this,'pcnt-w')">${esc(t)}</textarea><div class="char-count" id="pcnt-w">${t.length} 字</div></div>`;
   }
+  if (platform === 'both' || platform === 'xhs') {
+    const t = data.xhs_script || data.xhs_copy || '';
+    html += `<div class="card draft-card"><h2>📸 小紅書腳本</h2><textarea id="pro-xhs" oninput="updateCount(this,'pcnt-x')">${esc(t)}</textarea><div class="char-count" id="pcnt-x">${t.length} 字</div></div>`;
+  }
+  if (!html) {
+    const t = data.script || data.video_script || '';
+    html = `<div class="card draft-card" style="grid-column:1/-1"><h2>🎬 腳本</h2><textarea id="pro-main" oninput="updateCount(this,'pcnt-m')">${esc(t)}</textarea><div class="char-count" id="pcnt-m">${t.length} 字</div></div>`;
+  }
+  document.getElementById('pro-drafts-grid').innerHTML = html;
+  document.getElementById('pro-output').style.display = 'block';
+  document.getElementById('pro-output').scrollIntoView({ behavior: 'smooth' });
+}
+
+async function confirmProSave() {
+  setStatus('pro-save-status', '存入中...', '');
+  const w = document.getElementById('pro-wechat')?.value || '';
+  const x = document.getElementById('pro-xhs')?.value   || '';
+  const m = document.getElementById('pro-main')?.value  || '';
+  try {
+    await fetch(WH_CONFIRM, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ record_id: proRecordId, title: document.getElementById('pro-topic').value, threads_copy: w||m, xhs_copy: x||m, video_script: w||x||m }) });
+    setStatus('pro-save-status', '✅ 已存入語料庫！', 'success');
+  } catch(e) { setStatus('pro-save-status', '❌ 失敗：' + e.message, 'error'); }
+}
+
+// ── Tab 4 ────────────────────────────────────────────────
+async function syncStory() {
+  setStatus('story-save-status', '同步中...', '');
+  try {
+    await fetch(WH_STORY_SYNC, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(getPersona()) });
+    setStatus('story-save-status', '✅ 已同步到飛書！', 'success');
+    document.getElementById('pro-positioning-preview').textContent = '「' + document.getElementById('s-positioning').value + '」';
+  } catch(e) { setStatus('story-save-status', '❌ 需建立 n8n webhook: copy-studio-story-sync', 'error'); }
+}
+
+// ── Tab 5 ────────────────────────────────────────────────
+const POS_QS = [
+  { num:1, layer:'基礎框架', q:'你做這個帳號最終想怎麼變現？', hint:'', type:'options', options:['賣課 + 私域直播','帶貨 / 電商','接業配','導流私域','其他'] },
+  { num:2, layer:'基礎框架', q:'你打算在哪個平台起號？', hint:'', type:'options', options:['視頻號','小紅書','視頻號 + 小紅書','抖音','多平台'] },
+  { num:3, layer:'人設挖掘', q:'你的經歷裡，有沒有什麼「格格不入」的地方？', hint:'兩件事湊在同一個人身上讓人意外的組合，或某個讓你徹底改變方向的轉折點。', type:'textarea', placeholder:'請描述你的格格不入時刻...' },
+  { num:4, layer:'人設挖掘', q:'你最堅決反對什麼？', hint:'別人在做但你看到就想搖頭的事——關於工作方式、創業、人生選擇都行。', type:'textarea', placeholder:'你堅決反對的事情...' },
+  { num:5, layer:'人設挖掘', q:'你想扮演什麼角色？', hint:'', type:'options', options:['提醒者（我來告訴你你不知道的事）','領導者（跟我走，我帶你）','同行者（我們一起做這件事）','私密知音（只有你懂我）'] },
+  { num:6, layer:'人設挖掘', q:'如果只能說一件事，你做得比大多數同行好的是什麼？', hint:'你最與眾不同的一個能力。', type:'textarea', placeholder:'你最強的核心能力...' },
+  { num:7, layer:'變現連接', q:'觀眾跟了你三個月，你希望他們有什麼具體的不同？', hint:'', type:'textarea', placeholder:'三個月後，觀眾會有什麼改變...' }
+];
+
+let posAnswers = {}, posQ = 0, posOpt = null;
+
+function initPositioning() {
+  posAnswers = {}; posQ = 0; posOpt = null;
+  document.getElementById('pos-result').style.display = 'none';
+  document.getElementById('pos-card').style.display   = 'block';
+  renderPosDots(); renderPosQ();
+}
+
+function renderPosDots() {
+  document.getElementById('pos-dots').innerHTML = POS_QS.map((_,i) => {
+    let c = 'pos-dot';
+    if (i < posQ) c += ' done';
+    if (i === posQ) c += ' current';
+    return `<div class="${c}"></div>`;
+  }).join('');
+  document.getElementById('pos-progress-text').textContent = `第 ${posQ+1} 題 / 共 ${POS_QS.length} 題`;
+}
+
+function renderPosQ() {
+  const q = POS_QS[posQ], saved = posAnswers[posQ];
+  let body = '';
+  if (q.type === 'options') {
+    posOpt = saved || null;
+    body = `<div class="option-list">${q.options.map(o => `<button class="option-btn ${saved===o?'selected':''}" onclick="selectOpt(this,'${esc(o)}')">${o}</button>`).join('')}</div>`;
+  } else {
+    body = `<textarea id="pos-ans" rows="5" placeholder="${q.placeholder||''}" style="margin-top:0">${saved||''}</textarea>`;
+  }
+  document.getElementById('pos-question-area').innerHTML = `
+    <div class="q-layer">${q.layer} · Q${q.num}</div>
+    <div class="q-text">${q.q}</div>
+    ${q.hint ? `<div class="q-hint">${q.hint}</div>` : ''}
+    ${body}`;
+  document.getElementById('pos-back-btn').disabled = posQ === 0;
+  document.getElementById('pos-next-btn').textContent = posQ === POS_QS.length-1 ? '生成定位報告 ✨' : '下一題 →';
+}
+
+function selectOpt(btn, val) {
+  document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected'); posOpt = val;
+}
+
+function posNext() {
+  const q = POS_QS[posQ]; let ans = '';
+  if (q.type === 'options') { if (!posOpt) { alert('請選擇一個選項'); return; } ans = posOpt; }
+  else { ans = (document.getElementById('pos-ans')?.value||'').trim(); if (!ans) { alert('請填入回答'); return; } }
+  posAnswers[posQ] = ans;
+  if (posQ === POS_QS.length-1) { buildPosReport(); return; }
+  posQ++; posOpt = null; renderPosDots(); renderPosQ();
+}
+
+function posBack() {
+  if (posQ === 0) return;
+  if (POS_QS[posQ].type === 'textarea') posAnswers[posQ] = document.getElementById('pos-ans')?.value || '';
+  posQ--; posOpt = posAnswers[posQ] || null; renderPosDots(); renderPosQ();
+}
+
+function buildPosReport() {
+  document.getElementById('pos-card').style.display = 'none';
+  const a = posAnswers;
+  const html = `
+    <div style="padding:14px;background:#111;border-radius:8px;border-left:3px solid var(--gold);margin-bottom:20px">
+      <p style="font-size:11px;color:var(--gold-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">定位方向（草稿）</p>
+      <p style="color:var(--gold-light);line-height:1.8">變現方式：${esc(a[0]||'—')} · 平台：${esc(a[1]||'—')}<br>建議進入「故事庫」精修定位一句話，再同步到腳本生成器 Pro</p>
+    </div>
+    ${POS_QS.map((q,i) => `
+      <div style="margin-bottom:12px;padding:12px 14px;background:#111;border-radius:8px">
+        <p style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Q${q.num} ${q.q}</p>
+        <p style="color:var(--text);line-height:1.7">${esc(a[i]||'—')}</p>
+      </div>`).join('')}`;
+  document.getElementById('pos-result-content').innerHTML = html;
+  document.getElementById('pos-result').style.display = 'block';
+  document.getElementById('pos-result').scrollIntoView({ behavior: 'smooth' });
+}
+
+async function savePosResult() {
+  setStatus('pos-save-status', '存入中...', '');
+  try {
+    await fetch(WH_STORY_SYNC, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ type:'positioning', answers: posAnswers }) });
+    setStatus('pos-save-status', '✅ 已存入飛書！', 'success');
+  } catch(e) { setStatus('pos-save-status', '❌ 失敗：' + e.message, 'error'); }
+}
+
+function resetPositioning() {
+  initPositioning();
+  document.getElementById('pos-card').scrollIntoView({ behavior: 'smooth' });
+}
+
+// ── Boot ─────────────────────────────────────────────────
+initPositioning();
 </script>
-
 </body>
 </html>
