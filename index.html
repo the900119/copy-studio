@@ -945,7 +945,7 @@ async function searchDouyin() {
       body: JSON.stringify({ niche })
     });
     const d = await r.json();
-    const topics = d.topics || d.results || [];
+    const topics = d.topics || d.results || d.items || [];
     renderDouyinResults(topics);
   } catch(e) {
     document.getElementById('douyin-loading').style.display = 'none';
