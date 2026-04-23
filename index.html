@@ -415,7 +415,6 @@
             <button class="btn" onclick="doSearch()">🔍 找半年內 Top 10</button>
             <div class="search-results" id="search-results">
               <div id="results-list"></div>
-              <button class="btn" style="margin-top:12px" onclick="generateFromSelected()">✨ 生成選中文案</button>
             </div>
           </div>
 
@@ -1053,16 +1052,14 @@ async function doSearch() {
 
 function renderResults(list) {
   if (!list.length) { alert('找不到結果'); return; }
-  // Auto-save creator to favorites
   const ytInput = document.getElementById('search-input').value.trim();
   if (ytInput) saveFav('YT', ytInput, ytInput);
-  document.getElementById('results-list').innerHTML = list.map((v, i) => `
+  document.getElementById('results-list').innerHTML = list.map((v) => `
     <div class="result-item">
-      <input type="checkbox" id="r${i}" value="${esc(v.url)}" data-title="${esc(v.title)}">
-      <label for="r${i}" class="result-meta" style="cursor:pointer;flex:1">
+      <div class="result-meta" style="flex:1">
         <div class="result-title" title="${esc(v.title)}">${esc(v.title)}</div>
         <div class="result-sub">👀 ${(v.views||0).toLocaleString()} · ${v.date||''}</div>
-      </label>
+      </div>
       <button class="add-inbox-btn" onclick="addToInbox('${esc(v.title)}','${esc(v.title)}',${v.views||0},'YouTube','${esc(v.title)}')">＋暫存</button>
     </div>`).join('');
   document.getElementById('search-results').style.display = 'block';
@@ -1111,13 +1108,12 @@ function renderXHSResults(data, inputRedId) {
   if (creator && redId) { saveXHSHistory(redId, creator); saveFav('XHS', creator, redId); }
   document.getElementById('results-list').innerHTML =
     `<p style="font-size:11px;color:var(--gold-dim);margin-bottom:8px">創作者：${esc(creator)} · 共 ${notes.length} 篇高讚貼文</p>` +
-    notes.map((n, i) => `
+    notes.map((n) => `
     <div class="result-item">
-      <input type="checkbox" id="r${i}" value="${esc(n.note_id)}" data-title="${esc(n.title)}" data-type="${esc(n.note_type)}">
-      <label for="r${i}" class="result-meta" style="cursor:pointer;flex:1">
+      <div class="result-meta" style="flex:1">
         <div class="result-title" title="${esc(n.title)}">${esc(n.title)}</div>
         <div class="result-sub">❤️ ${(n.likes||0).toLocaleString()} · ${n.note_type === 'video' ? '🎬 影片' : '📸 圖文'}</div>
-      </label>
+      </div>
       <button class="add-inbox-btn" onclick="addToInbox('${esc(n.title)}','${esc(n.title)}',${n.likes||0},'小紅書','${esc(n.title+(n.note_type?' ['+n.note_type+']':''))}')">＋暫存</button>
     </div>`).join('');
   document.getElementById('search-results').style.display = 'block';
