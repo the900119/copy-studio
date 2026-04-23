@@ -1125,7 +1125,10 @@ function renderXHSResults(data, inputRedId) {
         <div class="result-title" title="${esc(n.title)}">${esc(n.title)}</div>
         <div class="result-sub">❤️ ${(n.likes||0).toLocaleString()} · ${n.note_type === 'video' ? '🎬 影片' : '📸 圖文'}</div>
       </div>
-      <button class="add-inbox-btn" onclick="addToInbox('${esc(n.title)}','${esc(n.title)}',${n.likes||0},'小紅書','${esc(n.title+(n.note_type?' ['+n.note_type+']':''))}')">＋暫存</button>
+      <div style="display:flex;gap:6px;flex-shrink:0">
+        ${n.note_type === 'video' ? `<button class="add-inbox-btn" style="background:var(--gold);color:#000;font-weight:600" onclick="generateFromXHSNote('${esc(n.note_id)}','${esc(n.title)}','video')">▶️ 生成</button>` : ''}
+        <button class="add-inbox-btn" onclick="addToInbox('${esc(n.title)}','${esc(n.title)}',${n.likes||0},'小紅書','${esc(n.title+(n.note_type?' ['+n.note_type+']':''))}')">＋暫存</button>
+      </div>
     </div>`).join('');
   document.getElementById('search-results').style.display = 'block';
 }
