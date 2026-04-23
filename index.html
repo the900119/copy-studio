@@ -5,10 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>餅妹內容中控台</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Serif+TC:wght@400;500;600;700&family=LXGW+WenKai+TC&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Serif+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --font-body: -apple-system, BlinkMacSystemFont, 'Noto Sans TC', sans-serif;
       --bg: #0D0D0D;
       --bg-card: #1A1A1A;
       --border: #2A2A2A;
@@ -21,11 +20,7 @@
       --error-color: #f87171;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: var(--font-body); background: var(--bg); color: var(--text); min-height: 100vh; }
-    .font-picker { display: flex; gap: 4px; align-items: center; margin-left: auto; }
-    .font-chip { font-size: 11px; padding: 3px 10px; border-radius: 12px; border: 1px solid var(--border); background: transparent; color: var(--text-muted); cursor: pointer; font-family: inherit; transition: all 0.15s; white-space: nowrap; }
-    .font-chip:hover { border-color: var(--gold-dim); color: var(--gold); }
-    .font-chip.active { border-color: var(--gold); color: var(--gold); background: rgba(212,168,67,0.08); }
+    body { font-family: 'Noto Sans TC', -apple-system, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
     /* Creator favorites */
     .creator-fav-item { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 6px; background: #0e0e0e; cursor: pointer; transition: border-color 0.15s; }
     .creator-fav-item:hover { border-color: var(--gold-dim); }
@@ -37,7 +32,7 @@
     /* ── Header ── */
     .header { background: #080808; border-bottom: 1px solid var(--border); padding: 12px 24px; display: flex; align-items: center; gap: 10px; }
     .header-diamond { color: var(--gold); font-size: 18px; }
-    .header h1 { font-size: 16px; font-weight: 700; color: var(--gold); letter-spacing: 0.5px; }
+    .header h1 { font-size: 16px; font-weight: 600; color: var(--gold); letter-spacing: 0.5px; font-family: 'Noto Serif TC', serif; }
     .header p { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
 
     /* ── App Layout ── */
@@ -92,14 +87,14 @@
     .sidebar-divider { height: 1px; background: var(--border); margin: 10px 16px; }
 
     /* ── Main Content ── */
-    .main-content { flex: 1; min-width: 0; overflow-x: hidden; }
-    .container { max-width: 1100px; margin: 0 auto; padding: 22px 20px; }
+    .main-content { flex: 1; min-width: 0; overflow-x: hidden; display: flex; flex-direction: column; }
+    .container { width: 100%; padding: 28px 32px; flex: 1; }
     .tab-panel { display: none; }
-    .tab-panel.active { display: block; }
+    .tab-panel.active { display: block; min-height: calc(100vh - 57px); }
 
     /* ── Cards ── */
-    .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 20px; }
-    .card h2 { font-size: 14px; font-weight: 600; color: var(--gold-light); margin-bottom: 14px; }
+    .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 22px; }
+    .card h2 { font-size: 15px; font-weight: 600; color: var(--gold-light); margin-bottom: 14px; font-family: 'Noto Serif TC', serif; letter-spacing: 0.3px; }
     .card-tag { display: inline-block; background: rgba(212,168,67,0.08); color: var(--gold); font-size: 11px; padding: 2px 9px; border-radius: 20px; margin-bottom: 10px; border: 1px solid rgba(212,168,67,0.2); }
 
     /* ── Layout Helpers ── */
@@ -270,13 +265,6 @@
   <div>
     <h1>餅妹內容中控台</h1>
     <p>IP 定位 · 選題 · 腳本生成</p>
-  </div>
-  <div class="font-picker">
-    <span style="font-size:10px;color:var(--text-muted);margin-right:4px">字體</span>
-    <button class="font-chip active" onclick="setFont('system',this)">無印</button>
-    <button class="font-chip" onclick="setFont('sans',this)" style="font-family:'Noto Sans TC'">黑體</button>
-    <button class="font-chip" onclick="setFont('serif',this)" style="font-family:'Noto Serif TC'">宋體</button>
-    <button class="font-chip" onclick="setFont('kai',this)" style="font-family:'LXGW WenKai TC'">楷書</button>
   </div>
 </div>
 
@@ -1440,32 +1428,6 @@ async function saveAllInboxToFeishu() {
     alert('✅ 已全部存入飛書選題庫');
   } catch(e) { alert('失敗：' + e.message); }
 }
-
-// ── Font picker ──────────────────────────────────────────
-const FONTS = {
-  system: "-apple-system, BlinkMacSystemFont, 'Noto Sans TC', sans-serif",
-  sans:   "'Noto Sans TC', sans-serif",
-  serif:  "'Noto Serif TC', serif",
-  kai:    "'LXGW WenKai TC', 'LXGW WenKai', cursive"
-};
-function setFont(key, btn) {
-  document.documentElement.style.setProperty('--font-body', FONTS[key]);
-  localStorage.setItem('copy_studio_font', key);
-  document.querySelectorAll('.font-chip').forEach(c => c.classList.remove('active'));
-  if (btn) btn.classList.add('active');
-}
-(function initFont() {
-  const saved = localStorage.getItem('copy_studio_font');
-  if (saved && FONTS[saved]) {
-    document.documentElement.style.setProperty('--font-body', FONTS[saved]);
-    const chips = document.querySelectorAll('.font-chip');
-    chips.forEach(c => {
-      if (c.textContent.trim() === {system:'無印',sans:'黑體',serif:'宋體',kai:'楷書'}[saved]) {
-        c.classList.add('active');
-      } else { c.classList.remove('active'); }
-    });
-  }
-})();
 
 // ── Creator favorites ─────────────────────────────────────
 const FAV_KEY = 'copy_studio_creator_favs';
