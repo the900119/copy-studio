@@ -1236,7 +1236,7 @@ async function generatePro() {
   document.getElementById('pro-loading').style.display = 'block';
   document.getElementById('pro-output').style.display  = 'none';
   try {
-    const r = await fetch(WH_PRO, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ topic, hook: document.getElementById('pro-hook').value, skeleton: document.getElementById('pro-skeleton').value, platform: document.getElementById('pro-platform').value, length: document.getElementById('pro-length').value, extra: document.getElementById('pro-extra').value, persona: getPersona() }) });
+    const r = await fetch(WH_PRO, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ topic, hook: document.getElementById('pro-hook').value, skeleton: document.getElementById('pro-skeleton').value, extra: document.getElementById('pro-extra').value, persona: getPersona() }) });
     const d = await r.json(); proRecordId = d.record_id || ''; renderProDrafts(d);
   } catch(e) { document.getElementById('pro-loading').style.display = 'none'; alert('需在 n8n 建立 webhook: copy-studio-generate-pro\n\n' + e.message); }
 }
