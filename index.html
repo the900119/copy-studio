@@ -178,6 +178,19 @@
     .keyword-chip .angle { font-size: 11px; color: var(--text-muted); display: block; margin-top: 2px; }
     .keyword-chip:hover .angle { color: var(--gold-dim); }
 
+    /* ════ 選題暫存區 (Inbox) ════ */
+    .inbox-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 8px; background: #0e0e0e; }
+    .inbox-badge { font-size: 10px; padding: 2px 8px; border-radius: 10px; background: rgba(212,168,67,0.08); color: var(--gold-dim); border: 1px solid rgba(212,168,67,0.18); white-space: nowrap; flex-shrink: 0; margin-top: 2px; }
+    .inbox-text { font-size: 13px; color: var(--text); line-height: 1.4; word-break: break-all; }
+    .inbox-sub { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
+    .inbox-actions { display: flex; gap: 5px; flex-shrink: 0; margin-top: 2px; }
+    .inbox-btn { font-size: 11px; padding: 4px 9px; border-radius: 6px; cursor: pointer; border: 1px solid var(--border); background: transparent; color: var(--text-muted); font-family: inherit; transition: all 0.15s; white-space: nowrap; }
+    .inbox-btn:hover { border-color: var(--gold-dim); color: var(--gold); }
+    .inbox-btn.primary { border-color: rgba(212,168,67,0.3); color: var(--gold-dim); }
+    .inbox-btn.del:hover { border-color: #c0392b; color: #e74c3c; }
+    .add-inbox-btn { font-size: 11px; padding: 4px 9px; border-radius: 6px; cursor: pointer; border: 1px solid rgba(212,168,67,0.2); background: rgba(212,168,67,0.04); color: var(--gold-dim); font-family: inherit; transition: all 0.15s; flex-shrink: 0; margin-top: 0; }
+    .add-inbox-btn:hover { background: rgba(212,168,67,0.1); color: var(--gold); border-color: var(--gold-dim); }
+
     /* ════ Tab 4: 腳本生成 Pro ════ */
     .selector-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
     .persona-tag { display: inline-block; padding: 4px 12px; background: rgba(212,168,67,0.07); border: 1px solid rgba(212,168,67,0.18); border-radius: 4px; font-size: 12px; color: var(--gold-light); margin: 0 4px 6px 0; }
@@ -435,10 +448,17 @@
     <div class="tab-panel" id="tab-topics">
       <div class="container">
 
-        <div class="card mb-16">
-          <h2>五大話題柱</h2>
-          <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px">點擊任一關鍵詞 → 自動帶入腳本生成器 Pro</p>
+        <div class="card">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+            <h2 style="margin:0">選題暫存區</h2>
+            <span id="inbox-count-badge" style="font-size:11px;padding:2px 10px;border-radius:10px;background:rgba(212,168,67,0.08);color:var(--gold-dim);border:1px solid rgba(212,168,67,0.18)">0 / 20</span>
+            <button class="btn btn-sm" style="margin-left:auto;margin-top:0;font-size:11px;padding:6px 14px" onclick="saveAllInboxToFeishu()">📤 全部存飛書選題庫</button>
+          </div>
+          <p style="font-size:12px;color:var(--text-muted);margin-bottom:14px">在靈感收集（Step 02）任一結果點「＋暫存」加入，最多 20 條。選好後點「帶入生成」跳到第四步驟產出腳本。</p>
+          <div id="inbox-list"></div>
+        </div>
 
+        <div class="card mb-16" style="display:none" id="pillar-card-placeholder">
           <div class="pillar-tabs">
             <button class="pillar-tab active" onclick="switchPillar('factory',this)">🏭 工廠跨境</button>
             <button class="pillar-tab"        onclick="switchPillar('ai',this)">🤖 AI工具實戰</button>
@@ -578,7 +598,7 @@
           </div>
         </div>
 
-        <div class="card">
+        <div class="card" id="topic-ideas-card">
           <h2>選題靈感快速生成</h2>
           <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px">點擊上方關鍵詞帶入，或自己輸入方向，AI 生成 5 個選題角度</p>
           <div style="display:flex;gap:10px;align-items:flex-end">
@@ -886,8 +906,11 @@ function renderDouyinResults(topics) {
         ${t.angle ? `<div class="douyin-angle">💡 角度：${esc(t.angle)}</div>` : ''}
         ${t.reason ? `<div class="douyin-reason">🤖 ${esc(t.reason)}</div>` : ''}
       </div>
-      <button class="btn btn-sm btn-outline" style="flex-shrink:0;margin-top:0;font-size:11px;padding:5px 10px;white-space:nowrap"
-              onclick="useDouyinTopic('${esc(t.word)}','${esc(t.angle||'')}')">帶入生成</button>
+      <div style="display:flex;flex-direction:column;gap:5px;flex-shrink:0">
+        <button class="add-inbox-btn" onclick="addToInbox('${esc(t.angle||t.word)}','${esc(t.word)}',${t.hot||0},'抖音熱搜')">＋暫存</button>
+        <button class="btn btn-sm btn-outline" style="margin-top:0;font-size:11px;padding:5px 10px;white-space:nowrap"
+                onclick="useDouyinTopic('${esc(t.word)}','${esc(t.angle||'')}')">帶入生成</button>
+      </div>
     </div>`).join('');
   document.getElementById('douyin-results').style.display = 'block';
 }
@@ -982,10 +1005,11 @@ function renderResults(list) {
   document.getElementById('results-list').innerHTML = list.map((v, i) => `
     <div class="result-item">
       <input type="checkbox" id="r${i}" value="${esc(v.url)}" data-title="${esc(v.title)}">
-      <label for="r${i}" class="result-meta" style="cursor:pointer">
+      <label for="r${i}" class="result-meta" style="cursor:pointer;flex:1">
         <div class="result-title" title="${esc(v.title)}">${esc(v.title)}</div>
         <div class="result-sub">👀 ${(v.views||0).toLocaleString()} · ${v.date||''}</div>
       </label>
+      <button class="add-inbox-btn" onclick="addToInbox('${esc(v.title)}','${esc(v.title)}',${v.views||0},'YouTube')">＋暫存</button>
     </div>`).join('');
   document.getElementById('search-results').style.display = 'block';
 }
@@ -1036,10 +1060,11 @@ function renderXHSResults(data, inputRedId) {
     notes.map((n, i) => `
     <div class="result-item">
       <input type="checkbox" id="r${i}" value="${esc(n.note_id)}" data-title="${esc(n.title)}" data-type="${esc(n.note_type)}">
-      <label for="r${i}" class="result-meta" style="cursor:pointer">
+      <label for="r${i}" class="result-meta" style="cursor:pointer;flex:1">
         <div class="result-title" title="${esc(n.title)}">${esc(n.title)}</div>
         <div class="result-sub">❤️ ${(n.likes||0).toLocaleString()} · ${n.note_type === 'video' ? '🎬 影片' : '📸 圖文'}</div>
       </label>
+      <button class="add-inbox-btn" onclick="addToInbox('${esc(n.title)}','${esc(n.title)}',${n.likes||0},'小紅書')">＋暫存</button>
     </div>`).join('');
   document.getElementById('search-results').style.display = 'block';
 }
@@ -1298,8 +1323,109 @@ function resetPositioning() {
   document.getElementById('pos-card').scrollIntoView({ behavior: 'smooth' });
 }
 
+// ── 選題暫存區（Topic Inbox）────────────────────────────────
+const INBOX_KEY = 'copy_studio_topic_inbox';
+
+function loadInbox() {
+  try { return JSON.parse(localStorage.getItem(INBOX_KEY) || '[]'); } catch(e) { return []; }
+}
+
+function addToInbox(angle, word, hot, source) {
+  let list = loadInbox();
+  if (list.length >= 20) { alert('暫存區已滿（上限 20 條），請先清除或存入飛書'); return; }
+  const id = Date.now() + '_' + Math.random().toString(36).slice(2,6);
+  list.unshift({ id, angle, word: word || angle, hot: hot || 0, source, ts: Date.now() });
+  localStorage.setItem(INBOX_KEY, JSON.stringify(list));
+  renderInbox();
+  if (event && event.currentTarget) {
+    const btn = event.currentTarget;
+    const orig = btn.textContent;
+    btn.textContent = '✓ 已加';
+    btn.style.color = '#2ecc71';
+    setTimeout(() => { btn.textContent = orig; btn.style.color = ''; }, 1000);
+  }
+}
+
+function removeFromInbox(id) {
+  let list = loadInbox().filter(i => i.id !== id);
+  localStorage.setItem(INBOX_KEY, JSON.stringify(list));
+  renderInbox();
+}
+
+function renderInbox() {
+  const list = loadInbox();
+  const el = document.getElementById('inbox-list');
+  const badge = document.getElementById('inbox-count-badge');
+  if (!el) return;
+  if (badge) badge.textContent = list.length + ' / 20';
+  if (!list.length) {
+    el.innerHTML = '<p style="font-size:12px;color:var(--text-muted);text-align:center;padding:20px 0">暫無暫存選題。<br>在靈感收集結果中點「＋暫存」加入。</p>';
+    return;
+  }
+  el.innerHTML = list.map(item => `
+    <div class="inbox-item">
+      <span class="inbox-badge">${esc(item.source)}</span>
+      <div style="flex:1;min-width:0">
+        <div class="inbox-text">${esc(item.angle)}</div>
+        ${item.word && item.word !== item.angle ? `<div class="inbox-sub">詞：${esc(item.word)}${item.hot ? ' · 🔥' + Number(item.hot).toLocaleString() : ''}</div>` : (item.hot ? `<div class="inbox-sub">🔥 ${Number(item.hot).toLocaleString()}</div>` : '')}
+      </div>
+      <div class="inbox-actions">
+        <button class="inbox-btn primary" onclick="useInboxTopic('${esc(item.angle)}')">帶入生成</button>
+        <button class="inbox-btn" onclick="saveOneToFeishu('${esc(item.id)}')">存飛書</button>
+        <button class="inbox-btn del" onclick="removeFromInbox('${esc(item.id)}')">✕</button>
+      </div>
+    </div>`).join('');
+}
+
+function useInboxTopic(angle) {
+  document.getElementById('pro-topic').value = angle;
+  switchTab('pro');
+  setTimeout(() => document.getElementById('pro-topic').focus(), 100);
+}
+
+async function saveOneToFeishu(id) {
+  const item = loadInbox().find(i => i.id === id);
+  if (!item) return;
+  try {
+    await fetch(WH_SAVE_TOPICS, { method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ topics: [{ word: item.word||item.angle, angle: item.angle, source: item.source }] }) });
+    removeFromInbox(id);
+  } catch(e) { alert('失敗：' + e.message); }
+}
+
+async function saveAllInboxToFeishu() {
+  const list = loadInbox();
+  if (!list.length) { alert('暫存區是空的'); return; }
+  try {
+    await fetch(WH_SAVE_TOPICS, { method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ topics: list.map(i => ({ word: i.word||i.angle, angle: i.angle, source: i.source })) }) });
+    localStorage.setItem(INBOX_KEY, JSON.stringify([]));
+    renderInbox();
+    alert('✅ 已全部存入飛書選題庫');
+  } catch(e) { alert('失敗：' + e.message); }
+}
+
 // ── Boot ─────────────────────────────────────────────────
+// Move pillar + topic-ideas cards from Step 03 hidden area → Step 04
+(function() {
+  const pillarCard = document.getElementById('pillar-card-placeholder');
+  const ideaCard   = document.getElementById('topic-ideas-card');
+  const target = document.querySelector('#tab-pro .container');
+  const anchor = target.querySelector('.grid-2');
+  if (pillarCard) {
+    pillarCard.removeAttribute('style');
+    pillarCard.removeAttribute('id');
+    pillarCard.classList.add('mb-16');
+    pillarCard.innerHTML = '<h2>五大話題柱</h2><p style="font-size:13px;color:var(--text-muted);margin-bottom:16px">點擊任一關鍵詞 → 自動帶入腳本生成器</p>' + pillarCard.innerHTML;
+    target.insertBefore(pillarCard, anchor);
+  }
+  if (ideaCard) {
+    ideaCard.classList.add('mb-16');
+    target.insertBefore(ideaCard, anchor);
+  }
+})();
 initPositioning();
+renderInbox();
 </script>
 </body>
 </html>
