@@ -21,20 +21,65 @@
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans TC', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
 
     /* ── Header ── */
-    .header { background: #080808; border-bottom: 1px solid var(--border); padding: 14px 28px; display: flex; align-items: center; gap: 12px; }
-    .header-diamond { color: var(--gold); font-size: 20px; line-height: 1; }
-    .header h1 { font-size: 18px; font-weight: 700; color: var(--gold); letter-spacing: 0.5px; }
+    .header { background: #080808; border-bottom: 1px solid var(--border); padding: 12px 24px; display: flex; align-items: center; gap: 10px; }
+    .header-diamond { color: var(--gold); font-size: 18px; }
+    .header h1 { font-size: 16px; font-weight: 700; color: var(--gold); letter-spacing: 0.5px; }
     .header p { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
 
-    /* ── Tab Nav ── */
-    .tab-nav { background: #080808; border-bottom: 1px solid var(--border); display: flex; padding: 0 20px; overflow-x: auto; scrollbar-width: none; }
-    .tab-nav::-webkit-scrollbar { display: none; }
-    .tab-btn { padding: 13px 18px; font-size: 13px; font-weight: 500; color: var(--text-muted); border: none; background: transparent; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; white-space: nowrap; font-family: inherit; }
-    .tab-btn:hover { color: var(--gold-light); }
-    .tab-btn.active { color: var(--gold); border-bottom-color: var(--gold); }
+    /* ── App Layout ── */
+    .app-layout { display: flex; align-items: flex-start; min-height: calc(100vh - 57px); }
 
-    /* ── Container ── */
-    .container { max-width: 1200px; margin: 0 auto; padding: 22px 20px; }
+    /* ── Sidebar ── */
+    .sidebar {
+      width: 210px;
+      min-width: 210px;
+      flex-shrink: 0;
+      background: #080808;
+      border-right: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      padding: 20px 0;
+    }
+    .sidebar-section-label {
+      font-size: 9px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      padding: 0 16px 8px;
+      font-weight: 600;
+    }
+    .step-item {
+      padding: 11px 16px;
+      cursor: pointer;
+      border-left: 3px solid transparent;
+      transition: all 0.2s;
+    }
+    .step-item:hover { background: rgba(212,168,67,0.04); border-left-color: var(--gold-dim); }
+    .step-item.active { background: rgba(212,168,67,0.08); border-left-color: var(--gold); }
+    .step-num { font-size: 9px; color: var(--text-muted); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 4px; font-weight: 600; }
+    .step-item.active .step-num { color: var(--gold-dim); }
+    .step-row { display: flex; align-items: center; gap: 7px; }
+    .step-icon { font-size: 14px; }
+    .step-title { font-size: 13px; font-weight: 600; color: var(--text-muted); }
+    .step-item.active .step-title { color: var(--gold-light); }
+    .step-item:hover .step-title { color: var(--text); }
+    .step-desc { font-size: 10px; color: var(--text-muted); margin-top: 4px; line-height: 1.4; padding-left: 21px; }
+    .step-arrow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 12px;
+      color: var(--border);
+      font-size: 11px;
+      margin: 0 16px;
+    }
+    .sidebar-divider { height: 1px; background: var(--border); margin: 10px 16px; }
+
+    /* ── Main Content ── */
+    .main-content { flex: 1; min-width: 0; overflow-x: hidden; }
+    .container { max-width: 1100px; margin: 0 auto; padding: 22px 20px; }
     .tab-panel { display: none; }
     .tab-panel.active { display: block; }
 
@@ -43,7 +88,7 @@
     .card h2 { font-size: 14px; font-weight: 600; color: var(--gold-light); margin-bottom: 14px; }
     .card-tag { display: inline-block; background: rgba(212,168,67,0.08); color: var(--gold); font-size: 11px; padding: 2px 9px; border-radius: 20px; margin-bottom: 10px; border: 1px solid rgba(212,168,67,0.2); }
 
-    /* ── Layout ── */
+    /* ── Layout Helpers ── */
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
     .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
     .mb-16 { margin-bottom: 16px; }
@@ -82,6 +127,16 @@
     .result-title { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .result-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
 
+    /* ── TikHub Results ── */
+    .douyin-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+    .douyin-item:last-child { border-bottom: none; }
+    .douyin-item input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; flex-shrink: 0; accent-color: var(--gold); margin-top: 3px; }
+    .douyin-item-body { flex: 1; min-width: 0; }
+    .douyin-word { font-size: 13px; font-weight: 600; color: var(--text); }
+    .douyin-hot { font-size: 11px; color: var(--gold-dim); margin-top: 2px; }
+    .douyin-angle { font-size: 12px; color: var(--text-muted); margin-top: 3px; }
+    .douyin-reason { font-size: 11px; color: var(--text-muted); margin-top: 2px; font-style: italic; }
+
     /* ── Drafts ── */
     .drafts-section { display: none; margin-top: 16px; }
     .draft-card textarea { min-height: 360px; font-size: 13px; line-height: 1.75; resize: vertical; margin-top: 0; }
@@ -105,7 +160,7 @@
     /* ── Divider ── */
     .divider { height: 1px; background: var(--border); margin: 16px 0; }
 
-    /* ════ Tab 2: 選題庫 ════ */
+    /* ════ Tab 3: 選題庫 ════ */
     .pillar-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
     .pillar-tab { padding: 7px 16px; border: 1.5px solid var(--border); background: transparent; border-radius: 20px; font-size: 13px; color: var(--text-muted); cursor: pointer; font-family: inherit; transition: all 0.2s; }
     .pillar-tab.active { border-color: var(--gold-dim); background: rgba(212,168,67,0.07); color: var(--gold); font-weight: 600; }
@@ -119,15 +174,15 @@
     .keyword-chip .angle { font-size: 11px; color: var(--text-muted); display: block; margin-top: 2px; }
     .keyword-chip:hover .angle { color: var(--gold-dim); }
 
-    /* ════ Tab 3: Pro ════ */
+    /* ════ Tab 4: 腳本生成 Pro ════ */
     .selector-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
     .persona-tag { display: inline-block; padding: 4px 12px; background: rgba(212,168,67,0.07); border: 1px solid rgba(212,168,67,0.18); border-radius: 4px; font-size: 12px; color: var(--gold-light); margin: 0 4px 6px 0; }
     .pro-output { display: none; margin-top: 16px; }
 
-    /* ════ Tab 4: 故事庫 ════ */
+    /* ════ Tab 5: 故事庫 ════ */
     .story-field { margin-bottom: 14px; }
 
-    /* ════ Tab 5: IP定位 ════ */
+    /* ════ Tab 1: IP定位 ════ */
     .pos-progress { display: flex; gap: 5px; margin-bottom: 20px; align-items: center; }
     .pos-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border); transition: all 0.3s; }
     .pos-dot.done { background: var(--gold); }
@@ -142,8 +197,37 @@
 
     /* ── Mobile ── */
     @media (max-width: 768px) {
+      .app-layout { flex-direction: column; }
+      .sidebar {
+        width: 100%;
+        min-width: 0;
+        height: auto;
+        position: static;
+        display: flex;
+        flex-direction: row;
+        padding: 0;
+        overflow-x: auto;
+        overflow-y: hidden;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+        scrollbar-width: none;
+      }
+      .sidebar::-webkit-scrollbar { display: none; }
+      .sidebar-section-label { display: none; }
+      .step-arrow { display: none; }
+      .sidebar-divider { display: none; }
+      .step-item {
+        padding: 10px 14px;
+        min-width: fit-content;
+        border-left: none;
+        border-bottom: 2px solid transparent;
+        flex-shrink: 0;
+      }
+      .step-item.active { border-bottom-color: var(--gold); background: rgba(212,168,67,0.06); }
+      .step-desc { display: none; }
+      .step-num { font-size: 8px; }
+      .step-title { font-size: 11px; }
       .grid-2, .grid-3, .selector-row { grid-template-columns: 1fr; }
-      .header { padding: 12px 16px; }
       .container { padding: 14px; }
     }
   </style>
@@ -154,490 +238,559 @@
   <div class="header-diamond">◆</div>
   <div>
     <h1>餅妹內容中控台</h1>
-    <p>流量內容 · 一站管理</p>
+    <p>安先生工作流 · 從定位到腳本</p>
   </div>
 </div>
 
-<div class="tab-nav">
-  <button class="tab-btn active" onclick="switchTab('search',this)">🔍 靈感搜索</button>
-  <button class="tab-btn"        onclick="switchTab('topics',this)">📚 選題庫</button>
-  <button class="tab-btn"        onclick="switchTab('pro',this)">⚡ 腳本生成器 Pro</button>
-  <button class="tab-btn"        onclick="switchTab('story',this)">📖 故事庫</button>
-  <button class="tab-btn"        onclick="switchTab('positioning',this)">🎯 IP 定位助手</button>
-</div>
+<div class="app-layout">
 
-<!-- ════ Tab 1: 靈感搜索 ════ -->
-<div class="tab-panel active" id="tab-search">
-  <div class="container">
-    <div class="grid-2 mb-16">
+  <!-- ── Sidebar ── -->
+  <div class="sidebar">
+    <div class="sidebar-section-label">創作流程</div>
 
-      <div class="card">
-        <span class="card-tag">🔍 搜尋模式</span>
-        <h2>搜尋創作者熱門內容</h2>
-        <div class="platform-toggle">
-          <button class="platform-btn active" onclick="selectPlatform('search','yt',this)">YouTube</button>
-          <button class="platform-btn"        onclick="selectPlatform('search','xhs',this)">小紅書</button>
-        </div>
-        <input type="text" id="search-input" placeholder="頻道 URL 或 @handle（如 @MrBeast）">
-        <button class="btn" onclick="doSearch()">🔍 找半年內 Top 10</button>
-        <div class="search-results" id="search-results">
-          <div id="results-list"></div>
-          <button class="btn" style="margin-top:12px" onclick="generateFromSelected()">✨ 生成選中文案</button>
-        </div>
-      </div>
-
-      <div class="card">
-        <span class="card-tag">🔗 指定模式</span>
-        <h2>指定貼文 / 影片</h2>
-        <div class="platform-toggle">
-          <button class="platform-btn active" onclick="selectPlatform('direct','yt',this)">YouTube</button>
-          <button class="platform-btn"        onclick="selectPlatform('direct','xhs',this)">小紅書</button>
-          <button class="platform-btn"        onclick="selectPlatform('direct','text',this)">貼文字</button>
-        </div>
-        <div id="direct-url-area">
-          <input type="text" id="direct-url" placeholder="https://www.youtube.com/watch?v=...">
-        </div>
-        <div id="direct-text-area" style="display:none">
-          <textarea id="direct-text" rows="5" placeholder="直接貼入影片文案或逐字稿..."></textarea>
-        </div>
-        <button class="btn" onclick="generateDirect()">⚡ 直接生成文案</button>
-        <p style="font-size:11px;color:var(--text-muted);margin-top:8px;text-align:center">YT/XHS 約 45–90 秒，手動文字約 30 秒</p>
-      </div>
-
+    <div class="step-item active" data-tab="positioning" onclick="switchTab('positioning')">
+      <div class="step-num">STEP 01</div>
+      <div class="step-row"><span class="step-icon">🎯</span><span class="step-title">IP 定位助手</span></div>
+      <div class="step-desc">先定人設，再做內容</div>
     </div>
 
-    <div class="loading" id="search-loading">
-      <div class="spinner"></div>
-      <p class="loading-msg" id="search-loading-msg">處理中...</p>
+    <div class="step-arrow">↓</div>
+
+    <div class="step-item" data-tab="search" onclick="switchTab('search')">
+      <div class="step-num">STEP 02</div>
+      <div class="step-row"><span class="step-icon">🔍</span><span class="step-title">靈感收集</span></div>
+      <div class="step-desc">抖音熱搜 · YT · 小紅書</div>
     </div>
 
-    <div class="drafts-section" id="search-drafts">
-      <div class="grid-3">
-        <div class="card draft-card">
-          <h2>📝 Threads / FB 長文</h2>
-          <textarea id="draft-threads" oninput="updateCount(this,'cnt-threads')"></textarea>
-          <div class="char-count" id="cnt-threads">0 字</div>
-        </div>
-        <div class="card draft-card">
-          <h2>📸 小紅書圖文</h2>
-          <textarea id="draft-xhs" oninput="updateCount(this,'cnt-xhs')"></textarea>
-          <div class="char-count" id="cnt-xhs">0 字</div>
-        </div>
-        <div class="card draft-card">
-          <h2>🎬 短影音腳本</h2>
-          <textarea id="draft-video" oninput="updateCount(this,'cnt-video')"></textarea>
-          <div class="char-count" id="cnt-video">0 字</div>
-        </div>
-      </div>
-      <div class="confirm-bar">
-        <p>可直接編輯上方草稿後再存入語料庫</p>
-        <button class="btn btn-success" style="max-width:300px" onclick="confirmSave()">✅ 確認存入語料庫</button>
-        <div class="status-msg" id="search-save-status"></div>
-      </div>
+    <div class="step-arrow">↓</div>
+
+    <div class="step-item" data-tab="topics" onclick="switchTab('topics')">
+      <div class="step-num">STEP 03</div>
+      <div class="step-row"><span class="step-icon">📚</span><span class="step-title">選題庫</span></div>
+      <div class="step-desc">整理 · 普世化 · 陌生化</div>
+    </div>
+
+    <div class="step-arrow">↓</div>
+
+    <div class="step-item" data-tab="pro" onclick="switchTab('pro')">
+      <div class="step-num">STEP 04</div>
+      <div class="step-row"><span class="step-icon">⚡</span><span class="step-title">腳本生成 Pro</span></div>
+      <div class="step-desc">Hook · 骨架 · 情緒刺點</div>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <div class="step-item" data-tab="story" onclick="switchTab('story')">
+      <div class="step-row"><span class="step-icon">📖</span><span class="step-title">故事庫</span></div>
+      <div class="step-desc">人設素材管理</div>
     </div>
   </div>
-</div>
 
-<!-- ════ Tab 2: 選題庫 ════ -->
-<div class="tab-panel" id="tab-topics">
-  <div class="container">
+  <!-- ── Main Content ── -->
+  <div class="main-content">
 
-    <div class="card mb-16">
-      <h2>五大話題柱</h2>
-      <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px">點擊任一關鍵詞 → 自動帶入腳本生成器 Pro</p>
+    <!-- ════ STEP 01: IP 定位助手 ════ -->
+    <div class="tab-panel active" id="tab-positioning">
+      <div class="container">
+        <div style="max-width:700px;margin:0 auto">
 
-      <div class="pillar-tabs">
-        <button class="pillar-tab active" onclick="switchPillar('factory',this)">🏭 工廠跨境</button>
-        <button class="pillar-tab"        onclick="switchPillar('ai',this)">🤖 AI工具實戰</button>
-        <button class="pillar-tab"        onclick="switchPillar('jewelry',this)">💍 珠寶跨境</button>
-        <button class="pillar-tab"        onclick="switchPillar('taiwan',this)">🗺️ 台灣視角</button>
-        <button class="pillar-tab"        onclick="switchPillar('freedom',this)">🦋 自由/超級個體</button>
-      </div>
+          <div class="card mb-16" id="pos-card">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+              <h2 style="margin:0">IP 定位引導問答</h2>
+              <span style="font-size:12px;color:var(--text-muted)" id="pos-progress-text">第 1 題 / 共 7 題</span>
+            </div>
+            <div class="pos-progress" id="pos-dots"></div>
+            <div id="pos-question-area"></div>
+            <div style="display:flex;gap:10px;margin-top:16px" id="pos-nav">
+              <button class="btn btn-outline" style="width:auto;padding:10px 20px;font-size:14px;margin-top:0" onclick="posBack()" id="pos-back-btn">← 上一題</button>
+              <button class="btn" style="flex:1;margin-top:0" onclick="posNext()" id="pos-next-btn">下一題 →</button>
+            </div>
+          </div>
 
-      <div class="keyword-section active" id="pillar-factory">
-        <div class="keyword-tier">
-          <h4>核心詞（流量入口）</h4>
-          <div class="keyword-chips">
-            <div class="keyword-chip" onclick="useKeyword(this)">工廠跨境<span class="angle">工廠做跨境到底值不值</span></div>
-            <div class="keyword-chip" onclick="useKeyword(this)">實體轉型跨境<span class="angle">轉型三步走</span></div>
+          <div id="pos-result" style="display:none">
+            <div class="card mb-16">
+              <h2>🎯 你的定位整合報告</h2>
+              <div id="pos-result-content" style="font-size:13px;line-height:1.9"></div>
+            </div>
+            <div class="confirm-bar">
+              <button class="btn" style="max-width:280px;margin-bottom:8px" onclick="savePosResult()">☁️ 存入飛書故事庫</button>
+              <br>
+              <button class="btn btn-outline btn-sm" onclick="resetPositioning()" style="margin-top:8px">重新定位</button>
+              <div class="status-msg" id="pos-save-status"></div>
+            </div>
           </div>
-        </div>
-        <div class="keyword-tier">
-          <h4>中層詞（精準篩選）</h4>
-          <div class="keyword-chips">
-            <div class="keyword-chip" onclick="useKeyword(this)">工廠老闆做亞馬遜<span class="angle">有貨有廠，缺的是這三件事</span></div>
-            <div class="keyword-chip" onclick="useKeyword(this)">工廠二代跨境<span class="angle">二代接班 vs 自己跑跨境</span></div>
-            <div class="keyword-chip" onclick="useKeyword(this)">深圳工廠賣歐美<span class="angle">實際操作第一步</span></div>
-          </div>
-        </div>
-        <div class="keyword-tier">
-          <h4>長尾詞（高轉化）</h4>
-          <div class="keyword-chips">
-            <div class="keyword-chip" onclick="useKeyword(this)">工廠庫存清海外<span class="angle">滯銷品的出路</span></div>
-            <div class="keyword-chip" onclick="useKeyword(this)">跨境踩坑經歷<span class="angle">我踩過的坑你不要踩</span></div>
-            <div class="keyword-chip" onclick="useKeyword(this)">跨境電商失敗原因<span class="angle">失敗故事 → 引發共鳴</span></div>
-          </div>
-        </div>
-      </div>
 
-      <div class="keyword-section" id="pillar-ai">
-        <div class="keyword-tier">
-          <h4>核心詞</h4>
-          <div class="keyword-chips">
-            <div class="keyword-chip" onclick="useKeyword(this)">AI跨境電商<span class="angle">AI時代不懂這個你會被淘汰</span></div>
-            <div class="keyword-chip" onclick="useKeyword(this)">AI做生意<span class="angle">一個人管多個業務</span></div>
-          </div>
-        </div>
-        <div class="keyword-tier">
-          <h4>中層詞</h4>
-          <div class="keyword-chips">
-            <div class="keyword-chip" onclick="useKeyword(this)">AI選品工具<span class="angle">具體工具拆解（可收藏）</span></div>
-            <div class="keyword-chip" onclick="useKeyword(this)">AI客服跨境<span class="angle">24小時不用人力</span></div>
-            <div class="keyword-chip" onclick="useKeyword(this)">ChatGPT跨境實戰<span class="angle">我每天怎麼用的</span></div>
-          </div>
-        </div>
-        <div class="keyword-tier">
-          <h4>長尾詞</h4>
-          <div class="keyword-chips">
-            <div class="keyword-chip" onclick="useKeyword(this)">AI幫老闆管公司<span class="angle">超級個體怎麼用AI當團隊</span></div>
-            <div class="keyword-chip" onclick="useKeyword(this)">AI時代女老闆<span class="angle">人設強化</span></div>
-            <div class="keyword-chip" onclick="useKeyword(this)">一個人管多個業務<span class="angle">AI替代了什麼崗位</span></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="keyword-section" id="pillar-jewelry">
-        <div class="keyword-tier">
-          <h4>核心詞</h4>
-          <div class="keyword-chips">
-            <div class="keyword-chip" onclick="useKeyword(this)">珠寶跨境<span class="angle">珠寶跨境的利潤空間</span></div>
-            <div class="keyword-chip" onclick="useKeyword(this)">首飾出海<span class="angle">首飾為什麼適合賣海外</span></div>
-          </div>
-        </div>
-        <div class="keyword-tier">
-          <h4>中層詞</h4>
-          <div class="keyword-chips">
-            <div class="keyword-chip" onclick="useKeyword(this)">珠寶歐洲市場<span class="angle">歐洲人買什麼珠寶</span></div>
-            <div class="keyword-chip" onclick="useKeyword(this)">西班牙電商市場<span class="angle">為什麼選歐洲不選美國</span></div>
-            <div class="keyword-chip" onclick="useKeyword(this)">珠寶工廠做獨立站<span class="angle">獨立站 vs 平台的真實對比</span></div>
-          </div>
-        </div>
-        <div class="keyword-tier">
-          <h4>差異詞（護城河）</h4>
-          <div class="keyword-chips">
-            <div class="keyword-chip" onclick="useKeyword(this)">西班牙倉儲<span class="angle">為什麼在西班牙建倉</span></div>
-            <div class="keyword-chip" onclick="useKeyword(this)">歐洲本地倉跨境<span class="angle">本地倉的成本和優勢</span></div>
-            <div class="keyword-chip" onclick="useKeyword(this)">珠寶選品歐美<span class="angle">哪些款式在歐美賣得動</span></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="keyword-section" id="pillar-taiwan">
-        <div class="keyword-tier">
-          <h4>核心詞</h4>
-          <div class="keyword-chips">
-            <div class="keyword-chip" onclick="useKeyword(this)">台灣人做跨境<span class="angle">台灣人做跨境的隱形優勢</span></div>
-            <div class="keyword-chip" onclick="useKeyword(this)">台灣跨境電商<span class="angle">台灣視角看跨境</span></div>
-          </div>
-        </div>
-        <div class="keyword-tier">
-          <h4>中層詞</h4>
-          <div class="keyword-chips">
-            <div class="keyword-chip" onclick="useKeyword(this)">跨境收款海外金流<span class="angle">台灣人怎麼收海外的錢</span></div>
-            <div class="keyword-chip" onclick="useKeyword(this)">Stripe跨境收款<span class="angle">最實用的收款工具</span></div>
-            <div class="keyword-chip" onclick="useKeyword(this)">不在大陸怎麼做生意<span class="angle">遠端操盤實際怎麼做</span></div>
-          </div>
-        </div>
-        <div class="keyword-tier">
-          <h4>長尾詞（信息差）</h4>
-          <div class="keyword-chips">
-            <div class="keyword-chip" onclick="useKeyword(this)">愛沙尼亞公司開設<span class="angle">海外架構第一步</span></div>
-            <div class="keyword-chip" onclick="useKeyword(this)">歐盟VAT申請<span class="angle">做歐洲必知的稅務</span></div>
-            <div class="keyword-chip" onclick="useKeyword(this)">海外信息差跨境<span class="angle">台灣人知道但大陸人不知道的事</span></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="keyword-section" id="pillar-freedom">
-        <div class="keyword-tier">
-          <h4>核心詞</h4>
-          <div class="keyword-chips">
-            <div class="keyword-chip" onclick="useKeyword(this)">超級個體<span class="angle">AI時代最有效的工作模式</span></div>
-            <div class="keyword-chip" onclick="useKeyword(this)">AI個人創業<span class="angle">一個人頂一個團隊</span></div>
-          </div>
-        </div>
-        <div class="keyword-tier">
-          <h4>中層詞</h4>
-          <div class="keyword-chips">
-            <div class="keyword-chip" onclick="useKeyword(this)">女老闆創業<span class="angle">女性創業的真實困難</span></div>
-            <div class="keyword-chip" onclick="useKeyword(this)">30歲後創業<span class="angle">30歲轉型晚嗎</span></div>
-            <div class="keyword-chip" onclick="useKeyword(this)">醫療轉行創業<span class="angle">格格不入的反差人設</span></div>
-          </div>
-        </div>
-        <div class="keyword-tier">
-          <h4>情感詞（普世共鳴）</h4>
-          <div class="keyword-chips">
-            <div class="keyword-chip" onclick="useKeyword(this)">財務自由<span class="angle">自由是需要旅費的</span></div>
-            <div class="keyword-chip" onclick="useKeyword(this)">地點自由生活<span class="angle">在哪裡工作都一樣</span></div>
-            <div class="keyword-chip" onclick="useKeyword(this)">時間自由創業<span class="angle">不被排班控制的生活</span></div>
-          </div>
         </div>
       </div>
     </div>
 
-    <div class="card">
-      <h2>選題靈感快速生成</h2>
-      <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px">點擊上方關鍵詞帶入，或自己輸入方向，AI 生成 5 個選題角度</p>
-      <div style="display:flex;gap:10px;align-items:flex-end">
-        <div style="flex:1"><input type="text" id="topic-seed" placeholder="關鍵詞或方向（如：工廠老闆跨境）"></div>
-        <button class="btn btn-sm" style="margin-top:0;white-space:nowrap" onclick="generateTopicIdeas()">生成選題</button>
-      </div>
-      <div class="loading" id="topic-loading" style="padding:20px"><div class="spinner"></div></div>
-      <div id="topic-ideas-output" style="display:none;margin-top:14px">
-        <div class="divider"></div>
-        <div id="topic-ideas-content" style="font-size:13px;line-height:1.9;color:var(--text)"></div>
-      </div>
-    </div>
+    <!-- ════ STEP 02: 靈感收集 ════ -->
+    <div class="tab-panel" id="tab-search">
+      <div class="container">
 
-  </div>
-</div>
-
-<!-- ════ Tab 3: 腳本生成器 Pro ════ -->
-<div class="tab-panel" id="tab-pro">
-  <div class="container">
-    <div class="grid-2 mb-16">
-
-      <div class="card">
-        <h2>腳本設定</h2>
-        <div class="story-field">
-          <label class="field-label">選題 / 主題</label>
-          <input type="text" id="pro-topic" placeholder="從選題庫點擊帶入，或自己輸入">
-        </div>
-        <div class="selector-row">
-          <div>
-            <label class="field-label">Hook 類型</label>
-            <select id="pro-hook">
-              <option value="">自動選擇（推薦）</option>
-              <option value="01">01｜不平衡情緒登場（最強留人）</option>
-              <option value="02">02｜完形心理（並置陌生事物）</option>
-              <option value="03">03｜與我有關（精準點名人群）</option>
-              <option value="04">04｜否定性力量（損失厭惡）</option>
-              <option value="05">05｜社會身份的敏感（站隊/挑釁）</option>
-              <option value="06">06｜動物性慾望（感官刺激）</option>
-              <option value="07">07｜圍觀與熱鬧</option>
-              <option value="08">08｜偷窺（內幕/自我暴露）</option>
-              <option value="09">09｜反差與反常</option>
-              <option value="10">10｜特殊消息（獨家/新概念）</option>
-              <option value="11">11｜強節奏（BGM/排比）</option>
-              <option value="12">12｜人間美好</option>
-              <option value="13">13｜新奇有趣</option>
-            </select>
-          </div>
-          <div>
-            <label class="field-label">骨架類型</label>
-            <select id="pro-skeleton">
-              <option value="">自動選擇（推薦）</option>
-              <option value="interest">興趣點推進（冷啟動首選）</option>
-              <option value="drama">戲劇性推進（高評論互動）</option>
-              <option value="resonance">共鳴型推進（感同身受）</option>
-              <option value="logic">理性邏輯型（知識IP首選）</option>
-              <option value="rhythm">節奏型推進（洗腦感）</option>
-            </select>
-          </div>
-        </div>
-        <div class="selector-row">
-          <div>
-            <label class="field-label">目標平台</label>
-            <select id="pro-platform">
-              <option value="both">視頻號 + 小紅書（兩版）</option>
-              <option value="wechat">視頻號</option>
-              <option value="xhs">小紅書</option>
-            </select>
-          </div>
-          <div>
-            <label class="field-label">腳本長度</label>
-            <select id="pro-length">
-              <option value="30">短｜30秒 / 約150字</option>
-              <option value="60" selected>中｜60秒 / 約300字</option>
-              <option value="90">長｜90秒 / 約500字</option>
-            </select>
-          </div>
-        </div>
-        <div class="story-field">
-          <label class="field-label">今日素材補充（可選）</label>
-          <textarea id="pro-extra" rows="3" placeholder="今天有什麼新故事？想強調什麼真實細節？有沒有剛踩的坑？"></textarea>
-        </div>
-        <button class="btn" onclick="generatePro()">⚡ 生成人設感腳本</button>
-      </div>
-
-      <div class="card">
-        <h2>人設快速預覽</h2>
-        <p style="font-size:12px;color:var(--text-muted);margin-bottom:12px">腳本生成時自動帶入以下資料（在故事庫編輯）</p>
-        <div style="margin-bottom:12px">
-          <span class="persona-tag">醫療出身</span>
-          <span class="persona-tag">科技PM</span>
-          <span class="persona-tag">珠寶跨境</span>
-          <span class="persona-tag">台灣視角</span>
-          <span class="persona-tag">西班牙倉</span>
-          <span class="persona-tag">AI管理</span>
-          <span class="persona-tag">同行者</span>
-        </div>
-        <div class="divider"></div>
-        <p style="font-size:11px;color:var(--text-muted);margin-bottom:5px">定位一句話</p>
-        <p style="font-size:13px;color:var(--gold-light);line-height:1.7;margin-bottom:14px" id="pro-positioning-preview">「醫療出身、用 AI 管珠寶跨境的台灣女老闆，帶深圳工廠主從供應鏈優勢跨出去——我就在路上，把親歷的坑和機會第一時間告訴你。」</p>
-        <div class="divider"></div>
-        <p style="font-size:11px;color:var(--text-muted);margin-bottom:5px">核心立場</p>
-        <p style="font-size:13px;color:var(--text);line-height:1.6;margin-bottom:14px">反對限制性信念。資源給願意行動的人，不浪費在藉口上。</p>
-        <div class="divider"></div>
-        <p style="font-size:11px;color:var(--text-muted);margin-bottom:5px">與觀眾關係</p>
-        <p style="font-size:13px;color:var(--text)">同行者——我在路上，把學到的分享給你</p>
-        <button class="btn btn-outline" style="margin-top:16px" onclick="gotoStory()">編輯故事庫 →</button>
-      </div>
-
-    </div>
-
-    <div class="loading" id="pro-loading">
-      <div class="spinner"></div>
-      <p class="loading-msg">正在生成有人設感的腳本（約 30–45 秒）...</p>
-    </div>
-
-    <div class="pro-output" id="pro-output">
-      <div class="grid-2" id="pro-drafts-grid"></div>
-      <div class="confirm-bar">
-        <p>可直接編輯後存入語料庫</p>
-        <button class="btn btn-success" style="max-width:280px" onclick="confirmProSave()">✅ 存入語料庫</button>
-        <div class="status-msg" id="pro-save-status"></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ════ Tab 4: 故事庫 ════ -->
-<div class="tab-panel" id="tab-story">
-  <div class="container">
-    <div class="grid-2">
-
-      <div>
+        <!-- 🔥 抖音熱搜 -->
         <div class="card mb-16">
-          <h2>核心身份</h2>
-          <div class="story-field">
-            <label class="field-label">定位一句話</label>
-            <textarea id="s-positioning" rows="3">醫療出身、用 AI 管珠寶跨境的台灣女老闆，帶深圳工廠主從供應鏈優勢跨出去——我就在路上，把親歷的坑和機會第一時間告訴你。</textarea>
+          <span class="card-tag">🔥 抖音熱搜</span>
+          <h2>抖音熱搜靈感挖掘</h2>
+          <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px">AI 從即時抖音熱搜中，篩選出與你賽道相關的靈感角度</p>
+          <div style="display:flex;gap:10px;align-items:flex-end">
+            <div style="flex:1">
+              <label class="field-label">你的賽道方向</label>
+              <input type="text" id="douyin-niche" placeholder="如：珠寶跨境、工廠老闆、AI創業">
+            </div>
+            <button class="btn btn-sm" style="margin-top:0;white-space:nowrap" onclick="searchDouyin()">🔥 抓熱搜靈感</button>
           </div>
-          <div class="story-field">
-            <label class="field-label">核心驅動力</label>
-            <textarea id="s-driver" rows="2">自由——貫穿所有人生選擇的唯一主題。「自由是需要旅費的，我得要賺錢。」</textarea>
-          </div>
-          <div class="story-field">
-            <label class="field-label">核心立場（你堅決反對什麼）</label>
-            <textarea id="s-stance" rows="3">反對限制性信念——知道現狀不好，卻拒絕改變，滿是藉口的人。「救不了就讓他爛掉好了」——資源給願意行動的人。</textarea>
-          </div>
-          <div class="story-field">
-            <label class="field-label">與觀眾關係</label>
-            <textarea id="s-relationship" rows="2">同行者——我在路上，把我學到的分享給你。不裝已成功，真實且耐打。</textarea>
-          </div>
-          <div class="story-field">
-            <label class="field-label">情緒基調</label>
-            <textarea id="s-tone" rows="1">大剌剌不拐彎（天然狀態，不是設計出來的）</textarea>
+          <div class="loading" id="douyin-loading" style="padding:24px"><div class="spinner"></div><p class="loading-msg">正在抓取抖音熱搜並 AI 篩選（約 15–25 秒）...</p></div>
+          <div id="douyin-results" style="display:none">
+            <div class="divider"></div>
+            <p style="font-size:11px;color:var(--text-muted);margin-bottom:12px">AI 篩選結果 — 勾選感興趣的角度，存入選題庫；或點「帶入生成」直接生成腳本</p>
+            <div id="douyin-list"></div>
+            <div style="display:flex;gap:10px;margin-top:12px;align-items:center">
+              <button class="btn btn-success btn-sm" style="margin-top:0" onclick="saveSelectedTopics()">✅ 存入選題庫</button>
+              <div class="status-msg" id="douyin-save-status" style="margin:0"></div>
+            </div>
           </div>
         </div>
+
+        <!-- YT / XHS 搜尋 -->
+        <div class="grid-2 mb-16">
+
+          <div class="card">
+            <span class="card-tag">🔍 搜尋模式</span>
+            <h2>搜尋創作者熱門內容</h2>
+            <div class="platform-toggle">
+              <button class="platform-btn active" onclick="selectPlatform('search','yt',this)">YouTube</button>
+              <button class="platform-btn"        onclick="selectPlatform('search','xhs',this)">小紅書</button>
+            </div>
+            <input type="text" id="search-input" placeholder="頻道 URL 或 @handle（如 @MrBeast）">
+            <button class="btn" onclick="doSearch()">🔍 找半年內 Top 10</button>
+            <div class="search-results" id="search-results">
+              <div id="results-list"></div>
+              <button class="btn" style="margin-top:12px" onclick="generateFromSelected()">✨ 生成選中文案</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <span class="card-tag">🔗 指定模式</span>
+            <h2>指定貼文 / 影片</h2>
+            <div class="platform-toggle">
+              <button class="platform-btn active" onclick="selectPlatform('direct','yt',this)">YouTube</button>
+              <button class="platform-btn"        onclick="selectPlatform('direct','xhs',this)">小紅書</button>
+              <button class="platform-btn"        onclick="selectPlatform('direct','text',this)">貼文字</button>
+            </div>
+            <div id="direct-url-area">
+              <input type="text" id="direct-url" placeholder="https://www.youtube.com/watch?v=...">
+            </div>
+            <div id="direct-text-area" style="display:none">
+              <textarea id="direct-text" rows="5" placeholder="直接貼入影片文案或逐字稿..."></textarea>
+            </div>
+            <button class="btn" onclick="generateDirect()">⚡ 直接生成文案</button>
+            <p style="font-size:11px;color:var(--text-muted);margin-top:8px;text-align:center">YT/XHS 約 45–90 秒，手動文字約 30 秒</p>
+          </div>
+
+        </div>
+
+        <div class="loading" id="search-loading">
+          <div class="spinner"></div>
+          <p class="loading-msg" id="search-loading-msg">處理中...</p>
+        </div>
+
+        <div class="drafts-section" id="search-drafts">
+          <div class="grid-3">
+            <div class="card draft-card">
+              <h2>📝 Threads / FB 長文</h2>
+              <textarea id="draft-threads" oninput="updateCount(this,'cnt-threads')"></textarea>
+              <div class="char-count" id="cnt-threads">0 字</div>
+            </div>
+            <div class="card draft-card">
+              <h2>📸 小紅書圖文</h2>
+              <textarea id="draft-xhs" oninput="updateCount(this,'cnt-xhs')"></textarea>
+              <div class="char-count" id="cnt-xhs">0 字</div>
+            </div>
+            <div class="card draft-card">
+              <h2>🎬 短影音腳本</h2>
+              <textarea id="draft-video" oninput="updateCount(this,'cnt-video')"></textarea>
+              <div class="char-count" id="cnt-video">0 字</div>
+            </div>
+          </div>
+          <div class="confirm-bar">
+            <p>可直接編輯上方草稿後再存入語料庫</p>
+            <button class="btn btn-success" style="max-width:300px" onclick="confirmSave()">✅ 確認存入語料庫</button>
+            <div class="status-msg" id="search-save-status"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ════ STEP 03: 選題庫 ════ -->
+    <div class="tab-panel" id="tab-topics">
+      <div class="container">
 
         <div class="card mb-16">
-          <h2>最與眾不同的能力</h2>
-          <div class="story-field">
-            <label class="field-label">三合一核心能力</label>
-            <textarea id="s-skills" rows="4">1. 快速搭建系統 + 調動夥伴落地——想到就能建，建了就能跑
-2. 數據分析能力——看得懂數字背後的意思
-3. 業務洞察 + 談大單——能感受到機會在哪，能把機會談成合約</textarea>
-          </div>
-        </div>
-      </div>
+          <h2>五大話題柱</h2>
+          <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px">點擊任一關鍵詞 → 自動帶入腳本生成器 Pro</p>
 
-      <div>
-        <div class="card mb-16">
-          <h2>人生時間軸（格格不入素材）</h2>
-          <div class="story-field">
-            <label class="field-label">起點：台灣小鄉鎮</label>
-            <textarea id="s-origin" rows="3">周圍的人純樸，但從小感覺自己「不屬於這裡」。天生帶著野心，想去城市、想離開台灣、想去遠方。別人玩鬧時她在學習，因為「我知道我總是要離開這裡的」。</textarea>
+          <div class="pillar-tabs">
+            <button class="pillar-tab active" onclick="switchPillar('factory',this)">🏭 工廠跨境</button>
+            <button class="pillar-tab"        onclick="switchPillar('ai',this)">🤖 AI工具實戰</button>
+            <button class="pillar-tab"        onclick="switchPillar('jewelry',this)">💍 珠寶跨境</button>
+            <button class="pillar-tab"        onclick="switchPillar('taiwan',this)">🗺️ 台灣視角</button>
+            <button class="pillar-tab"        onclick="switchPillar('freedom',this)">🦋 自由/超級個體</button>
           </div>
-          <div class="story-field">
-            <label class="field-label">醫療期：聽力師</label>
-            <textarea id="s-medical" rows="4">念醫學院，主修聽力師（台灣稀缺醫療行業）。搬到台北天母——「終於感受自由的空氣」。學拳擊、話劇、鏡頭表演、瑜伽、空環、鋼管、自由潛水。當外拍模特、Youtuber、接業配。頓悟：「我不屬於只能走 SOP 的醫療業。」</textarea>
+
+          <div class="keyword-section active" id="pillar-factory">
+            <div class="keyword-tier">
+              <h4>核心詞（流量入口）</h4>
+              <div class="keyword-chips">
+                <div class="keyword-chip" onclick="useKeyword(this)">工廠跨境<span class="angle">工廠做跨境到底值不值</span></div>
+                <div class="keyword-chip" onclick="useKeyword(this)">實體轉型跨境<span class="angle">轉型三步走</span></div>
+              </div>
+            </div>
+            <div class="keyword-tier">
+              <h4>中層詞（精準篩選）</h4>
+              <div class="keyword-chips">
+                <div class="keyword-chip" onclick="useKeyword(this)">工廠老闆做亞馬遜<span class="angle">有貨有廠，缺的是這三件事</span></div>
+                <div class="keyword-chip" onclick="useKeyword(this)">工廠二代跨境<span class="angle">二代接班 vs 自己跑跨境</span></div>
+                <div class="keyword-chip" onclick="useKeyword(this)">深圳工廠賣歐美<span class="angle">實際操作第一步</span></div>
+              </div>
+            </div>
+            <div class="keyword-tier">
+              <h4>長尾詞（高轉化）</h4>
+              <div class="keyword-chips">
+                <div class="keyword-chip" onclick="useKeyword(this)">工廠庫存清海外<span class="angle">滯銷品的出路</span></div>
+                <div class="keyword-chip" onclick="useKeyword(this)">跨境踩坑經歷<span class="angle">我踩過的坑你不要踩</span></div>
+                <div class="keyword-chip" onclick="useKeyword(this)">跨境電商失敗原因<span class="angle">失敗故事 → 引發共鳴</span></div>
+              </div>
+            </div>
           </div>
-          <div class="story-field">
-            <label class="field-label">科技期：健康科技業 PM</label>
-            <textarea id="s-tech" rows="3">進健康科技業做 PM，日本美國台灣三地跑。積累跨國談單技術、開創跨國專案的流程能力。</textarea>
+
+          <div class="keyword-section" id="pillar-ai">
+            <div class="keyword-tier">
+              <h4>核心詞</h4>
+              <div class="keyword-chips">
+                <div class="keyword-chip" onclick="useKeyword(this)">AI跨境電商<span class="angle">AI時代不懂這個你會被淘汰</span></div>
+                <div class="keyword-chip" onclick="useKeyword(this)">AI做生意<span class="angle">一個人管多個業務</span></div>
+              </div>
+            </div>
+            <div class="keyword-tier">
+              <h4>中層詞</h4>
+              <div class="keyword-chips">
+                <div class="keyword-chip" onclick="useKeyword(this)">AI選品工具<span class="angle">具體工具拆解（可收藏）</span></div>
+                <div class="keyword-chip" onclick="useKeyword(this)">AI客服跨境<span class="angle">24小時不用人力</span></div>
+                <div class="keyword-chip" onclick="useKeyword(this)">ChatGPT跨境實戰<span class="angle">我每天怎麼用的</span></div>
+              </div>
+            </div>
+            <div class="keyword-tier">
+              <h4>長尾詞</h4>
+              <div class="keyword-chips">
+                <div class="keyword-chip" onclick="useKeyword(this)">AI幫老闆管公司<span class="angle">超級個體怎麼用AI當團隊</span></div>
+                <div class="keyword-chip" onclick="useKeyword(this)">AI時代女老闆<span class="angle">人設強化</span></div>
+                <div class="keyword-chip" onclick="useKeyword(this)">一個人管多個業務<span class="angle">AI替代了什麼崗位</span></div>
+              </div>
+            </div>
           </div>
-          <div class="story-field">
-            <label class="field-label">現在：知識付費 + 珠寶跨境 + 海外</label>
-            <textarea id="s-now" rows="4">咬牙離開大資本健康科技業。把醫療 SOP 嚴謹性 + 專案談單技術 + 跨國流程能力帶進知識付費，成為營運長。現在在海外，做跨境電商（珠寶）+ 用 AI 管理公司。</textarea>
+
+          <div class="keyword-section" id="pillar-jewelry">
+            <div class="keyword-tier">
+              <h4>核心詞</h4>
+              <div class="keyword-chips">
+                <div class="keyword-chip" onclick="useKeyword(this)">珠寶跨境<span class="angle">珠寶跨境的利潤空間</span></div>
+                <div class="keyword-chip" onclick="useKeyword(this)">首飾出海<span class="angle">首飾為什麼適合賣海外</span></div>
+              </div>
+            </div>
+            <div class="keyword-tier">
+              <h4>中層詞</h4>
+              <div class="keyword-chips">
+                <div class="keyword-chip" onclick="useKeyword(this)">珠寶歐洲市場<span class="angle">歐洲人買什麼珠寶</span></div>
+                <div class="keyword-chip" onclick="useKeyword(this)">西班牙電商市場<span class="angle">為什麼選歐洲不選美國</span></div>
+                <div class="keyword-chip" onclick="useKeyword(this)">珠寶工廠做獨立站<span class="angle">獨立站 vs 平台的真實對比</span></div>
+              </div>
+            </div>
+            <div class="keyword-tier">
+              <h4>差異詞（護城河）</h4>
+              <div class="keyword-chips">
+                <div class="keyword-chip" onclick="useKeyword(this)">西班牙倉儲<span class="angle">為什麼在西班牙建倉</span></div>
+                <div class="keyword-chip" onclick="useKeyword(this)">歐洲本地倉跨境<span class="angle">本地倉的成本和優勢</span></div>
+                <div class="keyword-chip" onclick="useKeyword(this)">珠寶選品歐美<span class="angle">哪些款式在歐美賣得動</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="keyword-section" id="pillar-taiwan">
+            <div class="keyword-tier">
+              <h4>核心詞</h4>
+              <div class="keyword-chips">
+                <div class="keyword-chip" onclick="useKeyword(this)">台灣人做跨境<span class="angle">台灣人做跨境的隱形優勢</span></div>
+                <div class="keyword-chip" onclick="useKeyword(this)">台灣跨境電商<span class="angle">台灣視角看跨境</span></div>
+              </div>
+            </div>
+            <div class="keyword-tier">
+              <h4>中層詞</h4>
+              <div class="keyword-chips">
+                <div class="keyword-chip" onclick="useKeyword(this)">跨境收款海外金流<span class="angle">台灣人怎麼收海外的錢</span></div>
+                <div class="keyword-chip" onclick="useKeyword(this)">Stripe跨境收款<span class="angle">最實用的收款工具</span></div>
+                <div class="keyword-chip" onclick="useKeyword(this)">不在大陸怎麼做生意<span class="angle">遠端操盤實際怎麼做</span></div>
+              </div>
+            </div>
+            <div class="keyword-tier">
+              <h4>長尾詞（信息差）</h4>
+              <div class="keyword-chips">
+                <div class="keyword-chip" onclick="useKeyword(this)">愛沙尼亞公司開設<span class="angle">海外架構第一步</span></div>
+                <div class="keyword-chip" onclick="useKeyword(this)">歐盟VAT申請<span class="angle">做歐洲必知的稅務</span></div>
+                <div class="keyword-chip" onclick="useKeyword(this)">海外信息差跨境<span class="angle">台灣人知道但大陸人不知道的事</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="keyword-section" id="pillar-freedom">
+            <div class="keyword-tier">
+              <h4>核心詞</h4>
+              <div class="keyword-chips">
+                <div class="keyword-chip" onclick="useKeyword(this)">超級個體<span class="angle">AI時代最有效的工作模式</span></div>
+                <div class="keyword-chip" onclick="useKeyword(this)">AI個人創業<span class="angle">一個人頂一個團隊</span></div>
+              </div>
+            </div>
+            <div class="keyword-tier">
+              <h4>中層詞</h4>
+              <div class="keyword-chips">
+                <div class="keyword-chip" onclick="useKeyword(this)">女老闆創業<span class="angle">女性創業的真實困難</span></div>
+                <div class="keyword-chip" onclick="useKeyword(this)">30歲後創業<span class="angle">30歲轉型晚嗎</span></div>
+                <div class="keyword-chip" onclick="useKeyword(this)">醫療轉行創業<span class="angle">格格不入的反差人設</span></div>
+              </div>
+            </div>
+            <div class="keyword-tier">
+              <h4>情感詞（普世共鳴）</h4>
+              <div class="keyword-chips">
+                <div class="keyword-chip" onclick="useKeyword(this)">財務自由<span class="angle">自由是需要旅費的</span></div>
+                <div class="keyword-chip" onclick="useKeyword(this)">地點自由生活<span class="angle">在哪裡工作都一樣</span></div>
+                <div class="keyword-chip" onclick="useKeyword(this)">時間自由創業<span class="angle">不被排班控制的生活</span></div>
+              </div>
+            </div>
           </div>
         </div>
 
         <div class="card">
-          <h2>差異化護城河</h2>
-          <div class="story-field">
-            <label class="field-label">對標帳號</label>
-            <textarea id="s-competitor" rows="2">班長跨境——已落地美區，理想型，是目標狀態的參照</textarea>
+          <h2>選題靈感快速生成</h2>
+          <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px">點擊上方關鍵詞帶入，或自己輸入方向，AI 生成 5 個選題角度</p>
+          <div style="display:flex;gap:10px;align-items:flex-end">
+            <div style="flex:1"><input type="text" id="topic-seed" placeholder="關鍵詞或方向（如：工廠老闆跨境）"></div>
+            <button class="btn btn-sm" style="margin-top:0;white-space:nowrap" onclick="generateTopicIdeas()">生成選題</button>
           </div>
-          <div class="story-field">
-            <label class="field-label">我的護城河（別人很難複製）</label>
-            <textarea id="s-moat" rows="4">1. 珠寶供應鏈——垂直品類，不是泛跨境
+          <div class="loading" id="topic-loading" style="padding:20px"><div class="spinner"></div></div>
+          <div id="topic-ideas-output" style="display:none;margin-top:14px">
+            <div class="divider"></div>
+            <div id="topic-ideas-content" style="font-size:13px;line-height:1.9;color:var(--text)"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ════ STEP 04: 腳本生成器 Pro ════ -->
+    <div class="tab-panel" id="tab-pro">
+      <div class="container">
+        <div class="grid-2 mb-16">
+
+          <div class="card">
+            <h2>腳本設定</h2>
+            <div class="story-field">
+              <label class="field-label">選題 / 主題</label>
+              <input type="text" id="pro-topic" placeholder="從選題庫點擊帶入，或自己輸入">
+            </div>
+            <div class="selector-row">
+              <div>
+                <label class="field-label">Hook 類型</label>
+                <select id="pro-hook">
+                  <option value="">自動選擇（推薦）</option>
+                  <option value="01">01｜不平衡情緒登場（最強留人）</option>
+                  <option value="02">02｜完形心理（並置陌生事物）</option>
+                  <option value="03">03｜與我有關（精準點名人群）</option>
+                  <option value="04">04｜否定性力量（損失厭惡）</option>
+                  <option value="05">05｜社會身份的敏感（站隊/挑釁）</option>
+                  <option value="06">06｜動物性慾望（感官刺激）</option>
+                  <option value="07">07｜圍觀與熱鬧</option>
+                  <option value="08">08｜偷窺（內幕/自我暴露）</option>
+                  <option value="09">09｜反差與反常</option>
+                  <option value="10">10｜特殊消息（獨家/新概念）</option>
+                  <option value="11">11｜強節奏（BGM/排比）</option>
+                  <option value="12">12｜人間美好</option>
+                  <option value="13">13｜新奇有趣</option>
+                </select>
+              </div>
+              <div>
+                <label class="field-label">骨架類型</label>
+                <select id="pro-skeleton">
+                  <option value="">自動選擇（推薦）</option>
+                  <option value="interest">興趣點推進（冷啟動首選）</option>
+                  <option value="drama">戲劇性推進（高評論互動）</option>
+                  <option value="resonance">共鳴型推進（感同身受）</option>
+                  <option value="logic">理性邏輯型（知識IP首選）</option>
+                  <option value="rhythm">節奏型推進（洗腦感）</option>
+                </select>
+              </div>
+            </div>
+            <div class="selector-row">
+              <div>
+                <label class="field-label">目標平台</label>
+                <select id="pro-platform">
+                  <option value="both">視頻號 + 小紅書（兩版）</option>
+                  <option value="wechat">視頻號</option>
+                  <option value="xhs">小紅書</option>
+                </select>
+              </div>
+              <div>
+                <label class="field-label">腳本長度</label>
+                <select id="pro-length">
+                  <option value="30">短｜30秒 / 約150字</option>
+                  <option value="60" selected>中｜60秒 / 約300字</option>
+                  <option value="90">長｜90秒 / 約500字</option>
+                </select>
+              </div>
+            </div>
+            <div class="story-field">
+              <label class="field-label">今日素材補充（可選）</label>
+              <textarea id="pro-extra" rows="3" placeholder="今天有什麼新故事？想強調什麼真實細節？有沒有剛踩的坑？"></textarea>
+            </div>
+            <button class="btn" onclick="generatePro()">⚡ 生成人設感腳本</button>
+          </div>
+
+          <div class="card">
+            <h2>人設快速預覽</h2>
+            <p style="font-size:12px;color:var(--text-muted);margin-bottom:12px">腳本生成時自動帶入以下資料（在故事庫編輯）</p>
+            <div style="margin-bottom:12px">
+              <span class="persona-tag">醫療出身</span>
+              <span class="persona-tag">科技PM</span>
+              <span class="persona-tag">珠寶跨境</span>
+              <span class="persona-tag">台灣視角</span>
+              <span class="persona-tag">西班牙倉</span>
+              <span class="persona-tag">AI管理</span>
+              <span class="persona-tag">同行者</span>
+            </div>
+            <div class="divider"></div>
+            <p style="font-size:11px;color:var(--text-muted);margin-bottom:5px">定位一句話</p>
+            <p style="font-size:13px;color:var(--gold-light);line-height:1.7;margin-bottom:14px" id="pro-positioning-preview">「醫療出身、用 AI 管珠寶跨境的台灣女老闆，帶深圳工廠主從供應鏈優勢跨出去——我就在路上，把親歷的坑和機會第一時間告訴你。」</p>
+            <div class="divider"></div>
+            <p style="font-size:11px;color:var(--text-muted);margin-bottom:5px">核心立場</p>
+            <p style="font-size:13px;color:var(--text);line-height:1.6;margin-bottom:14px">反對限制性信念。資源給願意行動的人，不浪費在藉口上。</p>
+            <div class="divider"></div>
+            <p style="font-size:11px;color:var(--text-muted);margin-bottom:5px">與觀眾關係</p>
+            <p style="font-size:13px;color:var(--text)">同行者——我在路上，把學到的分享給你</p>
+            <button class="btn btn-outline" style="margin-top:16px" onclick="switchTab('story')">編輯故事庫 →</button>
+          </div>
+
+        </div>
+
+        <div class="loading" id="pro-loading">
+          <div class="spinner"></div>
+          <p class="loading-msg">正在生成有人設感的腳本（約 30–45 秒）...</p>
+        </div>
+
+        <div class="pro-output" id="pro-output">
+          <div class="grid-2" id="pro-drafts-grid"></div>
+          <div class="confirm-bar">
+            <p>可直接編輯後存入語料庫</p>
+            <button class="btn btn-success" style="max-width:280px" onclick="confirmProSave()">✅ 存入語料庫</button>
+            <div class="status-msg" id="pro-save-status"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ 故事庫 ════ -->
+    <div class="tab-panel" id="tab-story">
+      <div class="container">
+        <div class="grid-2">
+
+          <div>
+            <div class="card mb-16">
+              <h2>核心身份</h2>
+              <div class="story-field">
+                <label class="field-label">定位一句話</label>
+                <textarea id="s-positioning" rows="3">醫療出身、用 AI 管珠寶跨境的台灣女老闆，帶深圳工廠主從供應鏈優勢跨出去——我就在路上，把親歷的坑和機會第一時間告訴你。</textarea>
+              </div>
+              <div class="story-field">
+                <label class="field-label">核心驅動力</label>
+                <textarea id="s-driver" rows="2">自由——貫穿所有人生選擇的唯一主題。「自由是需要旅費的，我得要賺錢。」</textarea>
+              </div>
+              <div class="story-field">
+                <label class="field-label">核心立場（你堅決反對什麼）</label>
+                <textarea id="s-stance" rows="3">反對限制性信念——知道現狀不好，卻拒絕改變，滿是藉口的人。「救不了就讓他爛掉好了」——資源給願意行動的人。</textarea>
+              </div>
+              <div class="story-field">
+                <label class="field-label">與觀眾關係</label>
+                <textarea id="s-relationship" rows="2">同行者——我在路上，把我學到的分享給你。不裝已成功，真實且耐打。</textarea>
+              </div>
+              <div class="story-field">
+                <label class="field-label">情緒基調</label>
+                <textarea id="s-tone" rows="1">大剌剌不拐彎（天然狀態，不是設計出來的）</textarea>
+              </div>
+            </div>
+
+            <div class="card mb-16">
+              <h2>最與眾不同的能力</h2>
+              <div class="story-field">
+                <label class="field-label">三合一核心能力</label>
+                <textarea id="s-skills" rows="4">1. 快速搭建系統 + 調動夥伴落地——想到就能建，建了就能跑
+2. 數據分析能力——看得懂數字背後的意思
+3. 業務洞察 + 談大單——能感受到機會在哪，能把機會談成合約</textarea>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="card mb-16">
+              <h2>人生時間軸（格格不入素材）</h2>
+              <div class="story-field">
+                <label class="field-label">起點：台灣小鄉鎮</label>
+                <textarea id="s-origin" rows="3">周圍的人純樸，但從小感覺自己「不屬於這裡」。天生帶著野心，想去城市、想離開台灣、想去遠方。別人玩鬧時她在學習，因為「我知道我總是要離開這裡的」。</textarea>
+              </div>
+              <div class="story-field">
+                <label class="field-label">醫療期：聽力師</label>
+                <textarea id="s-medical" rows="4">念醫學院，主修聽力師（台灣稀缺醫療行業）。搬到台北天母——「終於感受自由的空氣」。學拳擊、話劇、鏡頭表演、瑜伽、空環、鋼管、自由潛水。當外拍模特、Youtuber、接業配。頓悟：「我不屬於只能走 SOP 的醫療業。」</textarea>
+              </div>
+              <div class="story-field">
+                <label class="field-label">科技期：健康科技業 PM</label>
+                <textarea id="s-tech" rows="3">進健康科技業做 PM，日本美國台灣三地跑。積累跨國談單技術、開創跨國專案的流程能力。</textarea>
+              </div>
+              <div class="story-field">
+                <label class="field-label">現在：知識付費 + 珠寶跨境 + 海外</label>
+                <textarea id="s-now" rows="4">咬牙離開大資本健康科技業。把醫療 SOP 嚴謹性 + 專案談單技術 + 跨國流程能力帶進知識付費，成為營運長。現在在海外，做跨境電商（珠寶）+ 用 AI 管理公司。</textarea>
+              </div>
+            </div>
+
+            <div class="card">
+              <h2>差異化護城河</h2>
+              <div class="story-field">
+                <label class="field-label">對標帳號</label>
+                <textarea id="s-competitor" rows="2">班長跨境——已落地美區，理想型，是目標狀態的參照</textarea>
+              </div>
+              <div class="story-field">
+                <label class="field-label">我的護城河（別人很難複製）</label>
+                <textarea id="s-moat" rows="4">1. 珠寶供應鏈——垂直品類，不是泛跨境
 2. 西班牙渠道 + 倉儲——歐洲切入點，稀缺
 3. 台灣金流優勢——跨境收付款靈活，海外資訊掌握快
 競爭策略：借（台灣視角）+ 跨（醫療→跨境第一人）</textarea>
+              </div>
+              <div class="story-field">
+                <label class="field-label">想帶觀眾去哪裡（3個月後）</label>
+                <textarea id="s-destination" rows="3">理解 AI 能突破所有技術門檻 → 相信自己所想及可達 → 每個人都能走向自由理想的生活</textarea>
+              </div>
+            </div>
           </div>
-          <div class="story-field">
-            <label class="field-label">想帶觀眾去哪裡（3個月後）</label>
-            <textarea id="s-destination" rows="3">理解 AI 能突破所有技術門檻 → 相信自己所想及可達 → 每個人都能走向自由理想的生活</textarea>
-          </div>
+
+        </div>
+
+        <div class="confirm-bar" style="margin-top:16px">
+          <p>編輯後同步到飛書，腳本生成時自動帶入</p>
+          <button class="btn" style="max-width:280px" onclick="syncStory()">☁️ 同步到飛書</button>
+          <div class="status-msg" id="story-save-status"></div>
         </div>
       </div>
-
     </div>
 
-    <div class="confirm-bar" style="margin-top:16px">
-      <p>編輯後同步到飛書，腳本生成時自動帶入</p>
-      <button class="btn" style="max-width:280px" onclick="syncStory()">☁️ 同步到飛書</button>
-      <div class="status-msg" id="story-save-status"></div>
-    </div>
-  </div>
-</div>
-
-<!-- ════ Tab 5: IP 定位助手 ════ -->
-<div class="tab-panel" id="tab-positioning">
-  <div class="container">
-    <div style="max-width:700px;margin:0 auto">
-
-      <div class="card mb-16" id="pos-card">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-          <h2 style="margin:0">IP 定位引導問答</h2>
-          <span style="font-size:12px;color:var(--text-muted)" id="pos-progress-text">第 1 題 / 共 7 題</span>
-        </div>
-        <div class="pos-progress" id="pos-dots"></div>
-        <div id="pos-question-area"></div>
-        <div style="display:flex;gap:10px;margin-top:16px" id="pos-nav">
-          <button class="btn btn-outline" style="width:auto;padding:10px 20px;font-size:14px;margin-top:0" onclick="posBack()" id="pos-back-btn">← 上一題</button>
-          <button class="btn" style="flex:1;margin-top:0" onclick="posNext()" id="pos-next-btn">下一題 →</button>
-        </div>
-      </div>
-
-      <div id="pos-result" style="display:none">
-        <div class="card mb-16">
-          <h2>🎯 你的定位整合報告</h2>
-          <div id="pos-result-content" style="font-size:13px;line-height:1.9"></div>
-        </div>
-        <div class="confirm-bar">
-          <button class="btn" style="max-width:280px;margin-bottom:8px" onclick="savePosResult()">☁️ 存入飛書故事庫</button>
-          <br>
-          <button class="btn btn-outline btn-sm" onclick="resetPositioning()" style="margin-top:8px">重新定位</button>
-          <div class="status-msg" id="pos-save-status"></div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-</div>
+  </div><!-- /main-content -->
+</div><!-- /app-layout -->
 
 <script>
 // ── Webhooks ─────────────────────────────────────────────
@@ -645,24 +798,29 @@ const N8N = 'https://eglobal.app.n8n.cloud/webhook';
 const WH_SEARCH      = N8N + '/copy-studio-search';
 const WH_GENERATE    = N8N + '/copy-studio-generate';
 const WH_CONFIRM     = N8N + '/copy-studio-confirm';
-const WH_PRO         = N8N + '/copy-studio-generate-pro';   // 需在 n8n 建立
-const WH_STORY_SYNC  = N8N + '/copy-studio-story-sync';     // 需在 n8n 建立
-const WH_TOPIC_IDEAS = N8N + '/copy-studio-topic-ideas';    // 需在 n8n 建立
+const WH_PRO         = N8N + '/copy-studio-generate-pro';
+const WH_STORY_SYNC  = N8N + '/copy-studio-story-sync';
+const WH_TOPIC_IDEAS = N8N + '/copy-studio-topic-ideas';
+const WH_DOUYIN      = N8N + '/copy-studio-search-douyin';
+const WH_SAVE_TOPICS = N8N + '/copy-studio-save-topics';
 
 let searchPlatform = 'yt', directPlatform = 'yt';
 let currentRecordId = '', currentTitle = '', proRecordId = '';
 
-// ── Tabs ─────────────────────────────────────────────────
-function switchTab(id, btn) {
+// ── Navigation ───────────────────────────────────────────
+function switchTab(id) {
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.step-item').forEach(b => b.classList.remove('active'));
   document.getElementById('tab-' + id).classList.add('active');
-  if (btn) btn.classList.add('active');
+  const item = document.querySelector(`.step-item[data-tab="${id}"]`);
+  if (item) {
+    item.classList.add('active');
+    item.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+  }
 }
-function gotoStory() { switchTab('story', document.querySelectorAll('.tab-btn')[3]); }
 
 // ── Utilities ────────────────────────────────────────────
-function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function updateCount(ta, id) { document.getElementById(id).textContent = ta.value.length + ' 字'; }
 function setStatus(id, msg, type) { const el = document.getElementById(id); el.textContent = msg; el.className = 'status-msg' + (type ? ' '+type : ''); }
 function showLoad(id, msg) { const el = document.getElementById(id); el.style.display = 'block'; const p = el.querySelector('p'); if (p && msg) p.textContent = msg; }
@@ -683,12 +841,82 @@ function getPersona() {
   };
 }
 
-// ── Tab 1 ────────────────────────────────────────────────
+// ── STEP 02: 靈感收集 — 抖音熱搜 ──────────────────────────
+async function searchDouyin() {
+  const niche = document.getElementById('douyin-niche').value.trim();
+  if (!niche) { alert('請輸入賽道方向'); return; }
+  document.getElementById('douyin-loading').style.display = 'block';
+  document.getElementById('douyin-results').style.display = 'none';
+  try {
+    const r = await fetch(WH_DOUYIN, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ niche })
+    });
+    const d = await r.json();
+    const topics = d.topics || d.results || [];
+    renderDouyinResults(topics);
+  } catch(e) {
+    document.getElementById('douyin-loading').style.display = 'none';
+    alert('抓取失敗：' + e.message);
+  }
+}
+
+function renderDouyinResults(topics) {
+  document.getElementById('douyin-loading').style.display = 'none';
+  if (!topics.length) { alert('沒有找到相關熱搜靈感'); return; }
+  document.getElementById('douyin-list').innerHTML = topics.map((t, i) => `
+    <div class="douyin-item">
+      <input type="checkbox" id="dt${i}"
+             data-word="${esc(t.word)}" data-angle="${esc(t.angle||'')}" data-reason="${esc(t.reason||'')}">
+      <div class="douyin-item-body">
+        <div class="douyin-word">${esc(t.word)}</div>
+        ${t.hot ? `<div class="douyin-hot">🔥 熱度 ${Number(t.hot||0).toLocaleString()}</div>` : ''}
+        ${t.angle ? `<div class="douyin-angle">💡 角度：${esc(t.angle)}</div>` : ''}
+        ${t.reason ? `<div class="douyin-reason">🤖 ${esc(t.reason)}</div>` : ''}
+      </div>
+      <button class="btn btn-sm btn-outline" style="flex-shrink:0;margin-top:0;font-size:11px;padding:5px 10px;white-space:nowrap"
+              onclick="useDouyinTopic('${esc(t.word)}','${esc(t.angle||'')}')">帶入生成</button>
+    </div>`).join('');
+  document.getElementById('douyin-results').style.display = 'block';
+}
+
+function useDouyinTopic(word, angle) {
+  const topic = angle ? word + '——' + angle : word;
+  document.getElementById('pro-topic').value = topic;
+  switchTab('pro');
+  setTimeout(() => document.getElementById('pro-topic').focus(), 100);
+}
+
+async function saveSelectedTopics() {
+  const checked = [...document.querySelectorAll('#douyin-list input:checked')];
+  if (!checked.length) { alert('請先勾選要存入的選題'); return; }
+  const topics = checked.map(c => ({
+    word:   c.dataset.word,
+    angle:  c.dataset.angle,
+    reason: c.dataset.reason,
+    niche:  document.getElementById('douyin-niche').value.trim(),
+    source: '抖音熱搜'
+  }));
+  setStatus('douyin-save-status', '存入中...', '');
+  try {
+    await fetch(WH_SAVE_TOPICS, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ topics })
+    });
+    setStatus('douyin-save-status', `✅ 已存入 ${topics.length} 條到選題庫！`, 'success');
+    checked.forEach(c => { c.checked = false; });
+  } catch(e) { setStatus('douyin-save-status', '❌ 失敗：' + e.message, 'error'); }
+}
+
+// ── STEP 02: 靈感收集 — YT / XHS ──────────────────────────
 function selectPlatform(mode, platform, btn) {
   btn.parentElement.querySelectorAll('.platform-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  if (mode === 'search') { searchPlatform = platform; }
-  else {
+  if (mode === 'search') {
+    searchPlatform = platform;
+  } else {
     directPlatform = platform;
     document.getElementById('direct-url-area').style.display  = platform === 'text' ? 'none' : 'block';
     document.getElementById('direct-text-area').style.display = platform === 'text' ? 'block' : 'none';
@@ -764,7 +992,7 @@ async function confirmSave() {
   } catch(e) { setStatus('search-save-status', '❌ 失敗：' + e.message, 'error'); }
 }
 
-// ── Tab 2 ────────────────────────────────────────────────
+// ── STEP 03: 選題庫 ──────────────────────────────────────
 function switchPillar(id, btn) {
   document.querySelectorAll('.pillar-tab').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('.keyword-section').forEach(s => s.classList.remove('active'));
@@ -776,7 +1004,7 @@ function useKeyword(chip) {
   const kw = chip.childNodes[0].textContent.trim();
   document.getElementById('pro-topic').value  = kw;
   document.getElementById('topic-seed').value = kw;
-  switchTab('pro', document.querySelectorAll('.tab-btn')[2]);
+  switchTab('pro');
   setTimeout(() => document.getElementById('pro-topic').focus(), 100);
 }
 
@@ -796,7 +1024,7 @@ async function generateTopicIdeas() {
   } finally { document.getElementById('topic-loading').style.display = 'none'; }
 }
 
-// ── Tab 3 ────────────────────────────────────────────────
+// ── STEP 04: 腳本生成 Pro ─────────────────────────────────
 async function generatePro() {
   const topic = document.getElementById('pro-topic').value.trim();
   if (!topic) { alert('請輸入選題 / 主題'); return; }
@@ -840,7 +1068,7 @@ async function confirmProSave() {
   } catch(e) { setStatus('pro-save-status', '❌ 失敗：' + e.message, 'error'); }
 }
 
-// ── Tab 4 ────────────────────────────────────────────────
+// ── 故事庫 ────────────────────────────────────────────────
 async function syncStory() {
   setStatus('story-save-status', '同步中...', '');
   try {
@@ -850,7 +1078,7 @@ async function syncStory() {
   } catch(e) { setStatus('story-save-status', '❌ 需建立 n8n webhook: copy-studio-story-sync', 'error'); }
 }
 
-// ── Tab 5 ────────────────────────────────────────────────
+// ── STEP 01: IP 定位助手 ──────────────────────────────────
 const POS_QS = [
   { num:1, layer:'基礎框架', q:'你做這個帳號最終想怎麼變現？', hint:'', type:'options', options:['賣課 + 私域直播','帶貨 / 電商','接業配','導流私域','其他'] },
   { num:2, layer:'基礎框架', q:'你打算在哪個平台起號？', hint:'', type:'options', options:['視頻號','小紅書','視頻號 + 小紅書','抖音','多平台'] },
