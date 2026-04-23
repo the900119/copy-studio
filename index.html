@@ -803,6 +803,9 @@ const WH_STORY_SYNC  = N8N + '/copy-studio-story-sync';
 const WH_TOPIC_IDEAS = N8N + '/copy-studio-topic-ideas';
 const WH_DOUYIN      = N8N + '/copy-studio-search-douyin';
 const WH_SAVE_TOPICS = N8N + '/copy-studio-save-topics';
+const WH_XHS_SEARCH     = N8N + '/copy-studio-xhs-search';
+const WH_XHS_TRANSCRIBE = N8N + '/copy-studio-xhs-transcribe';
+const WH_XHS_REWRITE    = N8N + '/copy-studio-xhs-rewrite';
 
 let searchPlatform = 'yt', directPlatform = 'yt';
 let currentRecordId = '', currentTitle = '', proRecordId = '';
@@ -916,10 +919,17 @@ function selectPlatform(mode, platform, btn) {
   btn.classList.add('active');
   if (mode === 'search') {
     searchPlatform = platform;
+    const inp = document.getElementById('search-input');
+    inp.placeholder = platform === 'xhs' ? '輸入小紅書創作者暱稱（如 班長跨境）' : '頻道 URL 或 @handle（如 @MrBeast）';
   } else {
     directPlatform = platform;
     document.getElementById('direct-url-area').style.display  = platform === 'text' ? 'none' : 'block';
     document.getElementById('direct-text-area').style.display = platform === 'text' ? 'block' : 'none';
+    if (platform === 'xhs') {
+      document.getElementById('direct-url').placeholder = '小紅書貼文 URL（https://www.xiaohongshu.com/explore/...）';
+    } else {
+      document.getElementById('direct-url').placeholder = 'https://www.youtube.com/watch?v=...';
+    }
   }
 }
 
@@ -940,13 +950,19 @@ function showDrafts(data) {
 
 async function doSearch() {
   const input = document.getElementById('search-input').value.trim();
-  if (!input) { alert('請輸入頻道 URL 或 handle'); return; }
-  showLoad('search-loading', '正在搜尋半年內熱門內容（約 60–120 秒）...');
+  if (!input) { alert('請輸入頻道 URL 或創作者名字'); return; }
+  showLoad('search-loading', searchPlatform === 'xhs' ? '正在搜尋小紅書創作者高讚貼文（約 30 秒）...' : '正在搜尋半年內熱門內容（約 60–120 秒）...');
   document.getElementById('search-results').style.display = 'none';
   document.getElementById('search-drafts').style.display  = 'none';
   try {
-    const r = await fetch(WH_SEARCH, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ platform: searchPlatform, url: input }) });
-    const d = await r.json(); hideLoad('search-loading'); renderResults(d.results || []);
+    if (searchPlatform === 'xhs') {
+      const r = await fetch(WH_XHS_SEARCH, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ creator: input }) });
+      const d = await r.json(); hideLoad('search-loading');
+      renderXHSResults(d);
+    } else {
+      const r = await fetch(WH_SEARCH, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ platform: searchPlatform, url: input }) });
+      const d = await r.json(); hideLoad('search-loading'); renderResults(d.results || []);
+    }
   } catch(e) { hideLoad('search-loading'); alert('搜尋失敗：' + e.message); }
 }
 
@@ -963,9 +979,30 @@ function renderResults(list) {
   document.getElementById('search-results').style.display = 'block';
 }
 
+function renderXHSResults(data) {
+  const notes = data.notes || [];
+  if (!notes.length) { alert('找不到創作者或高讚貼文，請確認名字是否正確'); return; }
+  const creator = data.creator || '';
+  document.getElementById('results-list').innerHTML =
+    `<p style="font-size:11px;color:var(--gold-dim);margin-bottom:8px">創作者：${esc(creator)} · 共 ${notes.length} 篇高讚貼文</p>` +
+    notes.map((n, i) => `
+    <div class="result-item">
+      <input type="checkbox" id="r${i}" value="${esc(n.note_id)}" data-title="${esc(n.title)}" data-type="${esc(n.note_type)}">
+      <label for="r${i}" class="result-meta" style="cursor:pointer">
+        <div class="result-title" title="${esc(n.title)}">${esc(n.title)}</div>
+        <div class="result-sub">❤️ ${(n.likes||0).toLocaleString()} · ${n.note_type === 'video' ? '🎬 影片' : '📸 圖文'}</div>
+      </label>
+    </div>`).join('');
+  document.getElementById('search-results').style.display = 'block';
+}
+
 async function generateFromSelected() {
   const checked = [...document.querySelectorAll('#results-list input:checked')];
   if (!checked.length) { alert('請先勾選要生成的影片'); return; }
+  if (searchPlatform === 'xhs') {
+    await generateFromXHSNote(checked[0].value, checked[0].dataset.title, checked[0].dataset.type);
+    return;
+  }
   showLoad('search-loading', '正在生成文案（約 45–90 秒）...');
   try {
     const r = await fetch(WH_GENERATE, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ platform: searchPlatform, url: checked[0].value, text: '' }) });
@@ -973,10 +1010,46 @@ async function generateFromSelected() {
   } catch(e) { hideLoad('search-loading'); alert('生成失敗：' + e.message); }
 }
 
+async function generateFromXHSNote(noteId, title, noteType) {
+  if (noteType !== 'video') { alert('目前只支援影片類型的貼文（需要音頻轉逐字稿）'); return; }
+  showLoad('search-loading', '① 下載影片並轉逐字稿（Groq Whisper，約 30 秒）...');
+  try {
+    const t = await fetch(WH_XHS_TRANSCRIBE, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ note_id: noteId }) });
+    const td = await t.json();
+    if (!td.transcript) { hideLoad('search-loading'); alert('逐字稿為空，可能是純圖文貼文'); return; }
+    showLoad('search-loading', '② 正在用餅妹人設改寫腳本（約 20 秒）...');
+    const persona = getPersona();
+    const r = await fetch(WH_XHS_REWRITE, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ transcript: td.transcript, title: td.title || title, platform: 'xhs', length: 60, persona })
+    });
+    const rd = await r.json();
+    hideLoad('search-loading');
+    document.getElementById('draft-xhs').value = rd.script || '';
+    document.getElementById('draft-threads').value = '';
+    document.getElementById('draft-video').value = '';
+    document.getElementById('cnt-xhs').textContent = (rd.script||'').length + ' 字';
+    document.getElementById('cnt-threads').textContent = '0 字';
+    document.getElementById('cnt-video').textContent = '0 字';
+    document.getElementById('search-drafts').style.display = 'block';
+    document.getElementById('search-drafts').scrollIntoView({ behavior: 'smooth' });
+    setStatus('search-save-status', '', '');
+  } catch(e) { hideLoad('search-loading'); alert('生成失敗：' + e.message); }
+}
+
+function extractXHSNoteId(url) {
+  const m = url.match(/\/explore\/([a-f0-9]+)/i) || url.match(/noteId=([a-f0-9]+)/i);
+  return m ? m[1] : url.trim();
+}
+
 async function generateDirect() {
   let url = '', text = '';
   if (directPlatform === 'text') { text = document.getElementById('direct-text').value.trim(); if (!text) { alert('請輸入文字內容'); return; } }
   else { url = document.getElementById('direct-url').value.trim(); if (!url) { alert('請輸入 URL'); return; } }
+  if (directPlatform === 'xhs') {
+    await generateFromXHSNote(extractXHSNoteId(url), '', 'video');
+    return;
+  }
   showLoad('search-loading', '正在生成文案（約 30–60 秒）...');
   try {
     const r = await fetch(WH_GENERATE, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ platform: directPlatform, url, text }) });
