@@ -1661,7 +1661,7 @@ function quickSearchCreator(platform, handle, name) {
   const anchor = target.querySelector('.grid-2');
 
   const wrapper = document.createElement('div');
-  wrapper.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:16px;align-items:start';
+  wrapper.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:16px;align-items:stretch';
 
   if (pillarCard) {
     pillarCard.removeAttribute('style');
