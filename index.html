@@ -1184,7 +1184,6 @@ function renderXHSResults(data, inputRedId) {
         <div class="result-sub">❤️ ${(n.likes||0).toLocaleString()} · ${n.note_type === 'video' ? '🎬 影片' : '📸 圖文'}</div>
       </div>
       <div style="display:flex;gap:6px;flex-shrink:0">
-        ${n.note_type === 'video' ? `<button class="add-inbox-btn" style="background:var(--gold);color:#000;font-weight:600" onclick="generateFromXHSNote('${esc(n.note_id)}','${esc(n.title)}','video','${esc(n.xsec_token||'')}')">▶️ 生成</button>` : ''}
         <button class="add-inbox-btn" onclick="addToInbox('${esc(n.title)}','${esc(n.title)}',${n.likes||0},'小紅書','','${esc(creator)}','${esc(n.note_id)}','${esc(n.xsec_token||'')}')">＋暫存</button>
       </div>
     </div>`).join('');
