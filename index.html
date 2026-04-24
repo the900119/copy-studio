@@ -205,8 +205,8 @@
     .tb-item:last-child { border-bottom: none; }
     .tb-rank { font-size: 11px; font-weight: 700; color: var(--gold-dim); width: 18px; text-align: right; flex-shrink: 0; }
     .tb-rank.top3 { color: var(--gold); }
-    .tb-keyword { font-size: 12px; color: var(--text); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; }
-    .tb-keyword:hover { color: var(--gold); }
+    .tb-keyword { font-size: 12px; color: var(--text); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; text-decoration: none; }
+    .tb-keyword:hover { color: var(--gold); text-decoration: underline; }
     .tb-add { font-size: 10px; padding: 2px 7px; border-radius: 5px; cursor: pointer; border: 1px solid rgba(212,168,67,0.2); background: transparent; color: var(--gold-dim); font-family: inherit; transition: all 0.15s; flex-shrink: 0; }
     .tb-add:hover { background: rgba(212,168,67,0.1); color: var(--gold); }
 
@@ -699,6 +699,21 @@
     <!-- ════ STEP 04: 腳本生成器 Pro ════ -->
     <div class="tab-panel" id="tab-pro">
       <div class="container">
+
+        <!-- ── Step 1：原文逐字稿（頂部，帶入選題後立即顯示） ── -->
+        <div class="card mb-16" id="pro-source-card" style="display:none">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+            <div class="source-label" style="margin-bottom:0">原文逐字稿 / 參考素材</div>
+            <span style="font-size:11px;color:var(--text-muted)">先閱讀原文，再決定 Hook 與補充角度</span>
+          </div>
+          <div id="source-fetch-hint" style="display:none;text-align:center;padding:20px 0">
+            <p style="font-size:13px;color:var(--text-muted);margin-bottom:12px">此選題來自 XHS 影片，點擊取得逐字稿後再生成</p>
+            <button onclick="fetchPendingTranscript()" style="font-size:13px;padding:8px 20px;border-radius:8px;border:1px solid var(--gold-dim);background:transparent;color:var(--gold-dim);cursor:pointer;font-family:inherit">📥 取得原影片逐字稿</button>
+          </div>
+          <div class="source-body" id="source-display" style="max-height:300px;overflow-y:auto;white-space:pre-wrap;font-size:13px;line-height:1.75;color:var(--text-muted)">（無參考素材）</div>
+        </div>
+
+        <!-- ── Step 2：腳本設定 + 人設預覽 ── -->
         <div class="grid-2 mb-16">
 
           <div class="card">
@@ -740,8 +755,8 @@
               </div>
             </div>
             <div class="story-field">
-              <label class="field-label">參考素材 / 逐字稿（可選）</label>
-              <textarea id="pro-extra" rows="4" placeholder="從步驟三帶入的逐字稿，或今天想用的真實素材、踩坑故事、數據…"></textarea>
+              <label class="field-label">你的補充（素材、故事、數據）</label>
+              <textarea id="pro-extra" rows="4" placeholder="看完原文後，加入你想融入的真實素材、踩坑故事、個人觀點或數據…"></textarea>
             </div>
             <button class="btn" onclick="generatePro()">⚡ 一鍵生成長文 · 小紅書 · 短影音</button>
           </div>
@@ -772,63 +787,47 @@
 
         </div>
 
+        <!-- ── Loading ── -->
         <div class="loading" id="pro-loading">
           <div class="spinner"></div>
           <p class="loading-msg">正在生成三版腳本（長文 · 小紅書 · 短影音，約 40–60 秒）...</p>
         </div>
 
+        <!-- ── Step 3：輸出（全寬 tabs） ── -->
         <div class="pro-output" id="pro-output">
-
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start;margin-bottom:16px">
-
-            <!-- 左欄：原文 -->
-            <div class="card" style="padding-bottom:12px">
-              <div class="source-label" style="margin-bottom:10px">
-                原文參考
-                <span class="diff-note">↑ 確認與原文差異度</span>
-              </div>
-              <div id="source-fetch-hint" style="display:none;text-align:center;padding:24px 0">
-                <p style="font-size:13px;color:var(--text-muted);margin-bottom:12px">此選題來自 XHS 影片，尚未取得逐字稿</p>
-                <button onclick="fetchPendingTranscript()" style="font-size:13px;padding:8px 20px;border-radius:8px;border:1px solid var(--gold-dim);background:transparent;color:var(--gold-dim);cursor:pointer">📥 取得原影片逐字稿</button>
-              </div>
-              <div class="source-body" id="source-display" style="max-height:480px;overflow-y:auto">（無參考素材）</div>
+          <div class="card">
+            <div class="out-tab-bar">
+              <button class="out-tab active" onclick="switchOutTab('xhs',this)">📸 小紅書</button>
+              <button class="out-tab"        onclick="switchOutTab('short',this)">🎵 抖音</button>
+              <button class="out-tab"        onclick="switchOutTab('long',this)">📝 長文</button>
             </div>
 
-            <!-- 右欄：三版輸出 tabs -->
-            <div class="card">
-              <div class="out-tab-bar">
-                <button class="out-tab active" onclick="switchOutTab('xhs',this)">📸 小紅書</button>
-                <button class="out-tab"        onclick="switchOutTab('short',this)">🎵 抖音</button>
-                <button class="out-tab"        onclick="switchOutTab('long',this)">📝 長文</button>
+            <div id="out-xhs" class="out-pane active">
+              <textarea id="pro-xhs" rows="16" oninput="updateCount(this,'cnt-xhs')" style="width:100%"></textarea>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+                <div class="char-count" id="cnt-xhs">0 字</div>
+                <button class="btn btn-sm btn-outline" style="margin:0" onclick="saveOneDraft('xhs')">📤 存這版到飛書</button>
               </div>
+            </div>
 
-              <div id="out-xhs" class="out-pane active">
-                <textarea id="pro-xhs" rows="18" oninput="updateCount(this,'cnt-xhs')" style="width:100%"></textarea>
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
-                  <div class="char-count" id="cnt-xhs">0 字</div>
-                  <button class="btn btn-sm btn-outline" style="margin:0" onclick="saveOneDraft('xhs')">📤 存這版到飛書</button>
-                </div>
+            <div id="out-short" class="out-pane">
+              <textarea id="pro-short" rows="16" oninput="updateCount(this,'cnt-short')" style="width:100%"></textarea>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+                <div class="char-count" id="cnt-short">0 字</div>
+                <button class="btn btn-sm btn-outline" style="margin:0" onclick="saveOneDraft('short')">📤 存這版到飛書</button>
               </div>
+            </div>
 
-              <div id="out-short" class="out-pane">
-                <textarea id="pro-short" rows="18" oninput="updateCount(this,'cnt-short')" style="width:100%"></textarea>
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
-                  <div class="char-count" id="cnt-short">0 字</div>
-                  <button class="btn btn-sm btn-outline" style="margin:0" onclick="saveOneDraft('short')">📤 存這版到飛書</button>
-                </div>
-              </div>
-
-              <div id="out-long" class="out-pane">
-                <textarea id="pro-long" rows="18" oninput="updateCount(this,'cnt-long')" style="width:100%"></textarea>
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
-                  <div class="char-count" id="cnt-long">0 字</div>
-                  <button class="btn btn-sm btn-outline" style="margin:0" onclick="saveOneDraft('long')">📤 存這版到飛書</button>
-                </div>
+            <div id="out-long" class="out-pane">
+              <textarea id="pro-long" rows="16" oninput="updateCount(this,'cnt-long')" style="width:100%"></textarea>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+                <div class="char-count" id="cnt-long">0 字</div>
+                <button class="btn btn-sm btn-outline" style="margin:0" onclick="saveOneDraft('long')">📤 存這版到飛書</button>
               </div>
             </div>
           </div>
 
-          <div class="confirm-bar" style="margin-top:0">
+          <div class="confirm-bar" style="margin-top:12px">
             <p style="font-size:12px;color:var(--text-muted)">可直接在上方編輯後存入語料庫</p>
             <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:center">
               <button class="btn btn-success" style="max-width:240px" onclick="confirmProSave()">✅ 全部三版存飛書</button>
@@ -1006,7 +1005,7 @@ async function loadTrendingBoard(forceRefresh = false) {
   if (!forceRefresh) {
     try {
       const cached = JSON.parse(localStorage.getItem(TRENDING_CACHE_KEY) || 'null');
-      if (cached && Date.now() - cached.ts < TRENDING_CACHE_TTL && cached.tiktok && cached.hackernews) {
+      if (cached && Date.now() - cached.ts < TRENDING_CACHE_TTL && cached.tiktok && cached.hackernews && cached.hackernews[0]?.url) {
         renderTrendingCol('tb-douyin',     '🔥 抖音熱搜',   cached.douyin     || []);
         renderTrendingCol('tb-xhs',        '📸 小紅書熱門', cached.xhs        || []);
         renderTrendingCol('tb-tiktok',     '🎵 TikTok',     cached.tiktok     || []);
@@ -1040,6 +1039,16 @@ async function loadTrendingBoard(forceRefresh = false) {
   }
 }
 
+function tbSearchUrl(src, keyword, itemUrl) {
+  if (itemUrl) return itemUrl;
+  const q = encodeURIComponent(keyword);
+  if (src === '抖音熱搜')   return 'https://www.douyin.com/search/' + q;
+  if (src === '小紅書熱門') return 'https://www.xiaohongshu.com/search_result/?keyword=' + q;
+  if (src === 'TikTok')     return 'https://www.tiktok.com/search?q=' + q;
+  if (src === 'HackerNews') return 'https://hn.algolia.com/?q=' + q;
+  return '#';
+}
+
 function renderTrendingCol(elId, title, items) {
   const el = document.getElementById(elId);
   if (!el) return;
@@ -1048,10 +1057,11 @@ function renderTrendingCol(elId, title, items) {
   el.innerHTML = `<div class="tb-col-title">${title}</div>
     <div style="max-height:168px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--gold-dim) transparent">` +
     items.map(item => {
-      const kw = esc(item.keyword || '');
+      const kw  = esc(item.keyword || '');
+      const url = esc(tbSearchUrl(src, item.keyword || '', item.url || ''));
       return `<div class="tb-item">
         <span class="tb-rank${item.rank <= 3 ? ' top3' : ''}">${item.rank}</span>
-        <span class="tb-keyword" title="${kw}" onclick="addToInbox('${kw}','${kw}',0,'${src}','${kw}')">${kw}</span>
+        <a class="tb-keyword" href="${url}" target="_blank" rel="noopener" title="點擊查看詳情">${kw}</a>
         <button class="tb-add" onclick="tbAddToInbox(this,'${kw}','${src}')">＋</button>
       </div>`;
     }).join('') + `</div>`;
@@ -1433,24 +1443,35 @@ async function generatePro() {
   } catch(e) { document.getElementById('pro-loading').style.display = 'none'; alert('需在 n8n 建立 webhook: copy-studio-generate-pro\n\n' + e.message); }
 }
 
+function fmtOut(text) {
+  if (!text) return '';
+  // Add newline after sentence-ending punctuation, collapse excess blanks
+  return text.replace(/([。！？…]+)\s*/g, '$1\n').replace(/\n{3,}/g, '\n\n').trim();
+}
+
 function renderProDrafts(data) {
   document.getElementById('pro-loading').style.display = 'none';
   // Fill three panes
   const longEl  = document.getElementById('pro-long');
   const xhsEl   = document.getElementById('pro-xhs');
   const shortEl = document.getElementById('pro-short');
-  longEl.value  = data.long_script  || data.wechat_script || '';
-  xhsEl.value   = data.xhs_script   || '';
-  shortEl.value = data.short_script  || '';
+  longEl.value  = fmtOut(data.long_script  || data.wechat_script || '');
+  xhsEl.value   = fmtOut(data.xhs_script   || '');
+  shortEl.value = fmtOut(data.short_script  || '');
   ['long','xhs','short'].forEach(k => {
     const el = document.getElementById('pro-' + k);
     const cnt = document.getElementById('cnt-' + k);
     if (el && cnt) cnt.textContent = el.value.length + ' 字';
   });
-  // Show source panel (strip 【...】 header prefix if present)
-  const extra = document.getElementById('pro-extra')?.value || '';
+  // Source panel already at top — update only if content is missing
   const srcEl = document.getElementById('source-display');
-  if (srcEl) srcEl.textContent = extra.replace(/^【[^\n]*】\n?/, '') || '（無填寫素材，以下內容為 AI 基於人設自行生成）';
+  if (srcEl && (srcEl.textContent === '（無參考素材）' || !srcEl.textContent.trim())) {
+    const aiCtx = (data.source_context || '').trim();
+    if (aiCtx) {
+      srcEl.textContent = fmtOut(aiCtx);
+      document.getElementById('pro-source-card').style.display = '';
+    }
+  }
   // Show first tab
   switchOutTab('xhs', document.querySelector('.out-tab'));
   document.getElementById('pro-output').style.display = 'block';
@@ -1693,21 +1714,43 @@ function useInboxTopic(id) {
   if (!item) return;
   document.getElementById('pro-topic').value = item.angle;
   document.getElementById('pro-extra').value = '';
-  // XHS video: store note_id, show fetch hint in source panel
+
+  const sourceCard = document.getElementById('pro-source-card');
+  const hint       = document.getElementById('source-fetch-hint');
+  const display    = document.getElementById('source-display');
+
+  pendingNoteId    = '';
+  pendingXsecToken = '';
+  if (hint) hint.style.display = 'none';
+
   if (item.note_id) {
-    pendingNoteId = item.note_id;
+    // XHS 影片：顯示取得逐字稿按鈕
+    pendingNoteId    = item.note_id;
     pendingXsecToken = item.xsec_token || '';
-    const hint = document.getElementById('source-fetch-hint');
-    const display = document.getElementById('source-display');
-    if (hint) hint.style.display = '';
     if (display) display.textContent = '';
+    if (hint) hint.style.display = '';
   } else {
-    pendingNoteId = '';
-    pendingXsecToken = '';
-    if (item.content) document.getElementById('pro-extra').value = item.content;
+    // 熱點詞 / URL / 其他：顯示可用的說明資訊
+    const lines = [];
+    if (item.source) lines.push('來源：' + item.source);
+    if (item.creator) lines.push('創作者：' + item.creator);
+    if (item.hot) lines.push('熱度：' + Number(item.hot).toLocaleString());
+    if (item.content) lines.push('', item.content);
+    const bodyText = lines.join('\n').trim();
+    if (display) display.textContent = bodyText || '（此選題無原文素材）';
+    // Pre-fill extra only if it's actual extended content, not just metadata
+    if (item.content && item.content.length > 30) {
+      document.getElementById('pro-extra').value = item.content;
+    }
   }
+
+  // Always show source card when a topic is loaded
+  if (sourceCard) sourceCard.style.display = '';
+
   switchTab('pro');
-  setTimeout(() => document.getElementById('pro-topic').focus(), 100);
+  setTimeout(() => {
+    sourceCard?.scrollIntoView({ behavior: 'smooth' });
+  }, 150);
 }
 
 async function fetchTranscriptOnly(noteId, xsecToken) {
@@ -1719,7 +1762,9 @@ async function fetchTranscriptOnly(noteId, xsecToken) {
     const td = await r.json();
     if (!td.transcript) { if (srcEl) srcEl.textContent = '⚠️ 逐字稿為空（可能是純圖文貼文）'; return; }
     if (srcEl) srcEl.textContent = td.transcript;
-    setStatus('pro-save-status', '✅ 逐字稿已載入左側參考欄', 'success');
+    const sourceCard = document.getElementById('pro-source-card');
+    if (sourceCard) sourceCard.style.display = '';
+    setStatus('pro-save-status', '✅ 逐字稿已載入上方參考欄', 'success');
     setTimeout(() => setStatus('pro-save-status', '', ''), 4000);
   } catch(e) {
     if (srcEl) srcEl.textContent = '⚠️ 取得失敗：' + e.message;
