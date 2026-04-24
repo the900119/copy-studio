@@ -994,8 +994,6 @@ function renderDouyinResults(topics) {
       </div>
       <div style="display:flex;flex-direction:column;gap:5px;flex-shrink:0">
         <button class="add-inbox-btn" onclick="addToInbox('${esc(t.angle||t.word)}','${esc(t.word)}',${t.hot||0},'抖音熱搜','${esc((t.angle||'')+(t.reason?'\\n'+t.reason:''))}')">＋暫存</button>
-        <button class="btn btn-sm btn-outline" style="margin-top:0;font-size:11px;padding:5px 10px;white-space:nowrap"
-                onclick="useDouyinTopic('${esc(t.word)}','${esc(t.angle||'')}')">帶入生成</button>
       </div>
     </div>`).join('');
   document.getElementById('douyin-results').style.display = 'block';
@@ -1580,14 +1578,42 @@ function useInboxTopic(id) {
   setTimeout(() => document.getElementById('pro-topic').focus(), 100);
 }
 
+async function fetchTranscriptOnly(noteId, xsecToken) {
+  const srcEl = document.getElementById('source-display');
+  const hint  = document.getElementById('source-fetch-hint');
+  if (srcEl) srcEl.textContent = '⏳ 轉錄中，約 30–60 秒…';
+  try {
+    const r  = await fetch(WH_XHS_TRANSCRIBE, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ note_id: noteId, xsec_token: xsecToken }) });
+    const td = await r.json();
+    if (!td.transcript) { if (srcEl) srcEl.textContent = '⚠️ 逐字稿為空（可能是純圖文貼文）'; return; }
+    if (srcEl) srcEl.textContent = td.transcript;
+    document.getElementById('pro-extra').value = '【原影片逐字稿】\n' + td.transcript;
+    currentTranscript = td.transcript;
+    setStatus('pro-save-status', '✅ 逐字稿已載入左側參考欄', 'success');
+    setTimeout(() => setStatus('pro-save-status', '', ''), 4000);
+  } catch(e) {
+    if (srcEl) srcEl.textContent = '⚠️ 取得失敗：' + e.message;
+  }
+}
+
 function fetchPendingTranscript() {
   if (!pendingNoteId) return;
-  const title = document.getElementById('pro-topic').value || '';
-  const hint = document.getElementById('source-fetch-hint');
-  if (hint) hint.style.display = 'none';
-  generateFromXHSNote(pendingNoteId, title, 'video', pendingXsecToken);
-  pendingNoteId = '';
+  const noteId     = pendingNoteId;
+  const xsecToken  = pendingXsecToken;
+  pendingNoteId    = '';
   pendingXsecToken = '';
+  const hint   = document.getElementById('source-fetch-hint');
+  if (hint) hint.style.display = 'none';
+  const proOut = document.getElementById('pro-output');
+  const alreadyGenerated = proOut && proOut.style.display !== 'none';
+  if (alreadyGenerated) {
+    // 已有生成內容 → 只更新左側逐字稿欄，不動右側
+    fetchTranscriptOnly(noteId, xsecToken);
+  } else {
+    // 尚未生成 → 走完整流程（帶入逐字稿 + 準備生成）
+    const title = document.getElementById('pro-topic').value || '';
+    generateFromXHSNote(noteId, title, 'video', xsecToken);
+  }
 }
 
 async function saveOneToFeishu(id) {
