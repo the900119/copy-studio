@@ -1044,7 +1044,7 @@ function renderTrendingCol(elId, title, items) {
   const el = document.getElementById(elId);
   if (!el) return;
   if (!items.length) { el.innerHTML = `<div class="tb-col-title">${title}</div><p style="font-size:12px;color:var(--text-muted);padding:8px 0">暫無資料</p>`; return; }
-  const src = title.includes('抖音') ? '抖音熱搜' : title.includes('小紅書') ? '小紅書熱門' : '微博熱搜';
+  const src = title.includes('抖音') ? '抖音熱搜' : title.includes('小紅書') ? '小紅書熱門' : title.includes('TikTok') ? 'TikTok' : title.includes('HackerNews') ? 'HackerNews' : '微博熱搜';
   el.innerHTML = `<div class="tb-col-title">${title}</div>
     <div style="max-height:168px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--gold-dim) transparent">` +
     items.map(item => {
