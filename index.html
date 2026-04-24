@@ -1736,41 +1736,70 @@ async function fetchHNComments(hnId, item, display) {
     const score = d.points || item.hot || 0;
     const commentCount = d.children?.length || 0;
 
-    let html = `<div style="margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border);display:flex;gap:16px;font-size:12px;color:var(--text-muted)">
-      <span>⬆ ${score} 分</span>
-      <span>💬 ${commentCount} 則討論</span>
-      <a href="https://news.ycombinator.com/item?id=${hnId}" target="_blank" rel="noopener" style="color:var(--gold-dim);margin-left:auto">打開討論串 →</a>
-    </div>`;
-
-    if (comments.length === 0) {
-      html += `<p style="font-size:13px;color:var(--text-muted)">暫無討論留言</p>`;
-    } else {
-      html += comments.map(c => {
-        const _ta = document.createElement('textarea');
-        _ta.innerHTML = c.text.replace(/<p>/gi,'\n').replace(/<br\s*\/?>/gi,'\n').replace(/<[^>]+>/g,'');
-        const text = _ta.value.replace(/\n{3,}/g,'\n\n').trim();
-        const author = c.author || '匿名';
-        const replies = c.children?.length || 0;
-        return `<div style="margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,0.04)">
-          <div style="font-size:11px;color:var(--gold-dim);margin-bottom:4px;display:flex;gap:10px">
-            <span>${esc(author)}</span>
-            ${replies > 0 ? `<span style="color:var(--text-muted)">💬 ${replies} 則回覆</span>` : ''}
-          </div>
-          <div style="font-size:13px;color:var(--text);line-height:1.65">${esc(text).slice(0, 400)}${text.length > 400 ? '…' : ''}</div>
-        </div>`;
-      }).join('');
+    // Decode HTML entities
+    function decodeHN(html) {
+      const ta = document.createElement('textarea');
+      ta.innerHTML = html.replace(/<p>/gi,'\n').replace(/<br\s*\/?>/gi,'\n').replace(/<[^>]+>/g,'');
+      return ta.value.replace(/\n{3,}/g,'\n\n').trim();
     }
+
+    // Build header
+    let html = `<div style="margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border);display:flex;gap:16px;font-size:12px;color:var(--text-muted)">
+      <span>⬆ ${score} 分</span><span>💬 ${commentCount} 則討論</span>
+      <a href="https://news.ycombinator.com/item?id=${hnId}" target="_blank" rel="noopener" style="color:var(--gold-dim);margin-left:auto">打開討論串 →</a>
+    </div>
+    <div id="hn-ai-summary" style="background:rgba(212,168,67,0.06);border:1px solid rgba(212,168,67,0.15);border-radius:8px;padding:12px;margin-bottom:14px;font-size:13px;line-height:1.7;color:var(--text-muted)">⏳ AI 摘要生成中…</div>`;
+
+    const commentTexts = comments.map(c => decodeHN(c.text));
+
+    html += comments.map((c, i) => {
+      const text = commentTexts[i];
+      const author = c.author || '匿名';
+      const replies = c.children?.length || 0;
+      return `<div style="margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,0.04)">
+        <div style="font-size:11px;color:var(--gold-dim);margin-bottom:4px;display:flex;gap:10px">
+          <span>${esc(author)}</span>
+          ${replies > 0 ? `<span style="color:var(--text-muted)">💬 ${replies} 回覆</span>` : ''}
+        </div>
+        <div style="font-size:13px;color:var(--text);line-height:1.65;margin-bottom:4px">${esc(text.slice(0,400))}${text.length>400?'…':''}</div>
+        <div class="hn-zh-${hnId}-${i}" style="font-size:12px;color:var(--text-muted);line-height:1.6;padding-left:8px;border-left:2px solid rgba(212,168,67,0.2)">翻譯中…</div>
+      </div>`;
+    }).join('');
 
     if (display) display.innerHTML = html;
 
-    // Pre-fill extra with comment digest for AI context
-    const digest = comments.slice(0, 4).map(c => {
-      const ta = document.createElement('textarea');
-      ta.innerHTML = c.text.replace(/<[^>]+>/g,'');
-      return '- ' + ta.value.trim().slice(0, 150);
-    }).join('\n');
-    const extraEl = document.getElementById('pro-extra');
-    if (extraEl && !extraEl.value) extraEl.value = `【HN 討論精華】\n${digest}`;
+    // Call AI summarize + translate
+    try {
+      const commentsPayload = comments.map((c,i) => `[${i+1}] ${c.author||'匿名'} (${c.children?.length||0}回覆): ${commentTexts[i].slice(0,200)}`).join('\n\n');
+      const sr = await fetch('https://eglobal.app.n8n.cloud/webhook/hn-summarize', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ title: d.title || item.angle, comments: commentsPayload })
+      });
+      const sd = await sr.json();
+
+      // Update AI summary block
+      const summaryEl = document.getElementById('hn-ai-summary');
+      if (summaryEl && sd.summary) {
+        summaryEl.innerHTML = sd.summary.replace(/\*\*(.+?)\*\*/g,'<strong style="color:var(--gold-light)">$1</strong>').replace(/\n/g,'<br>').replace(/・/g,'<br>・');
+      }
+
+      // Update translations
+      const translations = sd.translations || [];
+      translations.forEach((zh, i) => {
+        const el = display?.querySelector(`.hn-zh-${hnId}-${i}`);
+        if (el && zh) el.textContent = zh;
+        else if (el) el.style.display = 'none';
+      });
+
+      // Pre-fill extra
+      const extraEl = document.getElementById('pro-extra');
+      if (extraEl && !extraEl.value && sd.summary) {
+        extraEl.value = `【HN 輿論摘要】\n${sd.summary.replace(/\*\*/g,'').replace(/<br>/g,'\n')}`;
+      }
+    } catch(e2) {
+      const summaryEl = document.getElementById('hn-ai-summary');
+      if (summaryEl) summaryEl.textContent = '（AI 摘要暫時無法取得）';
+    }
   } catch(e) {
     if (display) display.textContent = '⚠️ 載入失敗：' + e.message;
   }
