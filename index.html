@@ -1005,7 +1005,7 @@ async function loadTrendingBoard(forceRefresh = false) {
   if (!forceRefresh) {
     try {
       const cached = JSON.parse(localStorage.getItem(TRENDING_CACHE_KEY) || 'null');
-      if (cached && Date.now() - cached.ts < TRENDING_CACHE_TTL && cached.tiktok) {
+      if (cached && Date.now() - cached.ts < TRENDING_CACHE_TTL && cached.tiktok && cached.hackernews) {
         renderTrendingCol('tb-douyin',     '🔥 抖音熱搜',   cached.douyin     || []);
         renderTrendingCol('tb-xhs',        '📸 小紅書熱門', cached.xhs        || []);
         renderTrendingCol('tb-tiktok',     '🎵 TikTok',     cached.tiktok     || []);
