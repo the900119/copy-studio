@@ -917,6 +917,7 @@ const WH_XHS_REWRITE    = N8N + '/copy-studio-xhs-rewrite';
 let searchPlatform = 'yt', directPlatform = 'yt';
 const WH_DOUYIN_SEARCH = N8N + '/copy-studio-douyin-search';
 let activeInboxTab = 'all';
+let currentTranscript = '';
 let currentRecordId = '', currentTitle = '', proRecordId = '';
 
 // ── Navigation ───────────────────────────────────────────
@@ -1212,6 +1213,7 @@ async function generateFromXHSNote(noteId, title, noteType, xsecToken='') {
     const finalTitle = td.title || title || '（XHS 指定影片）';
     document.getElementById('pro-topic').value = finalTitle;
     document.getElementById('pro-extra').value = '【原影片逐字稿】\n' + td.transcript;
+    currentTranscript = td.transcript;
     // Show source panel preview
     document.getElementById('source-display').textContent = td.transcript;
     switchTab('pro');
@@ -1312,12 +1314,12 @@ function renderProDrafts(data) {
     const cnt = document.getElementById('cnt-' + k);
     if (el && cnt) cnt.textContent = el.value.length + ' 字';
   });
-  // Show source panel
+  // Show source panel (strip 【...】 header prefix if present)
   const extra = document.getElementById('pro-extra')?.value || '';
   const srcEl = document.getElementById('source-display');
-  if (srcEl) srcEl.textContent = extra || '（無填寫素材，以下內容為 AI 基於人設自行生成）';
+  if (srcEl) srcEl.textContent = extra.replace(/^【[^\n]*】\n?/, '') || '（無填寫素材，以下內容為 AI 基於人設自行生成）';
   // Show first tab
-  switchOutTab('long', document.querySelector('.out-tab'));
+  switchOutTab('xhs', document.querySelector('.out-tab'));
   document.getElementById('pro-output').style.display = 'block';
   document.getElementById('pro-output').scrollIntoView({ behavior: 'smooth' });
 }
@@ -1625,24 +1627,46 @@ function quickSearchCreator(platform, handle, name) {
 }
 
 // ── Boot ─────────────────────────────────────────────────
-// Move pillar + topic-ideas cards from Step 03 hidden area → Step 04
+// Move pillar + topic-ideas cards from Step 03 hidden area → Step 04, side-by-side
 (function() {
   const pillarCard = document.getElementById('pillar-card-placeholder');
   const ideaCard   = document.getElementById('topic-ideas-card');
   const target = document.querySelector('#tab-pro .container');
   const anchor = target.querySelector('.grid-2');
+
+  const wrapper = document.createElement('div');
+  wrapper.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:16px;align-items:start';
+
   if (pillarCard) {
     pillarCard.removeAttribute('style');
     pillarCard.removeAttribute('id');
-    pillarCard.classList.add('mb-16');
-    pillarCard.innerHTML = '<h2>五大話題柱</h2><p style="font-size:13px;color:var(--text-muted);margin-bottom:16px">點擊任一關鍵詞 → 自動帶入腳本生成器</p>' + pillarCard.innerHTML;
-    target.insertBefore(pillarCard, anchor);
+    // Build collapsible header
+    const pillarContent = pillarCard.innerHTML;
+    pillarCard.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <h2 style="margin:0">五大話題柱</h2>
+        <button id="pillar-toggle-btn" onclick="togglePillar()" style="font-size:12px;padding:3px 10px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text-muted);cursor:pointer">折疊 ▲</button>
+      </div>
+      <p id="pillar-subtitle" style="font-size:13px;color:var(--text-muted);margin-bottom:16px">點擊任一關鍵詞 → 自動帶入腳本生成器</p>
+      <div id="pillar-body">${pillarContent}</div>`;
+    wrapper.appendChild(pillarCard);
   }
   if (ideaCard) {
-    ideaCard.classList.add('mb-16');
-    target.insertBefore(ideaCard, anchor);
+    wrapper.appendChild(ideaCard);
   }
+  target.insertBefore(wrapper, anchor);
 })();
+
+function togglePillar() {
+  const body = document.getElementById('pillar-body');
+  const sub  = document.getElementById('pillar-subtitle');
+  const btn  = document.getElementById('pillar-toggle-btn');
+  if (!body) return;
+  const collapsed = body.style.display === 'none';
+  body.style.display = collapsed ? '' : 'none';
+  if (sub) sub.style.display = collapsed ? '' : 'none';
+  btn.textContent = collapsed ? '折疊 ▲' : '展開 ▼';
+}
 initPositioning();
 renderInbox();
 renderFavs();
