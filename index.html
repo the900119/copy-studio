@@ -1715,6 +1715,7 @@ async function fetchHNComments(hnId, item, display) {
     const d = await r.json();
     const comments = (d.children || [])
       .filter(c => c.text && c.text.length > 20)
+      .sort((a, b) => (b.children?.length || 0) - (a.children?.length || 0))
       .slice(0, 8);
     const score = d.points || item.hot || 0;
     const commentCount = d.children?.length || 0;
@@ -1731,9 +1732,13 @@ async function fetchHNComments(hnId, item, display) {
       html += comments.map(c => {
         const text = c.text.replace(/<[^>]+>/g, '').trim();
         const author = c.author || '匿名';
+        const replies = c.children?.length || 0;
         return `<div style="margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,0.04)">
-          <div style="font-size:11px;color:var(--gold-dim);margin-bottom:4px">${esc(author)}</div>
-          <div style="font-size:13px;color:var(--text);line-height:1.65">${esc(text).slice(0, 300)}${text.length > 300 ? '…' : ''}</div>
+          <div style="font-size:11px;color:var(--gold-dim);margin-bottom:4px;display:flex;gap:10px">
+            <span>${esc(author)}</span>
+            ${replies > 0 ? `<span style="color:var(--text-muted)">💬 ${replies} 則回覆</span>` : ''}
+          </div>
+          <div style="font-size:13px;color:var(--text);line-height:1.65">${esc(text).slice(0, 400)}${text.length > 400 ? '…' : ''}</div>
         </div>`;
       }).join('');
     }
