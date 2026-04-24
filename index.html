@@ -708,7 +708,10 @@
               </div>
             </div>
             <div class="story-field">
-              <label class="field-label">參考素材 / 逐字稿（可選，用來對照差異度）</label>
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+                <label class="field-label" style="margin:0">參考素材 / 逐字稿（可選）</label>
+                <button id="fetch-transcript-btn" onclick="fetchPendingTranscript()" style="display:none;font-size:12px;padding:3px 10px;border-radius:6px;border:1px solid var(--gold-dim);background:transparent;color:var(--gold-dim);cursor:pointer;white-space:nowrap">📥 取得原影片逐字稿</button>
+              </div>
               <textarea id="pro-extra" rows="4" placeholder="從步驟三帶入的逐字稿，或今天想用的真實素材、踩坑故事、數據…"></textarea>
             </div>
             <button class="btn" onclick="generatePro()">⚡ 一鍵生成長文 · 小紅書 · 短影音</button>
@@ -1537,7 +1540,7 @@ function renderInbox() {
         ${item.word && item.word !== item.angle ? `<div class="inbox-sub">詞：${esc(item.word)}${item.hot ? ' · 🔥' + Number(item.hot).toLocaleString() : ''}</div>` : (item.hot ? `<div class="inbox-sub">🔥 ${Number(item.hot).toLocaleString()}</div>` : '')}
       </div>
       <div class="inbox-actions">
-        <button class="inbox-btn primary" onclick="useInboxTopic('${esc(item.id)}')">${item.note_id ? '▶️ 轉錄生成' : '帶入生成 →'}</button>
+        <button class="inbox-btn primary" onclick="useInboxTopic('${esc(item.id)}')">帶入生成 →</button>
         <button class="inbox-btn del" onclick="removeFromInbox('${esc(item.id)}')">✕</button>
       </div>
     </div>`).join('');
@@ -1548,21 +1551,38 @@ function setInboxTab(tab) {
   renderInbox();
 }
 
+let pendingNoteId = '', pendingXsecToken = '';
+
 function useInboxTopic(id) {
   const item = loadInbox().find(i => i.id === id);
   if (!item) return;
-  // XHS video: trigger transcription flow
-  if (item.note_id) {
-    generateFromXHSNote(item.note_id, item.angle, 'video', item.xsec_token || '');
-    return;
-  }
   document.getElementById('pro-topic').value = item.angle;
-  if (item.content) {
-    const extra = document.getElementById('pro-extra');
-    if (extra && !extra.value) extra.value = item.content;
+  document.getElementById('pro-extra').value = '';
+  // XHS video: store note_id, show fetch button
+  if (item.note_id) {
+    pendingNoteId = item.note_id;
+    pendingXsecToken = item.xsec_token || '';
+    const btn = document.getElementById('fetch-transcript-btn');
+    if (btn) btn.style.display = '';
+  } else {
+    pendingNoteId = '';
+    pendingXsecToken = '';
+    const btn = document.getElementById('fetch-transcript-btn');
+    if (btn) btn.style.display = 'none';
+    if (item.content) document.getElementById('pro-extra').value = item.content;
   }
   switchTab('pro');
   setTimeout(() => document.getElementById('pro-topic').focus(), 100);
+}
+
+function fetchPendingTranscript() {
+  if (!pendingNoteId) return;
+  const title = document.getElementById('pro-topic').value || '';
+  generateFromXHSNote(pendingNoteId, title, 'video', pendingXsecToken);
+  pendingNoteId = '';
+  pendingXsecToken = '';
+  const btn = document.getElementById('fetch-transcript-btn');
+  if (btn) btn.style.display = 'none';
 }
 
 async function saveOneToFeishu(id) {
