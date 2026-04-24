@@ -370,9 +370,9 @@
       <div class="container">
 
         <!-- 🔥 抖音熱搜 + 收藏創作者 -->
-        <div class="mb-16" style="display:grid;grid-template-columns:1fr 260px;gap:16px;align-items:start">
+        <div id="douyin-grid" class="mb-16" style="display:grid;grid-template-columns:1fr 260px;gap:16px;align-items:start">
 
-          <div class="card">
+          <div class="card" id="douyin-card">
             <span class="card-tag">🔥 抖音熱搜</span>
             <h2>抖音熱搜靈感挖掘</h2>
             <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px">AI 從即時抖音熱搜中，篩選出與你賽道相關的靈感角度</p>
@@ -997,7 +997,22 @@ function renderDouyinResults(topics) {
       </div>
     </div>`).join('');
   document.getElementById('douyin-results').style.display = 'block';
+  document.getElementById('douyin-grid').style.alignItems = 'start';
 }
+
+function collapseDouyinResults() {
+  document.getElementById('douyin-results').style.display = 'none';
+  document.getElementById('douyin-grid').style.alignItems = 'stretch';
+}
+
+// 點擊 douyin-card 外部自動收折
+document.addEventListener('click', function(e) {
+  const card = document.getElementById('douyin-card');
+  const results = document.getElementById('douyin-results');
+  if (!card || !results) return;
+  if (results.style.display === 'none') return;
+  if (!card.contains(e.target)) collapseDouyinResults();
+});
 
 function useDouyinTopic(word, angle) {
   const topic = angle ? word + '——' + angle : word;
