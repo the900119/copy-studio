@@ -1668,12 +1668,12 @@ function quickSearchCreator(platform, handle, name) {
     // Build collapsible header
     const pillarContent = pillarCard.innerHTML;
     pillarCard.innerHTML = `
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+      <div style="display:flex;align-items:center;justify-content:space-between">
         <h2 style="margin:0">五大話題柱</h2>
-        <button id="pillar-toggle-btn" onclick="togglePillar()" style="font-size:12px;padding:3px 10px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text-muted);cursor:pointer">折疊 ▲</button>
+        <button id="pillar-toggle-btn" onclick="togglePillar()" style="font-size:12px;padding:3px 10px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text-muted);cursor:pointer">展開 ▼</button>
       </div>
-      <p id="pillar-subtitle" style="font-size:13px;color:var(--text-muted);margin-bottom:16px">點擊任一關鍵詞 → 自動帶入腳本生成器</p>
-      <div id="pillar-body">${pillarContent}</div>`;
+      <p id="pillar-subtitle" style="font-size:13px;color:var(--text-muted);margin:8px 0 0;display:none">點擊任一關鍵詞 → 自動帶入腳本生成器</p>
+      <div id="pillar-body" style="display:none">${pillarContent}</div>`;
     wrapper.appendChild(pillarCard);
   }
   if (ideaCard) {
