@@ -1709,6 +1709,46 @@ function setInboxTab(tab) {
 
 let pendingNoteId = '', pendingXsecToken = '';
 
+async function fetchHNComments(hnId, item, display) {
+  try {
+    const r = await fetch(`https://hn.algolia.com/api/v1/items/${hnId}`);
+    const d = await r.json();
+    const comments = (d.children || [])
+      .filter(c => c.text && c.text.length > 20)
+      .slice(0, 8);
+    const score = d.points || item.hot || 0;
+    const commentCount = d.children?.length || 0;
+
+    let html = `<div style="margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border);display:flex;gap:16px;font-size:12px;color:var(--text-muted)">
+      <span>⬆ ${score} 分</span>
+      <span>💬 ${commentCount} 則討論</span>
+      <a href="https://news.ycombinator.com/item?id=${hnId}" target="_blank" rel="noopener" style="color:var(--gold-dim);margin-left:auto">打開討論串 →</a>
+    </div>`;
+
+    if (comments.length === 0) {
+      html += `<p style="font-size:13px;color:var(--text-muted)">暫無討論留言</p>`;
+    } else {
+      html += comments.map(c => {
+        const text = c.text.replace(/<[^>]+>/g, '').trim();
+        const author = c.author || '匿名';
+        return `<div style="margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,0.04)">
+          <div style="font-size:11px;color:var(--gold-dim);margin-bottom:4px">${esc(author)}</div>
+          <div style="font-size:13px;color:var(--text);line-height:1.65">${esc(text).slice(0, 300)}${text.length > 300 ? '…' : ''}</div>
+        </div>`;
+      }).join('');
+    }
+
+    if (display) display.innerHTML = html;
+
+    // Pre-fill extra with comment digest for AI context
+    const digest = comments.slice(0, 4).map(c => '- ' + c.text.replace(/<[^>]+>/g,'').trim().slice(0,120)).join('\n');
+    const extraEl = document.getElementById('pro-extra');
+    if (extraEl && !extraEl.value) extraEl.value = `【HN 討論精華】\n${digest}`;
+  } catch(e) {
+    if (display) display.textContent = '⚠️ 載入失敗：' + e.message;
+  }
+}
+
 function useInboxTopic(id) {
   const item = loadInbox().find(i => i.id === id);
   if (!item) return;
@@ -1729,27 +1769,24 @@ function useInboxTopic(id) {
     pendingXsecToken = item.xsec_token || '';
     if (display) display.textContent = '';
     if (hint) hint.style.display = '';
+  } else if (item.source === 'HackerNews' && item.url) {
+    // HackerNews：抓討論串頂部留言
+    const hnId = item.url.match(/item\?id=(\d+)/)?.[1];
+    if (display) display.textContent = '⏳ 載入 HN 討論中…';
+    if (sourceCard) sourceCard.style.display = '';
+    if (hnId) fetchHNComments(hnId, item, display);
   } else {
-    // 熱點詞 / URL / 其他：顯示可用的說明資訊 + 原文連結
-    const lines = [];
-    if (item.source) lines.push('來源：' + item.source);
-    if (item.creator) lines.push('創作者：' + item.creator);
-    if (item.hot) lines.push('熱度：' + Number(item.hot).toLocaleString());
-    if (item.url) lines.push('原文：' + item.url);
-    if (item.content && item.content !== item.angle) lines.push('', item.content);
-    const bodyText = lines.join('\n').trim();
+    // 熱點詞 / 其他：顯示 metadata
     if (display) {
       display.innerHTML = '';
-      // Show URL as clickable link
-      if (item.url) {
-        const linkRow = document.createElement('div');
-        linkRow.style.cssText = 'margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border)';
-        linkRow.innerHTML = `<a href="${esc(item.url)}" target="_blank" rel="noopener" style="color:var(--gold-dim);font-size:13px;word-break:break-all">🔗 打開原文 → ${esc(item.url)}</a>`;
-        display.appendChild(linkRow);
-      }
+      const lines = [];
+      if (item.source)  lines.push('來源：' + item.source);
+      if (item.creator) lines.push('創作者：' + item.creator);
+      if (item.hot)     lines.push('熱度：' + Number(item.hot).toLocaleString());
+      if (item.content && item.content !== item.angle) lines.push('', item.content);
       const pre = document.createElement('pre');
       pre.style.cssText = 'margin:0;white-space:pre-wrap;font-size:13px;line-height:1.75;color:var(--text-muted);font-family:inherit';
-      pre.textContent = bodyText || '（此選題無原文素材）';
+      pre.textContent = lines.join('\n').trim() || '（此選題無原文素材）';
       display.appendChild(pre);
     }
   }
