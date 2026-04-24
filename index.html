@@ -1709,6 +1709,22 @@ function setInboxTab(tab) {
 
 let pendingNoteId = '', pendingXsecToken = '';
 
+async function fetchHNByTitle(title, item, display) {
+  try {
+    const q = encodeURIComponent(title.slice(0, 60));
+    const r = await fetch(`https://hn.algolia.com/api/v1/search?query=${q}&tags=story&hitsPerPage=3`);
+    const d = await r.json();
+    const hit = d.hits?.[0];
+    if (!hit?.objectID) {
+      if (display) display.textContent = '⚠️ 找不到對應的 HN 討論串';
+      return;
+    }
+    fetchHNComments(hit.objectID, item, display);
+  } catch(e) {
+    if (display) display.textContent = '⚠️ 搜尋失敗：' + e.message;
+  }
+}
+
 async function fetchHNComments(hnId, item, display) {
   try {
     const r = await fetch(`https://hn.algolia.com/api/v1/items/${hnId}`);
@@ -1780,12 +1796,17 @@ function useInboxTopic(id) {
     pendingXsecToken = item.xsec_token || '';
     if (display) display.textContent = '';
     if (hint) hint.style.display = '';
-  } else if (item.source === 'HackerNews' && item.url) {
+  } else if (item.source === 'HackerNews') {
     // HackerNews：抓討論串頂部留言
-    const hnId = item.url.match(/item\?id=(\d+)/)?.[1];
     if (display) display.textContent = '⏳ 載入 HN 討論中…';
     if (sourceCard) sourceCard.style.display = '';
-    if (hnId) fetchHNComments(hnId, item, display);
+    const hnId = item.url?.match(/item\?id=(\d+)/)?.[1];
+    if (hnId) {
+      fetchHNComments(hnId, item, display);
+    } else {
+      // 舊 inbox 沒有 HN URL，用標題搜索
+      fetchHNByTitle(item.angle || item.word || '', item, display);
+    }
   } else {
     // 熱點詞 / 其他：顯示 metadata
     if (display) {
