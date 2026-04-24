@@ -289,7 +289,7 @@
   <div class="sidebar">
     <div class="sidebar-section-label">創作流程</div>
 
-    <div class="step-item active" data-tab="positioning" onclick="switchTab('positioning')">
+    <div class="step-item" data-tab="positioning" onclick="switchTab('positioning')">
       <div class="step-num">STEP 01</div>
       <div class="step-row"><span class="step-icon">🎯</span><span class="step-title">IP 定位助手</span></div>
       <div class="step-desc">先定人設，再做內容</div>
@@ -297,7 +297,7 @@
 
     <div class="step-arrow">↓</div>
 
-    <div class="step-item" data-tab="search" onclick="switchTab('search')">
+    <div class="step-item active" data-tab="search" onclick="switchTab('search')">
       <div class="step-num">STEP 02</div>
       <div class="step-row"><span class="step-icon">🔍</span><span class="step-title">靈感收集</span></div>
       <div class="step-desc">抖音熱搜 · YT · 小紅書</div>
@@ -331,7 +331,7 @@
   <div class="main-content">
 
     <!-- ════ STEP 01: IP 定位助手 ════ -->
-    <div class="tab-panel active" id="tab-positioning">
+    <div class="tab-panel" id="tab-positioning">
       <div class="container">
         <div style="max-width:700px;margin:0 auto">
 
@@ -366,7 +366,7 @@
     </div>
 
     <!-- ════ STEP 02: 靈感收集 ════ -->
-    <div class="tab-panel" id="tab-search">
+    <div class="tab-panel active" id="tab-search">
       <div class="container">
 
         <!-- 🔥 抖音熱搜 + 收藏創作者 -->
@@ -1602,8 +1602,6 @@ async function fetchTranscriptOnly(noteId, xsecToken) {
     const td = await r.json();
     if (!td.transcript) { if (srcEl) srcEl.textContent = '⚠️ 逐字稿為空（可能是純圖文貼文）'; return; }
     if (srcEl) srcEl.textContent = td.transcript;
-    document.getElementById('pro-extra').value = '【原影片逐字稿】\n' + td.transcript;
-    currentTranscript = td.transcript;
     setStatus('pro-save-status', '✅ 逐字稿已載入左側參考欄', 'success');
     setTimeout(() => setStatus('pro-save-status', '', ''), 4000);
   } catch(e) {
@@ -1620,7 +1618,7 @@ function fetchPendingTranscript() {
   const hint   = document.getElementById('source-fetch-hint');
   if (hint) hint.style.display = 'none';
   const proOut = document.getElementById('pro-output');
-  const alreadyGenerated = proOut && proOut.style.display !== 'none';
+  const alreadyGenerated = proOut && proOut.style.display === 'block';
   if (alreadyGenerated) {
     // 已有生成內容 → 只更新左側逐字稿欄，不動右側
     fetchTranscriptOnly(noteId, xsecToken);
