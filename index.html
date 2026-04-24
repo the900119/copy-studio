@@ -708,10 +708,7 @@
               </div>
             </div>
             <div class="story-field">
-              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-                <label class="field-label" style="margin:0">參考素材 / 逐字稿（可選）</label>
-                <button id="fetch-transcript-btn" onclick="fetchPendingTranscript()" style="display:none;font-size:12px;padding:3px 10px;border-radius:6px;border:1px solid var(--gold-dim);background:transparent;color:var(--gold-dim);cursor:pointer;white-space:nowrap">📥 取得原影片逐字稿</button>
-              </div>
+              <label class="field-label">參考素材 / 逐字稿（可選）</label>
               <textarea id="pro-extra" rows="4" placeholder="從步驟三帶入的逐字稿，或今天想用的真實素材、踩坑故事、數據…"></textarea>
             </div>
             <button class="btn" onclick="generatePro()">⚡ 一鍵生成長文 · 小紅書 · 短影音</button>
@@ -757,6 +754,10 @@
               <div class="source-label" style="margin-bottom:10px">
                 原文參考
                 <span class="diff-note">↑ 確認與原文差異度</span>
+              </div>
+              <div id="source-fetch-hint" style="display:none;text-align:center;padding:24px 0">
+                <p style="font-size:13px;color:var(--text-muted);margin-bottom:12px">此選題來自 XHS 影片，尚未取得逐字稿</p>
+                <button onclick="fetchPendingTranscript()" style="font-size:13px;padding:8px 20px;border-radius:8px;border:1px solid var(--gold-dim);background:transparent;color:var(--gold-dim);cursor:pointer">📥 取得原影片逐字稿</button>
               </div>
               <div class="source-body" id="source-display" style="max-height:480px;overflow-y:auto">（無參考素材）</div>
             </div>
@@ -1558,17 +1559,17 @@ function useInboxTopic(id) {
   if (!item) return;
   document.getElementById('pro-topic').value = item.angle;
   document.getElementById('pro-extra').value = '';
-  // XHS video: store note_id, show fetch button
+  // XHS video: store note_id, show fetch hint in source panel
   if (item.note_id) {
     pendingNoteId = item.note_id;
     pendingXsecToken = item.xsec_token || '';
-    const btn = document.getElementById('fetch-transcript-btn');
-    if (btn) btn.style.display = '';
+    const hint = document.getElementById('source-fetch-hint');
+    const display = document.getElementById('source-display');
+    if (hint) hint.style.display = '';
+    if (display) display.textContent = '';
   } else {
     pendingNoteId = '';
     pendingXsecToken = '';
-    const btn = document.getElementById('fetch-transcript-btn');
-    if (btn) btn.style.display = 'none';
     if (item.content) document.getElementById('pro-extra').value = item.content;
   }
   switchTab('pro');
@@ -1578,11 +1579,11 @@ function useInboxTopic(id) {
 function fetchPendingTranscript() {
   if (!pendingNoteId) return;
   const title = document.getElementById('pro-topic').value || '';
+  const hint = document.getElementById('source-fetch-hint');
+  if (hint) hint.style.display = 'none';
   generateFromXHSNote(pendingNoteId, title, 'video', pendingXsecToken);
   pendingNoteId = '';
   pendingXsecToken = '';
-  const btn = document.getElementById('fetch-transcript-btn');
-  if (btn) btn.style.display = 'none';
 }
 
 async function saveOneToFeishu(id) {
