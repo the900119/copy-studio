@@ -1062,13 +1062,13 @@ function renderTrendingCol(elId, title, items) {
       return `<div class="tb-item">
         <span class="tb-rank${item.rank <= 3 ? ' top3' : ''}">${item.rank}</span>
         <a class="tb-keyword" href="${url}" target="_blank" rel="noopener" title="點擊查看詳情">${kw}</a>
-        <button class="tb-add" onclick="tbAddToInbox(this,'${kw}','${src}')">＋</button>
+        <button class="tb-add" onclick="tbAddToInbox(this,'${kw}','${src}','${esc(item.url||'')}')">＋</button>
       </div>`;
     }).join('') + `</div>`;
 }
 
-function tbAddToInbox(btn, keyword, source) {
-  addToInbox(keyword, keyword, 0, source, keyword);
+function tbAddToInbox(btn, keyword, source, url) {
+  addToInbox(keyword, keyword, 0, source, keyword, '', '', '', url || '');
   btn.textContent = '✓';
   btn.style.color = '#2ecc71';
   btn.style.borderColor = '#2ecc71';
@@ -1637,11 +1637,11 @@ function loadInbox() {
   try { return JSON.parse(localStorage.getItem(INBOX_KEY) || '[]'); } catch(e) { return []; }
 }
 
-function addToInbox(angle, word, hot, source, content, creator, noteId, xsecToken) {
+function addToInbox(angle, word, hot, source, content, creator, noteId, xsecToken, url) {
   let list = loadInbox();
   if (list.length >= 100) { alert('暫存區已滿（上限 100 條），請先清除已有選題'); return; }
   const id = Date.now() + '_' + Math.random().toString(36).slice(2,6);
-  list.unshift({ id, angle, word: word || angle, hot: hot || 0, source, content: content || '', creator: creator || '', note_id: noteId || '', xsec_token: xsecToken || '', ts: Date.now() });
+  list.unshift({ id, angle, word: word || angle, hot: hot || 0, source, content: content || '', creator: creator || '', note_id: noteId || '', xsec_token: xsecToken || '', url: url || '', ts: Date.now() });
   localStorage.setItem(INBOX_KEY, JSON.stringify(list));
   renderInbox();
   if (event && event.currentTarget) {
@@ -1730,17 +1730,27 @@ function useInboxTopic(id) {
     if (display) display.textContent = '';
     if (hint) hint.style.display = '';
   } else {
-    // 熱點詞 / URL / 其他：顯示可用的說明資訊
+    // 熱點詞 / URL / 其他：顯示可用的說明資訊 + 原文連結
     const lines = [];
     if (item.source) lines.push('來源：' + item.source);
     if (item.creator) lines.push('創作者：' + item.creator);
     if (item.hot) lines.push('熱度：' + Number(item.hot).toLocaleString());
-    if (item.content) lines.push('', item.content);
+    if (item.url) lines.push('原文：' + item.url);
+    if (item.content && item.content !== item.angle) lines.push('', item.content);
     const bodyText = lines.join('\n').trim();
-    if (display) display.textContent = bodyText || '（此選題無原文素材）';
-    // Pre-fill extra only if it's actual extended content, not just metadata
-    if (item.content && item.content.length > 30) {
-      document.getElementById('pro-extra').value = item.content;
+    if (display) {
+      display.innerHTML = '';
+      // Show URL as clickable link
+      if (item.url) {
+        const linkRow = document.createElement('div');
+        linkRow.style.cssText = 'margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border)';
+        linkRow.innerHTML = `<a href="${esc(item.url)}" target="_blank" rel="noopener" style="color:var(--gold-dim);font-size:13px;word-break:break-all">🔗 打開原文 → ${esc(item.url)}</a>`;
+        display.appendChild(linkRow);
+      }
+      const pre = document.createElement('pre');
+      pre.style.cssText = 'margin:0;white-space:pre-wrap;font-size:13px;line-height:1.75;color:var(--text-muted);font-family:inherit';
+      pre.textContent = bodyText || '（此選題無原文素材）';
+      display.appendChild(pre);
     }
   }
 
