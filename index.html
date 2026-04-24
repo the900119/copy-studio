@@ -410,6 +410,7 @@
             <div class="platform-toggle">
               <button class="platform-btn active" onclick="selectPlatform('search','yt',this)">YouTube</button>
               <button class="platform-btn"        onclick="selectPlatform('search','xhs',this)">小紅書</button>
+              <button class="platform-btn"        onclick="selectPlatform('search','douyin',this)">抖音</button>
             </div>
             <input type="text" id="search-input" placeholder="頻道 URL 或 @handle（如 @MrBeast）">
             <div id="xhs-history" style="display:none;margin:8px 0 4px">
@@ -485,9 +486,10 @@
         <div class="card">
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
             <h2 style="margin:0">選題暫存區</h2>
-            <span id="inbox-count-badge" style="font-size:11px;padding:2px 10px;border-radius:10px;background:rgba(212,168,67,0.08);color:var(--gold-dim);border:1px solid rgba(212,168,67,0.18)">0 / 20</span>
+            <span id="inbox-count-badge" style="font-size:11px;padding:2px 10px;border-radius:10px;background:rgba(212,168,67,0.08);color:var(--gold-dim);border:1px solid rgba(212,168,67,0.18)">0 / 100</span>
           </div>
-          <p style="font-size:12px;color:var(--text-muted);margin-bottom:14px">在靈感收集（Step 02）點「＋暫存」加入，最多 20 條。選一篇點「帶入生成」→ 跳到第四步驟，生成後再存飛書。</p>
+          <p style="font-size:12px;color:var(--text-muted);margin-bottom:10px">在靈感收集（Step 02）點「＋暫存」加入，最多 100 條。選一篇點「帶入生成」→ 跳到第四步驟，生成後再存飛書。</p>
+          <div id="inbox-tabs" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px"></div>
           <div id="inbox-list"></div>
         </div>
 
@@ -897,6 +899,8 @@ const WH_XHS_TRANSCRIBE = N8N + '/copy-studio-xhs-transcribe';
 const WH_XHS_REWRITE    = N8N + '/copy-studio-xhs-rewrite';
 
 let searchPlatform = 'yt', directPlatform = 'yt';
+const WH_DOUYIN_SEARCH = N8N + '/copy-studio-douyin-search';
+let activeInboxTab = 'all';
 let currentRecordId = '', currentTitle = '', proRecordId = '';
 
 // ── Navigation ───────────────────────────────────────────
@@ -1012,7 +1016,7 @@ function selectPlatform(mode, platform, btn) {
   if (mode === 'search') {
     searchPlatform = platform;
     const inp = document.getElementById('search-input');
-    inp.placeholder = platform === 'xhs' ? '輸入小紅書號（如 644895069）' : '頻道 URL 或 @handle（如 @MrBeast）';
+    inp.placeholder = platform === 'xhs' ? '輸入小紅書號（如 644895069）' : platform === 'douyin' ? '輸入關鍵字（如：跨境珠寶 AI工具）' : '頻道 URL 或 @handle（如 @MrBeast）';
     // Show/hide XHS history
     if (platform === 'xhs') renderXHSHistory();
     else document.getElementById('xhs-history').style.display = 'none';
@@ -1046,7 +1050,8 @@ function showDrafts(data) {
 async function doSearch() {
   const input = document.getElementById('search-input').value.trim();
   if (!input) { alert('請輸入頻道 URL 或創作者名字'); return; }
-  showLoad('search-loading', searchPlatform === 'xhs' ? '正在搜尋小紅書創作者高讚貼文（約 30 秒）...' : '正在搜尋半年內熱門內容（約 60–120 秒）...');
+  const loadMsg = searchPlatform === 'xhs' ? '正在搜尋小紅書創作者高讚貼文（約 30 秒）...' : searchPlatform === 'douyin' ? '正在搜尋抖音關鍵字熱門影片（約 15 秒）...' : '正在搜尋半年內熱門內容（約 60–120 秒）...';
+  showLoad('search-loading', loadMsg);
   document.getElementById('search-results').style.display = 'none';
   document.getElementById('search-drafts').style.display  = 'none';
   try {
@@ -1054,6 +1059,10 @@ async function doSearch() {
       const r = await fetch(WH_XHS_SEARCH, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ red_id: input }) });
       const d = await r.json(); hideLoad('search-loading');
       renderXHSResults(d, input);
+    } else if (searchPlatform === 'douyin') {
+      const r = await fetch(WH_DOUYIN_SEARCH, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ keyword: input }) });
+      const d = await r.json(); hideLoad('search-loading');
+      renderDouyinSearchResults(d.videos || [], input);
     } else {
       const r = await fetch(WH_SEARCH, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ platform: searchPlatform, url: input }) });
       const d = await r.json(); hideLoad('search-loading'); renderResults(d.results || []);
@@ -1072,6 +1081,21 @@ function renderResults(list) {
         <div class="result-sub">👀 ${(v.views||0).toLocaleString()} · ${v.date||''}</div>
       </div>
       <button class="add-inbox-btn" onclick="addToInbox('${esc(v.title)}','${esc(v.title)}',${v.views||0},'YouTube','${esc(v.title)}')">＋暫存</button>
+    </div>`).join('');
+  document.getElementById('search-results').style.display = 'block';
+}
+
+function renderDouyinSearchResults(videos, keyword) {
+  if (!videos.length) { alert('沒有找到相關影片，換個關鍵字試試'); return; }
+  document.getElementById('results-list').innerHTML =
+    `<p style="font-size:11px;color:var(--gold-dim);margin-bottom:8px">抖音關鍵字「${esc(keyword)}」· 按讚數排序 Top ${videos.length}</p>` +
+    videos.map(v => `
+    <div class="result-item">
+      <div class="result-meta" style="flex:1">
+        <div class="result-title" title="${esc(v.desc)}">${esc(v.desc)}</div>
+        <div class="result-sub">❤️ ${(v.likes||0).toLocaleString()} · 👤 ${esc(v.author_name)}</div>
+      </div>
+      <button class="add-inbox-btn" onclick="addToInbox('${esc(v.desc)}','${esc(v.desc)}',${v.likes||0},'抖音搜尋','${esc(v.desc)}','${esc(v.author_name)}')">＋暫存</button>
     </div>`).join('');
   document.getElementById('search-results').style.display = 'block';
 }
@@ -1127,7 +1151,7 @@ function renderXHSResults(data, inputRedId) {
       </div>
       <div style="display:flex;gap:6px;flex-shrink:0">
         ${n.note_type === 'video' ? `<button class="add-inbox-btn" style="background:var(--gold);color:#000;font-weight:600" onclick="generateFromXHSNote('${esc(n.note_id)}','${esc(n.title)}','video','${esc(n.xsec_token||'')}')">▶️ 生成</button>` : ''}
-        <button class="add-inbox-btn" onclick="addToInbox('${esc(n.title)}','${esc(n.title)}',${n.likes||0},'小紅書','${esc(n.title+(n.note_type?' ['+n.note_type+']':''))}')">＋暫存</button>
+        <button class="add-inbox-btn" onclick="addToInbox('${esc(n.title)}','${esc(n.title)}',${n.likes||0},'小紅書','${esc(n.title+(n.note_type?' ['+n.note_type+']':''))}','${esc(creator)}')">＋暫存</button>
       </div>
     </div>`).join('');
   document.getElementById('search-results').style.display = 'block';
@@ -1422,11 +1446,11 @@ function loadInbox() {
   try { return JSON.parse(localStorage.getItem(INBOX_KEY) || '[]'); } catch(e) { return []; }
 }
 
-function addToInbox(angle, word, hot, source, content) {
+function addToInbox(angle, word, hot, source, content, creator) {
   let list = loadInbox();
-  if (list.length >= 20) { alert('暫存區已滿（上限 20 條），請先清除已有選題'); return; }
+  if (list.length >= 100) { alert('暫存區已滿（上限 100 條），請先清除已有選題'); return; }
   const id = Date.now() + '_' + Math.random().toString(36).slice(2,6);
-  list.unshift({ id, angle, word: word || angle, hot: hot || 0, source, content: content || '', ts: Date.now() });
+  list.unshift({ id, angle, word: word || angle, hot: hot || 0, source, content: content || '', creator: creator || '', ts: Date.now() });
   localStorage.setItem(INBOX_KEY, JSON.stringify(list));
   renderInbox();
   if (event && event.currentTarget) {
@@ -1448,17 +1472,37 @@ function renderInbox() {
   const list = loadInbox();
   const el = document.getElementById('inbox-list');
   const badge = document.getElementById('inbox-count-badge');
+  const tabsEl = document.getElementById('inbox-tabs');
   if (!el) return;
-  if (badge) badge.textContent = list.length + ' / 20';
-  if (!list.length) {
-    el.innerHTML = '<p style="font-size:12px;color:var(--text-muted);text-align:center;padding:20px 0">暫無暫存選題。<br>在靈感收集結果中點「＋暫存」加入。</p>';
+  if (badge) badge.textContent = list.length + ' / 100';
+
+  // Build creator tab list
+  const creators = ['all', ...Array.from(new Set(list.map(i => i.creator).filter(Boolean)))];
+  if (tabsEl) {
+    if (creators.length <= 1) {
+      tabsEl.innerHTML = '';
+    } else {
+      if (!creators.includes(activeInboxTab)) activeInboxTab = 'all';
+      tabsEl.innerHTML = creators.map(c => {
+        const label = c === 'all' ? `全部 (${list.length})` : `${c} (${list.filter(i => i.creator === c).length})`;
+        const active = activeInboxTab === c ? 'border-color:var(--gold);color:var(--gold)' : '';
+        return `<button onclick="setInboxTab('${esc(c)}')" style="font-size:11px;padding:3px 10px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--text-muted);cursor:pointer;transition:all 0.15s;${active}">${esc(label)}</button>`;
+      }).join('');
+    }
+  }
+
+  const filtered = activeInboxTab === 'all' ? list : list.filter(i => i.creator === activeInboxTab);
+
+  if (!filtered.length) {
+    el.innerHTML = `<p style="font-size:12px;color:var(--text-muted);text-align:center;padding:20px 0">${list.length ? '此創作者暫無暫存選題。' : '暫無暫存選題。<br>在靈感收集結果中點「＋暫存」加入。'}</p>`;
     return;
   }
-  el.innerHTML = list.map(item => `
+  el.innerHTML = filtered.map(item => `
     <div class="inbox-item">
       <span class="inbox-badge">${esc(item.source)}</span>
       <div style="flex:1;min-width:0">
         <div class="inbox-text">${esc(item.angle)}</div>
+        ${item.creator ? `<div class="inbox-sub" style="color:var(--gold-dim)">👤 ${esc(item.creator)}</div>` : ''}
         ${item.word && item.word !== item.angle ? `<div class="inbox-sub">詞：${esc(item.word)}${item.hot ? ' · 🔥' + Number(item.hot).toLocaleString() : ''}</div>` : (item.hot ? `<div class="inbox-sub">🔥 ${Number(item.hot).toLocaleString()}</div>` : '')}
       </div>
       <div class="inbox-actions">
@@ -1466,6 +1510,11 @@ function renderInbox() {
         <button class="inbox-btn del" onclick="removeFromInbox('${esc(item.id)}')">✕</button>
       </div>
     </div>`).join('');
+}
+
+function setInboxTab(tab) {
+  activeInboxTab = tab;
+  renderInbox();
 }
 
 function useInboxTopic(id) {
