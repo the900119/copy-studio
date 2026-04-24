@@ -1337,10 +1337,12 @@ function switchOutTab(key, btn) {
 }
 
 async function saveOneDraft(format) {
+  const btn = event?.currentTarget;
   const title = document.getElementById('pro-topic').value;
   const content = document.getElementById('pro-' + format)?.value || '';
   if (!content) { alert('該版本內容為空'); return; }
   const formatLabel = {long:'長文', xhs:'小紅書', short:'短影音'}[format] || format;
+  if (btn) { btn.textContent = '存入中…'; btn.disabled = true; }
   try {
     await fetch(WH_CONFIRM, { method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ record_id: proRecordId, title: `[${formatLabel}] ${title}`,
@@ -1348,8 +1350,12 @@ async function saveOneDraft(format) {
         xhs_copy: format==='xhs' ? content : '',
         video_script: format==='short' ? content : '',
         format }) });
-    setStatus('pro-save-status', `✅ 已存入：${formatLabel}版`, 'success');
-  } catch(e) { setStatus('pro-save-status', '❌ ' + e.message, 'error'); }
+    if (btn) { btn.textContent = '✅ 已存入！'; btn.style.color = '#2ecc71'; btn.style.borderColor = '#2ecc71'; }
+    setTimeout(() => { if (btn) { btn.textContent = '📤 存這版到飛書'; btn.disabled = false; btn.style.color = ''; btn.style.borderColor = ''; } }, 2500);
+  } catch(e) {
+    if (btn) { btn.textContent = '❌ 失敗'; btn.disabled = false; }
+    setTimeout(() => { if (btn) btn.textContent = '📤 存這版到飛書'; }, 2000);
+  }
 }
 
 async function confirmProSave() {
@@ -1661,6 +1667,7 @@ function quickSearchCreator(platform, handle, name) {
   const anchor = target.querySelector('.grid-2');
 
   const wrapper = document.createElement('div');
+  wrapper.id = 'pillar-wrapper';
   wrapper.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:16px;align-items:stretch';
 
   if (pillarCard) {
@@ -1675,6 +1682,9 @@ function quickSearchCreator(platform, handle, name) {
       </div>
       <p id="pillar-subtitle" style="font-size:13px;color:var(--text-muted);margin:8px 0 0;display:none">點擊任一關鍵詞 → 自動帶入腳本生成器</p>
       <div id="pillar-body" style="display:none">${pillarContent}</div>`;
+    // collapsed by default: flex center
+    pillarCard.style.display = 'flex';
+    pillarCard.style.alignItems = 'center';
     wrapper.appendChild(pillarCard);
   }
   if (ideaCard) {
@@ -1684,14 +1694,25 @@ function quickSearchCreator(platform, handle, name) {
 })();
 
 function togglePillar() {
-  const body = document.getElementById('pillar-body');
-  const sub  = document.getElementById('pillar-subtitle');
-  const btn  = document.getElementById('pillar-toggle-btn');
+  const body   = document.getElementById('pillar-body');
+  const sub    = document.getElementById('pillar-subtitle');
+  const btn    = document.getElementById('pillar-toggle-btn');
+  const card   = btn?.closest('.card');
   if (!body) return;
   const collapsed = body.style.display === 'none';
-  body.style.display = collapsed ? '' : 'none';
-  if (sub) sub.style.display = collapsed ? '' : 'none';
-  btn.textContent = collapsed ? '折疊 ▲' : '展開 ▼';
+  if (collapsed) {
+    // Expand
+    body.style.display = '';
+    if (sub) sub.style.display = '';
+    btn.textContent = '折疊 ▲';
+    if (card) { card.style.display = ''; card.style.alignItems = ''; }
+  } else {
+    // Collapse — keep card same height as right, center header vertically
+    body.style.display = 'none';
+    if (sub) sub.style.display = 'none';
+    btn.textContent = '展開 ▼';
+    if (card) { card.style.display = 'flex'; card.style.alignItems = 'center'; }
+  }
 }
 initPositioning();
 renderInbox();
