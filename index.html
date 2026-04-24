@@ -1730,7 +1730,9 @@ async function fetchHNComments(hnId, item, display) {
       html += `<p style="font-size:13px;color:var(--text-muted)">暫無討論留言</p>`;
     } else {
       html += comments.map(c => {
-        const text = c.text.replace(/<[^>]+>/g, '').trim();
+        const _ta = document.createElement('textarea');
+        _ta.innerHTML = c.text.replace(/<p>/gi,'\n').replace(/<br\s*\/?>/gi,'\n').replace(/<[^>]+>/g,'');
+        const text = _ta.value.replace(/\n{3,}/g,'\n\n').trim();
         const author = c.author || '匿名';
         const replies = c.children?.length || 0;
         return `<div style="margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,0.04)">
@@ -1746,7 +1748,11 @@ async function fetchHNComments(hnId, item, display) {
     if (display) display.innerHTML = html;
 
     // Pre-fill extra with comment digest for AI context
-    const digest = comments.slice(0, 4).map(c => '- ' + c.text.replace(/<[^>]+>/g,'').trim().slice(0,120)).join('\n');
+    const digest = comments.slice(0, 4).map(c => {
+      const ta = document.createElement('textarea');
+      ta.innerHTML = c.text.replace(/<[^>]+>/g,'');
+      return '- ' + ta.value.trim().slice(0, 150);
+    }).join('\n');
     const extraEl = document.getElementById('pro-extra');
     if (extraEl && !extraEl.value) extraEl.value = `【HN 討論精華】\n${digest}`;
   } catch(e) {
