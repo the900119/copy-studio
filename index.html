@@ -1495,10 +1495,9 @@ function addToInbox(angle, word, hot, source, content, creator, noteId, xsecToke
   renderInbox();
   if (event && event.currentTarget) {
     const btn = event.currentTarget;
-    const orig = btn.textContent;
-    btn.textContent = '✓ 已加';
+    btn.textContent = '✓ 已加入';
     btn.style.color = '#2ecc71';
-    setTimeout(() => { btn.textContent = orig; btn.style.color = ''; }, 1000);
+    btn.disabled = true;
   }
 }
 
