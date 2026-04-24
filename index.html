@@ -383,8 +383,8 @@
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
             <div>
               <span class="card-tag">📊 即時排行榜</span>
-              <h2 style="margin-bottom:2px">五平台熱搜總覽</h2>
-              <p style="font-size:12px;color:var(--text-muted);margin:0">抖音 · 小紅書 · 微博 · TikTok · HackerNews — 點「＋」加入選題庫</p>
+              <h2 style="margin-bottom:2px">四平台熱搜總覽</h2>
+              <p style="font-size:12px;color:var(--text-muted);margin:0">抖音 · 小紅書 · TikTok · HackerNews — 點「＋」加入選題庫</p>
             </div>
             <button id="trending-refresh-btn" class="btn btn-sm btn-outline" style="white-space:nowrap;font-size:12px" onclick="loadTrendingBoard(true)">↻ 重新整理</button>
           </div>
@@ -392,10 +392,9 @@
             <div class="spinner" style="margin:0 auto 8px"></div>
             <p style="font-size:12px;color:var(--text-muted)">正在拉取五平台熱搜（約 15–25 秒）…</p>
           </div>
-          <div id="trending-board" style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;display:none">
+          <div id="trending-board" style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;display:none">
             <div id="tb-douyin"></div>
             <div id="tb-xhs"></div>
-            <div id="tb-weibo"></div>
             <div id="tb-tiktok"></div>
             <div id="tb-hackernews"></div>
           </div>
@@ -1009,7 +1008,6 @@ async function loadTrendingBoard(forceRefresh = false) {
       if (cached && Date.now() - cached.ts < TRENDING_CACHE_TTL && cached.tiktok) {
         renderTrendingCol('tb-douyin',     '🔥 抖音熱搜',   cached.douyin     || []);
         renderTrendingCol('tb-xhs',        '📸 小紅書熱門', cached.xhs        || []);
-        renderTrendingCol('tb-weibo',      '💬 微博熱搜',   cached.weibo      || []);
         renderTrendingCol('tb-tiktok',     '🎵 TikTok',     cached.tiktok     || []);
         renderTrendingCol('tb-hackernews', '💻 HackerNews', cached.hackernews || []);
         board.style.display = 'grid';
@@ -1027,7 +1025,6 @@ async function loadTrendingBoard(forceRefresh = false) {
     const d = await r.json();
     renderTrendingCol('tb-douyin',     '🔥 抖音熱搜',   d.douyin     || []);
     renderTrendingCol('tb-xhs',        '📸 小紅書熱門', d.xhs        || []);
-    renderTrendingCol('tb-weibo',      '💬 微博熱搜',   d.weibo      || []);
     renderTrendingCol('tb-tiktok',     '🎵 TikTok',     d.tiktok     || []);
     renderTrendingCol('tb-hackernews', '💻 HackerNews', d.hackernews || []);
     board.style.display = 'grid';
