@@ -199,6 +199,15 @@
     .inbox-btn.del:hover { border-color: #c0392b; color: #e74c3c; }
     .add-inbox-btn { font-size: 11px; padding: 4px 9px; border-radius: 6px; cursor: pointer; border: 1px solid rgba(212,168,67,0.2); background: rgba(212,168,67,0.04); color: var(--gold-dim); font-family: inherit; transition: all 0.15s; flex-shrink: 0; margin-top: 0; }
     .add-inbox-btn:hover { background: rgba(212,168,67,0.1); color: var(--gold); border-color: var(--gold-dim); }
+    .tb-col-title { font-size: 12px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; color: var(--gold-dim); margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+    .tb-item { display: flex; align-items: center; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+    .tb-item:last-child { border-bottom: none; }
+    .tb-rank { font-size: 11px; font-weight: 700; color: var(--gold-dim); width: 18px; text-align: right; flex-shrink: 0; }
+    .tb-rank.top3 { color: var(--gold); }
+    .tb-keyword { font-size: 12px; color: var(--text); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; }
+    .tb-keyword:hover { color: var(--gold); }
+    .tb-add { font-size: 10px; padding: 2px 7px; border-radius: 5px; cursor: pointer; border: 1px solid rgba(212,168,67,0.2); background: transparent; color: var(--gold-dim); font-family: inherit; transition: all 0.15s; flex-shrink: 0; }
+    .tb-add:hover { background: rgba(212,168,67,0.1); color: var(--gold); }
 
     /* ════ Tab 4: 腳本生成 Pro ════ */
     .selector-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
@@ -368,6 +377,27 @@
     <!-- ════ STEP 02: 靈感收集 ════ -->
     <div class="tab-panel active" id="tab-search">
       <div class="container">
+
+        <!-- 📊 即時熱搜排行榜 -->
+        <div class="card mb-16" id="trending-board-card">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+            <div>
+              <span class="card-tag">📊 即時排行榜</span>
+              <h2 style="margin-bottom:2px">三平台熱搜總覽</h2>
+              <p style="font-size:12px;color:var(--text-muted);margin:0">抖音 · 小紅書 · 微博 — 點「＋暫存」加入選題庫</p>
+            </div>
+            <button id="trending-refresh-btn" class="btn btn-sm btn-outline" style="white-space:nowrap;font-size:12px" onclick="loadTrendingBoard()">↻ 重新整理</button>
+          </div>
+          <div id="trending-loading" style="text-align:center;padding:20px 0;display:none">
+            <div class="spinner" style="margin:0 auto 8px"></div>
+            <p style="font-size:12px;color:var(--text-muted)">正在拉取三平台熱搜（約 10–20 秒）…</p>
+          </div>
+          <div id="trending-board" style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;display:none">
+            <div id="tb-douyin"></div>
+            <div id="tb-xhs"></div>
+            <div id="tb-weibo"></div>
+          </div>
+        </div>
 
         <!-- 🔥 抖音熱搜 + 收藏創作者 -->
         <div id="douyin-grid" class="mb-16" style="display:grid;grid-template-columns:1fr 260px;gap:16px;align-items:start">
@@ -917,6 +947,7 @@ const WH_SAVE_TOPICS = N8N + '/copy-studio-save-topics';
 const WH_XHS_SEARCH     = N8N + '/copy-studio-xhs-search';
 const WH_XHS_TRANSCRIBE = N8N + '/copy-studio-xhs-transcribe';
 const WH_XHS_REWRITE    = N8N + '/copy-studio-xhs-rewrite';
+const WH_TRENDING_BOARD = N8N + '/copy-studio-trending-board';
 
 let searchPlatform = 'yt', directPlatform = 'yt';
 const WH_DOUYIN_SEARCH = N8N + '/copy-studio-douyin-search';
@@ -956,6 +987,66 @@ function getPersona() {
     origin:       document.getElementById('s-origin').value,
     now:          document.getElementById('s-now').value
   };
+}
+
+// ── STEP 02: 即時熱搜排行榜 ──────────────────────────────
+let trendingBoardLoaded = false;
+async function loadTrendingBoard() {
+  const loading = document.getElementById('trending-loading');
+  const board   = document.getElementById('trending-board');
+  const btn     = document.getElementById('trending-refresh-btn');
+  loading.style.display = 'block';
+  board.style.display   = 'none';
+  if (btn) { btn.disabled = true; btn.textContent = '載入中…'; }
+  try {
+    const r = await fetch(WH_TRENDING_BOARD, { method: 'GET' });
+    const d = await r.json();
+    renderTrendingCol('tb-douyin', '🔥 抖音熱搜', d.douyin || []);
+    renderTrendingCol('tb-xhs',    '📸 小紅書熱門', d.xhs   || []);
+    renderTrendingCol('tb-weibo',  '💬 微博熱搜',  d.weibo  || []);
+    board.style.display = 'grid';
+    trendingBoardLoaded = true;
+  } catch(e) {
+    document.getElementById('tb-douyin').innerHTML = `<p style="font-size:12px;color:var(--text-muted)">載入失敗：${e.message}</p>`;
+    board.style.display = 'grid';
+  } finally {
+    loading.style.display = 'none';
+    if (btn) { btn.disabled = false; btn.textContent = '↻ 重新整理'; }
+  }
+}
+
+function renderTrendingCol(elId, title, items) {
+  const el = document.getElementById(elId);
+  if (!el) return;
+  if (!items.length) { el.innerHTML = `<div class="tb-col-title">${title}</div><p style="font-size:12px;color:var(--text-muted);padding:8px 0">暫無資料</p>`; return; }
+  el.innerHTML = `<div class="tb-col-title">${title}</div>` +
+    items.map(item => {
+      const kw = esc(item.keyword || '');
+      const src = title.includes('抖音') ? '抖音熱搜' : title.includes('小紅書') ? '小紅書熱門' : '微博熱搜';
+      return `<div class="tb-item">
+        <span class="tb-rank${item.rank <= 3 ? ' top3' : ''}">${item.rank}</span>
+        <span class="tb-keyword" title="${kw}" onclick="addToInbox('${kw}','${kw}',0,'${src}','${kw}')">${kw}</span>
+        <button class="tb-add" onclick="tbAddToInbox(this,'${kw}','${src}')">＋</button>
+      </div>`;
+    }).join('');
+}
+
+function tbAddToInbox(btn, keyword, source) {
+  addToInbox(keyword, keyword, 0, source, keyword);
+  btn.textContent = '✓';
+  btn.style.color = '#2ecc71';
+  btn.style.borderColor = '#2ecc71';
+  btn.disabled = true;
+}
+
+// 進入 Step 02 時自動載入一次
+document.querySelector('.step-item[data-tab="search"]')?.addEventListener('click', () => {
+  if (!trendingBoardLoaded) loadTrendingBoard();
+});
+
+// 若 Step 02 是預設 active，頁面載入後自動觸發
+if (document.getElementById('tab-search')?.classList.contains('active')) {
+  document.addEventListener('DOMContentLoaded', () => { if (!trendingBoardLoaded) loadTrendingBoard(); });
 }
 
 // ── STEP 02: 靈感收集 — 抖音熱搜 ──────────────────────────
