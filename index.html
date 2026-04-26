@@ -1695,13 +1695,15 @@ async function fetchDouyinSubtitle(awemeId, btn) {
     });
     const d = await r.json();
     if (d.transcript) {
-      if (area) area.innerHTML = `<div style="background:rgba(212,168,67,0.04);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:12px;font-size:13px;line-height:1.75;color:var(--text);white-space:pre-wrap">${esc(d.transcript)}</div>`;
+      const label = d.source === 'subtitle' ? '影片字幕' : '創作者文案';
+      const note = d.note ? `<div style="font-size:11px;color:var(--gold-dim);margin-bottom:6px">${esc(d.note)}</div>` : '';
+      if (area) area.innerHTML = `${note}<div style="background:rgba(212,168,67,0.04);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:12px;font-size:13px;line-height:1.75;color:var(--text);white-space:pre-wrap">${esc(d.transcript)}</div>`;
       const extraEl = document.getElementById('pro-extra');
       if (extraEl && !extraEl.value) extraEl.value = d.transcript;
-      btn.textContent = '✅ 字幕已載入';
+      btn.textContent = `✅ ${label}已載入`;
     } else {
-      if (area) area.innerHTML = `<p style="font-size:12px;color:var(--text-muted);margin-bottom:8px">⚠️ ${d.error || '此影片無字幕，請手動貼入內容'}</p>`;
-      btn.textContent = '無字幕';
+      if (area) area.innerHTML = `<p style="font-size:12px;color:var(--text-muted);margin-bottom:8px">⚠️ ${d.error || '此影片無文案，請手動貼入內容'}</p>`;
+      btn.textContent = '無文案';
     }
   } catch(e) {
     btn.textContent = '失敗';
