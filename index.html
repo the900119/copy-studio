@@ -1269,7 +1269,7 @@ function renderDouyinSearchResults(videos, keyword) {
         <div class="result-title" title="${esc(v.desc)}">${esc(v.desc)}</div>
         <div class="result-sub">❤️ ${(v.likes||0).toLocaleString()} · 👤 ${esc(v.author_name)}</div>
       </div>
-      <button class="add-inbox-btn" onclick="addToInbox('${esc(v.desc)}','${esc(v.desc)}',${v.likes||0},'抖音搜尋','${esc(v.desc)}','${esc(v.author_name)}')">＋暫存</button>
+      <button class="add-inbox-btn" onclick="addToInbox('${esc(v.desc)}','${esc(v.desc)}',${v.likes||0},'抖音搜尋','${esc(v.desc)}','${esc(v.author_name)}','','','https://www.douyin.com/video/${v.aweme_id}')">＋暫存</button>
     </div>`).join('');
   document.getElementById('search-results').style.display = 'block';
 }
@@ -1709,6 +1709,31 @@ function setInboxTab(tab) {
 
 let pendingNoteId = '', pendingXsecToken = '';
 
+async function fetchDouyinSubtitle(awemeId, btn) {
+  btn.disabled = true;
+  btn.textContent = '⏳ 抓取中…';
+  const area = document.getElementById('douyin-transcript-area');
+  try {
+    const r = await fetch('https://eglobal.app.n8n.cloud/webhook/copy-studio-douyin-subtitle', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ aweme_id: awemeId })
+    });
+    const d = await r.json();
+    if (d.transcript) {
+      if (area) area.innerHTML = `<div style="background:rgba(212,168,67,0.04);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:12px;font-size:13px;line-height:1.75;color:var(--text);white-space:pre-wrap">${esc(d.transcript)}</div>`;
+      const extraEl = document.getElementById('pro-extra');
+      if (extraEl && !extraEl.value) extraEl.value = d.transcript;
+      btn.textContent = '✅ 字幕已載入';
+    } else {
+      if (area) area.innerHTML = `<p style="font-size:12px;color:var(--text-muted);margin-bottom:8px">⚠️ ${d.error || '此影片無字幕，請手動貼入內容'}</p>`;
+      btn.textContent = '無字幕';
+    }
+  } catch(e) {
+    btn.textContent = '失敗';
+    if (area) area.textContent = '字幕抓取失敗：' + e.message;
+  }
+}
+
 async function fetchHNByTitle(title, item, display) {
   try {
     const q = encodeURIComponent(title.slice(0, 60));
@@ -1856,15 +1881,21 @@ function useInboxTopic(id) {
       const creatorStr = item.creator ? `<span>👤 ${esc(item.creator)}</span>` : '';
       const contentStr = item.content && item.content !== item.angle
         ? `<div style="margin-top:12px;font-size:13px;color:var(--text-muted);line-height:1.75;white-space:pre-wrap">${esc(item.content)}</div>` : '';
+      // For 抖音搜尋 with video URL, show subtitle fetch button
+      const douyinAwemeId = (src === '抖音搜尋' && item.url) ? item.url.match(/\/video\/(\d+)/)?.[1] : '';
+      const subtitleBtn = douyinAwemeId
+        ? `<button onclick="fetchDouyinSubtitle('${douyinAwemeId}',this)" style="font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid var(--gold-dim);background:transparent;color:var(--gold-dim);cursor:pointer;font-family:inherit">📝 取得影片字幕</button>` : '';
       const linkBtn = link
-        ? `<a href="${link}" target="_blank" rel="noopener" style="color:var(--gold-light);font-weight:600;font-size:12px">前往${esc(src)}查看完整討論 →</a>` : '';
+        ? `<a href="${link}" target="_blank" rel="noopener" style="color:var(--gold-light);font-weight:600;font-size:12px">前往${esc(src)} →</a>` : '';
       display.innerHTML = `
-        <div style="display:flex;gap:14px;font-size:12px;color:var(--text-muted);flex-wrap:wrap;margin-bottom:10px">
+        <div style="display:flex;gap:14px;font-size:12px;color:var(--text-muted);flex-wrap:wrap;margin-bottom:10px;align-items:center">
           <span>來源：${esc(src)}</span>${hotStr}${creatorStr}
-          <div style="margin-left:auto">${linkBtn}</div>
+          <div style="margin-left:auto;display:flex;gap:10px;align-items:center">${subtitleBtn}${linkBtn}</div>
         </div>
+        <div id="douyin-transcript-area"></div>
         ${contentStr}
-        ${!contentStr ? `<p style="font-size:12px;color:var(--text-muted);margin-top:8px">這是熱點關鍵字，無原始影片逐字稿。<br>點上方連結前往平台查看相關內容，再把你想引用的資料貼到「補充素材」欄。</p>` : ''}`;
+        ${!contentStr && !douyinAwemeId ? `<p style="font-size:12px;color:var(--text-muted);margin-top:8px">這是熱點關鍵字，無原始影片逐字稿。<br>點上方連結前往平台查看相關內容，再把你想引用的資料貼到「補充素材」欄。</p>` : ''}
+        ${douyinAwemeId && !contentStr ? `<p style="font-size:12px;color:var(--text-muted);margin-top:8px">點「取得影片字幕」抓取逐字稿，或直接前往抖音查看。</p>` : ''}`;
     }
   }
 
