@@ -1735,6 +1735,7 @@ async function fetchHNComments(hnId, item, display) {
       .slice(0, 8);
     const score = d.points || item.hot || 0;
     const commentCount = d.children?.length || 0;
+    const articleUrl = d.url || item.articleUrl || '';
 
     // Decode HTML entities
     function decodeHN(html) {
@@ -1744,9 +1745,12 @@ async function fetchHNComments(hnId, item, display) {
     }
 
     // Build header
-    let html = `<div style="margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border);display:flex;gap:16px;font-size:12px;color:var(--text-muted)">
+    let html = `<div style="margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border);display:flex;gap:16px;font-size:12px;color:var(--text-muted);flex-wrap:wrap">
       <span>⬆ ${score} 分</span><span>💬 ${commentCount} 則討論</span>
-      <a href="https://news.ycombinator.com/item?id=${hnId}" target="_blank" rel="noopener" style="color:var(--gold-dim);margin-left:auto">打開討論串 →</a>
+      <div style="margin-left:auto;display:flex;gap:14px;align-items:center">
+        ${articleUrl ? `<a href="${articleUrl.replace(/"/g,'&quot;')}" target="_blank" rel="noopener" style="color:var(--gold-light);font-weight:600;font-size:12px">閱讀原文 →</a>` : ''}
+        <a href="https://news.ycombinator.com/item?id=${hnId}" target="_blank" rel="noopener" style="color:var(--gold-dim)">HN 討論串 →</a>
+      </div>
     </div>
     <div id="hn-ai-summary" style="background:rgba(212,168,67,0.06);border:1px solid rgba(212,168,67,0.15);border-radius:8px;padding:12px;margin-bottom:14px;font-size:13px;line-height:1.7;color:var(--text-muted)">⏳ AI 摘要生成中…</div>`;
 
