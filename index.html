@@ -1686,16 +1686,20 @@ let pendingNoteId = '', pendingXsecToken = '';
 
 async function fetchDouyinSubtitle(awemeId, btn) {
   btn.disabled = true;
-  btn.textContent = '⏳ 抓取中…';
+  btn.textContent = '⏳ 下載中，約 15-30 秒…';
   const area = document.getElementById('douyin-transcript-area');
   try {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 90000);  // 90s timeout
     const r = await fetch('https://eglobal.app.n8n.cloud/webhook/copy-studio-douyin-subtitle', {
       method: 'POST', headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ aweme_id: awemeId })
+      body: JSON.stringify({ aweme_id: awemeId }),
+      signal: ctrl.signal
     });
+    clearTimeout(timer);
     const d = await r.json();
     if (d.transcript) {
-      const label = d.source === 'subtitle' ? '影片字幕' : '創作者文案';
+      const label = d.source === 'whisper' ? '逐字稿' : d.source === 'subtitle' ? '影片字幕' : '創作者文案';
       const note = d.note ? `<div style="font-size:11px;color:var(--gold-dim);margin-bottom:6px">${esc(d.note)}</div>` : '';
       if (area) area.innerHTML = `${note}<div style="background:rgba(212,168,67,0.04);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:12px;font-size:13px;line-height:1.75;color:var(--text);white-space:pre-wrap">${esc(d.transcript)}</div>`;
       const extraEl = document.getElementById('pro-extra');
@@ -1707,7 +1711,7 @@ async function fetchDouyinSubtitle(awemeId, btn) {
     }
   } catch(e) {
     btn.textContent = '失敗';
-    if (area) area.textContent = '字幕抓取失敗：' + e.message;
+    if (area) area.textContent = '逐字稿抓取失敗：' + e.message;
   }
 }
 
@@ -1861,7 +1865,7 @@ function useInboxTopic(id) {
       // For 抖音搜尋 with video URL, show subtitle fetch button
       const douyinAwemeId = (src === '抖音搜尋' && item.url) ? item.url.match(/\/video\/(\d+)/)?.[1] : '';
       const subtitleBtn = douyinAwemeId
-        ? `<button onclick="fetchDouyinSubtitle('${douyinAwemeId}',this)" style="font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid var(--gold-dim);background:transparent;color:var(--gold-dim);cursor:pointer;font-family:inherit">📝 取得影片字幕</button>` : '';
+        ? `<button onclick="fetchDouyinSubtitle('${douyinAwemeId}',this)" style="font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid var(--gold-dim);background:transparent;color:var(--gold-dim);cursor:pointer;font-family:inherit">🎙️ 轉錄影片逐字稿</button>` : '';
       const linkBtn = link
         ? `<a href="${link}" target="_blank" rel="noopener" style="color:var(--gold-light);font-weight:600;font-size:12px">前往${esc(src)} →</a>` : '';
       display.innerHTML = `
@@ -1872,7 +1876,7 @@ function useInboxTopic(id) {
         <div id="douyin-transcript-area"></div>
         ${contentStr}
         ${!contentStr && !douyinAwemeId ? `<p style="font-size:12px;color:var(--text-muted);margin-top:8px">這是熱點關鍵字，無原始影片逐字稿。<br>點上方連結前往平台查看相關內容，再把你想引用的資料貼到「補充素材」欄。</p>` : ''}
-        ${douyinAwemeId && !contentStr ? `<p style="font-size:12px;color:var(--text-muted);margin-top:8px">點「取得影片字幕」抓取逐字稿，或直接前往抖音查看。</p>` : ''}`;
+        ${douyinAwemeId && !contentStr ? `<p style="font-size:12px;color:var(--text-muted);margin-top:8px">點「轉錄影片逐字稿」讓 Whisper 轉錄，或直接前往抖音查看。</p>` : ''}`;
     }
   }
 
