@@ -1841,18 +1841,30 @@ function useInboxTopic(id) {
       fetchHNByTitle(item.angle || item.word || '', item, display);
     }
   } else {
-    // 熱點詞 / 其他：顯示 metadata
+    // 熱點詞 / 其他：顯示 metadata + 平台搜尋連結
     if (display) {
-      display.innerHTML = '';
-      const lines = [];
-      if (item.source)  lines.push('來源：' + item.source);
-      if (item.creator) lines.push('創作者：' + item.creator);
-      if (item.hot)     lines.push('熱度：' + Number(item.hot).toLocaleString());
-      if (item.content && item.content !== item.angle) lines.push('', item.content);
-      const pre = document.createElement('pre');
-      pre.style.cssText = 'margin:0;white-space:pre-wrap;font-size:13px;line-height:1.75;color:var(--text-muted);font-family:inherit';
-      pre.textContent = lines.join('\n').trim() || '（此選題無原文素材）';
-      display.appendChild(pre);
+      const kw = encodeURIComponent(item.angle || item.word || '');
+      const src = item.source || '';
+      const searchLinks = {
+        'TikTok':   `https://www.tiktok.com/search?q=${kw}`,
+        '抖音熱搜': `https://www.douyin.com/search/${kw}`,
+        '微博熱搜': `https://s.weibo.com/weibo?q=${kw}`,
+        '小紅書熱門': `https://www.xiaohongshu.com/search_result?keyword=${kw}`,
+      };
+      const link = searchLinks[src] || (item.url ? item.url : '');
+      const hotStr = item.hot ? `<span>🔥 熱度 ${Number(item.hot).toLocaleString()}</span>` : '';
+      const creatorStr = item.creator ? `<span>👤 ${esc(item.creator)}</span>` : '';
+      const contentStr = item.content && item.content !== item.angle
+        ? `<div style="margin-top:12px;font-size:13px;color:var(--text-muted);line-height:1.75;white-space:pre-wrap">${esc(item.content)}</div>` : '';
+      const linkBtn = link
+        ? `<a href="${link}" target="_blank" rel="noopener" style="color:var(--gold-light);font-weight:600;font-size:12px">前往${esc(src)}查看完整討論 →</a>` : '';
+      display.innerHTML = `
+        <div style="display:flex;gap:14px;font-size:12px;color:var(--text-muted);flex-wrap:wrap;margin-bottom:10px">
+          <span>來源：${esc(src)}</span>${hotStr}${creatorStr}
+          <div style="margin-left:auto">${linkBtn}</div>
+        </div>
+        ${contentStr}
+        ${!contentStr ? `<p style="font-size:12px;color:var(--text-muted);margin-top:8px">這是熱點關鍵字，無原始影片逐字稿。<br>點上方連結前往平台查看相關內容，再把你想引用的資料貼到「補充素材」欄。</p>` : ''}`;
     }
   }
 
