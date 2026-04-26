@@ -401,39 +401,7 @@
           </div>
         </div>
 
-        <!-- 🔥 抖音熱搜 + 收藏創作者 -->
-        <div id="douyin-grid" class="mb-16" style="display:grid;grid-template-columns:1fr 260px;gap:16px;align-items:start">
-
-          <div class="card" id="douyin-card">
-            <span class="card-tag">🔥 抖音熱搜</span>
-            <h2>抖音熱搜靈感挖掘</h2>
-            <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px">AI 從即時抖音熱搜中，篩選出與你賽道相關的靈感角度</p>
-            <div style="display:flex;gap:10px;align-items:flex-end">
-              <div style="flex:1">
-                <label class="field-label">你的賽道方向</label>
-                <input type="text" id="douyin-niche" placeholder="如：珠寶跨境、工廠老闆、AI創業">
-              </div>
-              <button class="btn btn-sm" style="margin-top:0;white-space:nowrap" onclick="searchDouyin()">🔥 抓熱搜靈感</button>
-            </div>
-            <div class="loading" id="douyin-loading" style="padding:24px"><div class="spinner"></div><p class="loading-msg">正在抓取抖音熱搜並 AI 篩選（約 15–25 秒）...</p></div>
-            <div id="douyin-results" style="display:none">
-              <div class="divider"></div>
-              <p style="font-size:11px;color:var(--text-muted);margin-bottom:12px">AI 篩選結果 — 點「＋暫存」加入選題庫，或「帶入生成」直接到第四步</p>
-              <div id="douyin-list"></div>
-            </div>
-          </div>
-
-          <div class="card">
-            <h2 style="margin-bottom:10px">收藏創作者</h2>
-            <p style="font-size:11px;color:var(--text-muted);margin-bottom:12px">搜尋過的 YT／小紅書創作者自動收藏，點擊快速搜尋</p>
-            <div id="creator-fav-list" style="max-height:160px;overflow-y:scroll;padding-right:4px;scrollbar-width:thin;scrollbar-color:#d4a843 rgba(255,255,255,0.06)">
-              <p style="font-size:11px;color:var(--text-muted);text-align:center;padding:20px 0">暫無收藏<br>搜尋創作者後自動儲存</p>
-            </div>
-          </div>
-
-        </div>
-
-        <!-- YT / XHS 搜尋 -->
+        <!-- YT / XHS / 抖音 搜尋 -->
         <div class="grid-2 mb-16">
 
           <div class="card">
@@ -442,7 +410,7 @@
             <div class="platform-toggle">
               <button class="platform-btn active" onclick="selectPlatform('search','yt',this)">YouTube</button>
               <button class="platform-btn"        onclick="selectPlatform('search','xhs',this)">小紅書</button>
-              <button class="platform-btn"        onclick="selectPlatform('search','douyin',this)">抖音</button>
+              <button class="platform-btn"        onclick="selectPlatform('search','douyin',this)">抖音關鍵字</button>
             </div>
             <input type="text" id="search-input" placeholder="頻道 URL 或 @handle（如 @MrBeast）">
             <div id="xhs-history" style="display:none;margin:8px 0 4px">
@@ -450,6 +418,13 @@
               <div id="xhs-history-chips" style="display:flex;flex-wrap:wrap;gap:6px"></div>
             </div>
             <button class="btn" onclick="doSearch()">🔍 找半年內 Top 10</button>
+            <!-- 收藏創作者（合併入此卡） -->
+            <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border)">
+              <div style="font-size:10px;color:var(--text-muted);margin-bottom:8px;letter-spacing:.5px;text-transform:uppercase">收藏創作者</div>
+              <div id="creator-fav-list" style="max-height:120px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#d4a843 rgba(255,255,255,0.06)">
+                <p style="font-size:11px;color:var(--text-muted);padding:8px 0">搜尋後自動收藏，點擊快速重搜</p>
+              </div>
+            </div>
             <div class="search-results" id="search-results">
               <div id="results-list"></div>
             </div>
