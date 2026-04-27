@@ -1032,12 +1032,15 @@ function renderTrendingCol(elId, title, items) {
   el.innerHTML = `<div class="tb-col-title">${title}</div>
     <div style="max-height:168px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--gold-dim) transparent">` +
     items.map(item => {
-      const kw  = esc(item.keyword || '');
-      const url = esc(tbSearchUrl(src, item.keyword || '', item.url || ''));
+      const kw   = esc(item.keyword || '');
+      const url  = esc(tbSearchUrl(src, item.keyword || '', item.url || ''));
+      const kwJ  = JSON.stringify(item.keyword || '').replace(/"/g, '&quot;');
+      const srcJ = JSON.stringify(src).replace(/"/g, '&quot;');
+      const urlJ = JSON.stringify(item.url || '').replace(/"/g, '&quot;');
       return `<div class="tb-item">
         <span class="tb-rank${item.rank <= 3 ? ' top3' : ''}">${item.rank}</span>
         <a class="tb-keyword" href="${url}" target="_blank" rel="noopener" title="點擊查看詳情">${kw}</a>
-        <button class="tb-add" onclick="tbAddToInbox(this,'${kw}','${src}','${esc(item.url||'')}')">＋</button>
+        <button class="tb-add" onclick="tbAddToInbox(this,${kwJ},${srcJ},${urlJ})">＋</button>
       </div>`;
     }).join('') + `</div>`;
 }
