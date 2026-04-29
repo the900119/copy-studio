@@ -1051,19 +1051,21 @@ function renderTrendingCol(elId, title, items) {
     items.map(item => {
       const kw   = esc(item.keyword || '');
       const url  = esc(tbSearchUrl(src, item.keyword || '', item.url || ''));
-      const kwJ  = JSON.stringify(item.keyword || '').replace(/"/g, '&quot;');
-      const srcJ = JSON.stringify(src).replace(/"/g, '&quot;');
-      const urlJ = JSON.stringify(item.url || '').replace(/"/g, '&quot;');
+      const kwJ   = JSON.stringify(item.keyword || '').replace(/"/g, '&quot;');
+      const srcJ  = JSON.stringify(src).replace(/"/g, '&quot;');
+      const urlJ  = JSON.stringify(item.url || '').replace(/"/g, '&quot;');
+      const descJ = JSON.stringify(item.desc || '').replace(/"/g, '&quot;');
+      const tipTitle = item.desc ? (item.keyword + '\n\n' + item.desc).slice(0,300) : item.keyword;
       return `<div class="tb-item">
         <span class="tb-rank${item.rank <= 3 ? ' top3' : ''}">${item.rank}</span>
-        <a class="tb-keyword" href="${url}" target="_blank" rel="noopener" title="點擊查看詳情">${kw}</a>
-        <button class="tb-add" onclick="tbAddToInbox(this,${kwJ},${srcJ},${urlJ})">＋</button>
+        <a class="tb-keyword" href="${url}" target="_blank" rel="noopener" title="${esc(tipTitle)}">${kw}</a>
+        <button class="tb-add" onclick="tbAddToInbox(this,${kwJ},${srcJ},${urlJ},${descJ})">＋</button>
       </div>`;
     }).join('') + `</div>`;
 }
 
-function tbAddToInbox(btn, keyword, source, url) {
-  addToInbox(keyword, keyword, 0, source, keyword, '', '', '', url || '');
+function tbAddToInbox(btn, keyword, source, url, desc) {
+  addToInbox(keyword, keyword, 0, source, desc || keyword, '', '', '', url || '');
   btn.textContent = '✓';
   btn.style.color = '#2ecc71';
   btn.style.borderColor = '#2ecc71';
