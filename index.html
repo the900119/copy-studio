@@ -385,7 +385,7 @@
             <div>
               <span class="card-tag">📊 即時排行榜</span>
               <h2 style="margin-bottom:2px">八平台熱搜總覽</h2>
-              <p style="font-size:12px;color:var(--text-muted);margin:0">抖音 · 小紅書 · TikTok · HN · Product Hunt · 36氪 · Reddit · Substack — 點「＋」加入選題庫</p>
+              <p style="font-size:12px;color:var(--text-muted);margin:0">抖音 · 小紅書 · TikTok · HN · Product Hunt · Rest of World · The Next Web · Substack — 點「＋」加入選題庫</p>
             </div>
             <button id="trending-refresh-btn" class="btn btn-sm btn-outline" style="white-space:nowrap;font-size:12px" onclick="loadTrendingBoard(true)">↻ 重新整理</button>
           </div>
@@ -990,8 +990,8 @@ async function loadTrendingBoard(forceRefresh = false) {
         renderTrendingCol('tb-tiktok',      '🎵 TikTok',       cached.tiktok      || []);
         renderTrendingCol('tb-hackernews',  '💻 HackerNews',   cached.hackernews  || []);
         renderTrendingCol('tb-producthunt', '🚀 Product Hunt', cached.producthunt || []);
-        renderTrendingCol('tb-36kr',        '🇨🇳 36氪',         cached.kr36        || []);
-        renderTrendingCol('tb-reddit',      '🔴 r/Entrepreneur',cached.reddit      || []);
+        renderTrendingCol('tb-36kr',        '🌏 Rest of World', cached.kr36        || []);
+        renderTrendingCol('tb-reddit',      '🇪🇺 The Next Web',  cached.reddit      || []);
         renderTrendingCol('tb-substack',    '📰 Substack',     cached.substack    || []);
         board.style.display = 'grid';
         trendingBoardLoaded = true;
@@ -1011,8 +1011,8 @@ async function loadTrendingBoard(forceRefresh = false) {
     renderTrendingCol('tb-tiktok',      '🎵 TikTok',        d.tiktok      || []);
     renderTrendingCol('tb-hackernews',  '💻 HackerNews',    d.hackernews  || []);
     renderTrendingCol('tb-producthunt', '🚀 Product Hunt',  d.producthunt || []);
-    renderTrendingCol('tb-36kr',        '🇨🇳 36氪',          d.kr36        || []);
-    renderTrendingCol('tb-reddit',      '🔴 r/Entrepreneur',d.reddit      || []);
+    renderTrendingCol('tb-36kr',        '🌏 Rest of World',  d.kr36        || []);
+    renderTrendingCol('tb-reddit',      '🇪🇺 The Next Web',  d.reddit      || []);
     renderTrendingCol('tb-substack',    '📰 Substack',      d.substack    || []);
     board.style.display = 'grid';
     trendingBoardLoaded = true;
@@ -1034,8 +1034,8 @@ function tbSearchUrl(src, keyword, itemUrl) {
   if (src === 'TikTok')     return 'https://www.tiktok.com/search?q=' + q;
   if (src === 'HackerNews') return 'https://hn.algolia.com/?q=' + q;
   if (src === 'Product Hunt') return itemUrl || ('https://www.producthunt.com/search?q=' + q);
-  if (src === '36氪') return itemUrl || ('https://36kr.com/search/articles/' + q);
-  if (src === 'r/Entrepreneur') return itemUrl || ('https://www.reddit.com/r/Entrepreneur/search/?q=' + q);
+  if (src === 'Rest of World') return itemUrl || ('https://restofworld.org/?s=' + q);
+  if (src === 'The Next Web') return itemUrl || ('https://thenextweb.com/?s=' + q);
   if (src === 'Substack') return itemUrl || ('https://substack.com/search?query=' + q);
   return '#';
 }
@@ -1044,7 +1044,7 @@ function renderTrendingCol(elId, title, items) {
   const el = document.getElementById(elId);
   if (!el) return;
   if (!items.length) { el.innerHTML = `<div class="tb-col-title">${title}</div><p style="font-size:12px;color:var(--text-muted);padding:8px 0">暫無資料</p>`; return; }
-  const src = title.includes('抖音') ? '抖音熱搜' : title.includes('小紅書') ? '小紅書熱門' : title.includes('TikTok') ? 'TikTok' : title.includes('HackerNews') ? 'HackerNews' : title.includes('Product Hunt') ? 'Product Hunt' : title.includes('36氪') ? '36氪' : title.includes('Entrepreneur') ? 'r/Entrepreneur' : title.includes('Substack') ? 'Substack' : '微博熱搜';
+  const src = title.includes('抖音') ? '抖音熱搜' : title.includes('小紅書') ? '小紅書熱門' : title.includes('TikTok') ? 'TikTok' : title.includes('HackerNews') ? 'HackerNews' : title.includes('Product Hunt') ? 'Product Hunt' : title.includes('Rest of World') ? 'Rest of World' : title.includes('Next Web') ? 'The Next Web' : title.includes('Substack') ? 'Substack' : '微博熱搜';
   el.innerHTML = `<div class="tb-col-title">${title}</div>
     <div style="max-height:168px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--gold-dim) transparent">` +
     items.map(item => {
