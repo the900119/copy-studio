@@ -810,12 +810,12 @@
         <div class="pro-output" id="pro-output">
           <div class="card">
             <div class="out-tab-bar">
-              <button class="out-tab active" onclick="switchOutTab('xhs',this)">📸 小紅書</button>
+              <button class="out-tab"        onclick="switchOutTab('xhs',this)">📸 小紅書</button>
               <button class="out-tab"        onclick="switchOutTab('short',this)">🎵 抖音</button>
-              <button class="out-tab"        onclick="switchOutTab('long',this)">📝 長文</button>
+              <button class="out-tab active" onclick="switchOutTab('long',this)">📝 長文</button>
             </div>
 
-            <div id="out-xhs" class="out-pane active">
+            <div id="out-xhs" class="out-pane">
               <textarea id="pro-xhs" rows="16" oninput="updateCount(this,'cnt-xhs')" style="width:100%"></textarea>
               <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
                 <div class="char-count" id="cnt-xhs">0 字</div>
@@ -831,7 +831,7 @@
               </div>
             </div>
 
-            <div id="out-long" class="out-pane">
+            <div id="out-long" class="out-pane active">
               <textarea id="pro-long" rows="16" oninput="updateCount(this,'cnt-long')" style="width:100%"></textarea>
               <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
                 <div class="char-count" id="cnt-long">0 字</div>
@@ -1549,8 +1549,8 @@ function renderProDrafts(data) {
       document.getElementById('pro-source-card').style.display = '';
     }
   }
-  // Show first tab
-  switchOutTab('xhs', document.querySelector('.out-tab'));
+  // Show long tab first
+  switchOutTab('long', document.querySelector('.out-tab[onclick*="long"]'));
   document.getElementById('pro-output').style.display = 'block';
   document.getElementById('pro-output').scrollIntoView({ behavior: 'smooth' });
 }
