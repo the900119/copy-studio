@@ -152,12 +152,12 @@
     .platform-btn.active { border-color: var(--gold-dim); background: rgba(212,168,67,0.07); color: var(--gold); font-weight: 600; }
 
     /* ── Results ── */
-    .search-results { margin-top: 14px; display: none; max-height: 340px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--gold-dim) transparent; }
-    .result-item { display: flex; align-items: center; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--border); }
+    .search-results { margin-top: 14px; display: none; max-height: 340px; overflow-y: auto; overflow-x: hidden; scrollbar-width: thin; scrollbar-color: var(--gold-dim) transparent; }
+    .result-item { display: flex; align-items: center; gap: 8px; padding: 9px 0; border-bottom: 1px solid var(--border); overflow: hidden; max-width: 100%; }
     .result-item:last-child { border-bottom: none; }
     .result-item input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; flex-shrink: 0; accent-color: var(--gold); }
-    .result-meta { flex: 1; min-width: 0; }
-    .result-title { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .result-meta { flex: 1; min-width: 0; overflow: hidden; }
+    .result-title { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
     .result-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
 
     /* ── TikHub Results ── */
@@ -221,7 +221,7 @@
     .inbox-btn:hover { border-color: var(--gold-dim); color: var(--gold); }
     .inbox-btn.primary { border-color: rgba(212,168,67,0.3); color: var(--gold-dim); }
     .inbox-btn.del:hover { border-color: #c0392b; color: #e74c3c; }
-    .add-inbox-btn { font-size: 11px; padding: 4px 9px; border-radius: 6px; cursor: pointer; border: 1px solid rgba(212,168,67,0.2); background: rgba(212,168,67,0.04); color: var(--gold-dim); font-family: inherit; transition: all 0.15s; flex-shrink: 0; margin-top: 0; }
+    .add-inbox-btn { font-size: 11px; padding: 4px 9px; border-radius: 6px; cursor: pointer; border: 1px solid rgba(212,168,67,0.2); background: rgba(212,168,67,0.04); color: var(--gold-dim); font-family: inherit; transition: all 0.15s; flex-shrink: 0 !important; margin-top: 0; white-space: nowrap; }
     .add-inbox-btn:hover { background: rgba(212,168,67,0.1); color: var(--gold); border-color: var(--gold-dim); }
     #trending-board > div { min-width: 0; overflow: hidden; }
     .tb-col-title { font-size: 12px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; color: var(--gold-dim); margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
@@ -1459,11 +1459,11 @@ function renderResults(list) {
   if (ytInput) saveFav('YT', ytInput, ytInput);
   document.getElementById('results-list').innerHTML = list.map((v) => `
     <div class="result-item">
-      <div class="result-meta" style="flex:1">
+      <div class="result-meta">
         <div class="result-title" title="${esc(v.title)}">${esc(v.title)}</div>
         <div class="result-sub">👀 ${(v.views||0).toLocaleString()} · ${v.date||''}</div>
       </div>
-      <button class="add-inbox-btn" onclick="addToInbox('${esc(v.title)}','${esc(v.title)}',${v.views||0},'YouTube','${esc(v.title)}')">＋暫存</button>
+      <button class="add-inbox-btn" style="flex-shrink:0" onclick="addToInbox('${esc(v.title)}','${esc(v.title)}',${v.views||0},'YouTube','${esc(v.title)}')">＋暫存</button>
     </div>`).join('');
   document.getElementById('search-results').style.display = 'block';
 }
@@ -1476,11 +1476,11 @@ function renderDouyinSearchResults(videos, keyword) {
     `<p style="font-size:11px;color:var(--gold-dim);margin-bottom:8px">抖音關鍵字「${esc(keyword)}」· 按讚數排序 Top ${videos.length}</p>` +
     videos.map((v, i) => `
     <div class="result-item">
-      <div class="result-meta" style="flex:1">
+      <div class="result-meta">
         <div class="result-title" title="${esc(v.desc)}">${esc(v.desc)}</div>
         <div class="result-sub">❤️ ${(v.likes||0).toLocaleString()} · 👤 ${esc(v.author_name)}</div>
       </div>
-      <button class="add-inbox-btn" onclick="addDouyinResultToInbox(${i})">＋暫存</button>
+      <button class="add-inbox-btn" style="flex-shrink:0" onclick="addDouyinResultToInbox(${i})">＋暫存</button>
     </div>`).join('');
   document.getElementById('search-results').style.display = 'block';
 }
@@ -1535,7 +1535,7 @@ function renderXHSResults(data, inputRedId) {
     `<p style="font-size:11px;color:var(--gold-dim);margin-bottom:8px">創作者：${esc(creator)} · 共 ${notes.length} 篇高讚貼文</p>` +
     notes.map((n) => `
     <div class="result-item">
-      <div class="result-meta" style="flex:1">
+      <div class="result-meta">
         <div class="result-title" title="${esc(n.title)}">${esc(n.title)}</div>
         <div class="result-sub">❤️ ${(n.likes||0).toLocaleString()} · ${n.note_type === 'video' ? '🎬 影片' : '📸 圖文'}</div>
       </div>
