@@ -153,11 +153,11 @@
 
     /* ── Results ── */
     .search-results { margin-top: 14px; display: none; max-height: 340px; overflow-y: auto; overflow-x: hidden; scrollbar-width: thin; scrollbar-color: var(--gold-dim) transparent; }
-    .result-item { display: flex; align-items: center; gap: 8px; padding: 9px 0; border-bottom: 1px solid var(--border); overflow: hidden; max-width: 100%; }
+    .result-item { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--border); min-width: 0; }
     .result-item:last-child { border-bottom: none; }
     .result-item input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; flex-shrink: 0; accent-color: var(--gold); }
-    .result-meta { flex: 1; min-width: 0; overflow: hidden; }
-    .result-title { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+    .result-meta { min-width: 0; overflow: hidden; }
+    .result-title { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .result-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
 
     /* ── TikHub Results ── */
