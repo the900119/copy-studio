@@ -1422,19 +1422,26 @@ function renderResults(list) {
   document.getElementById('search-results').style.display = 'block';
 }
 
+let _douyinSearchResults = [];
 function renderDouyinSearchResults(videos, keyword) {
   if (!videos.length) { alert('沒有找到相關影片，換個關鍵字試試'); return; }
+  _douyinSearchResults = videos;
   document.getElementById('results-list').innerHTML =
     `<p style="font-size:11px;color:var(--gold-dim);margin-bottom:8px">抖音關鍵字「${esc(keyword)}」· 按讚數排序 Top ${videos.length}</p>` +
-    videos.map(v => `
+    videos.map((v, i) => `
     <div class="result-item">
       <div class="result-meta" style="flex:1">
         <div class="result-title" title="${esc(v.desc)}">${esc(v.desc)}</div>
         <div class="result-sub">❤️ ${(v.likes||0).toLocaleString()} · 👤 ${esc(v.author_name)}</div>
       </div>
-      <button class="add-inbox-btn" onclick="addToInbox('${esc(v.desc)}','${esc(v.desc)}',${v.likes||0},'抖音搜尋','${esc(v.desc)}','${esc(v.author_name)}','','','https://www.douyin.com/video/${v.aweme_id}')">＋暫存</button>
+      <button class="add-inbox-btn" onclick="addDouyinResultToInbox(${i})">＋暫存</button>
     </div>`).join('');
   document.getElementById('search-results').style.display = 'block';
+}
+function addDouyinResultToInbox(i) {
+  const v = _douyinSearchResults[i];
+  if (!v) return;
+  addToInbox(v.desc, v.desc, v.likes||0, '抖音搜尋', v.desc, v.author_name, '', '', `https://www.douyin.com/video/${v.aweme_id}`);
 }
 
 // ── XHS 創作者搜尋歷史（localStorage）────────────────────
