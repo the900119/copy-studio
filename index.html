@@ -1750,7 +1750,6 @@ function addToInbox(angle, word, hot, source, content, creator, noteId, xsecToke
 }
 
 function removeFromInbox(id) {
-  if (!confirm('確定刪除這條選題？')) return;
   let list = loadInbox().filter(i => i.id !== id);
   localStorage.setItem(INBOX_KEY, JSON.stringify(list));
   renderInbox();
