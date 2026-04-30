@@ -1819,7 +1819,9 @@ async function fetchDouyinSubtitle(awemeId, btn) {
       signal: ctrl.signal
     });
     clearTimeout(timer);
-    const d = await r.json();
+    const text = await r.text();
+    if (!text) throw new Error('伺服器無回應（工作流異常），請稍後重試');
+    const d = JSON.parse(text);
     if (d.transcript) {
       const label = d.source === 'whisper' ? '逐字稿' : d.source === 'subtitle' ? '影片字幕' : '創作者文案';
       const note = d.note ? `<div style="font-size:11px;color:var(--gold-dim);margin-bottom:6px">${esc(d.note)}</div>` : '';
