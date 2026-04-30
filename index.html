@@ -356,6 +356,12 @@
       <div class="step-desc">Hook · 骨架 · 情緒刺點</div>
     </div>
 
+    <div class="step-item" data-tab="video" onclick="switchTab('video')">
+      <div class="step-num">STEP 05</div>
+      <div class="step-row"><span class="step-icon">🎬</span><span class="step-title">視頻生成</span></div>
+      <div class="step-desc">腳本 + 商品圖 → 影片</div>
+    </div>
+
     <div class="sidebar-divider"></div>
 
     <div class="step-item" data-tab="story" onclick="switchTab('story')">
@@ -868,6 +874,98 @@
             </div>
             <div class="status-msg" id="pro-save-status"></div>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ STEP 05: 視頻生成 ════ -->
+    <div class="tab-panel" id="tab-video">
+      <div class="container">
+        <div style="max-width:720px;margin:0 auto">
+
+          <div class="card mb-16">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
+              <h2 style="margin:0">🎬 視頻生成</h2>
+              <span style="font-size:11px;padding:2px 10px;border-radius:10px;background:rgba(212,168,67,0.08);color:var(--gold-dim);border:1px solid rgba(212,168,67,0.18)">可靈 AI · Kling</span>
+            </div>
+            <p style="font-size:12px;color:var(--text-muted);margin:0">腳本 + 商品圖 → 一鍵生成 TikTok 帶貨視頻</p>
+          </div>
+
+          <!-- 腳本輸入 -->
+          <div class="card mb-16">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+              <label class="field-label" style="margin:0">📝 視頻腳本 / Prompt</label>
+              <button class="btn btn-outline" style="font-size:11px;padding:4px 12px" onclick="importScriptFromPro()">從 Step 04 帶入 →</button>
+            </div>
+            <textarea id="video-prompt" rows="5" placeholder="輸入視頻腳本或描述，例如：A woman showcasing a gold necklace in natural light, minimalist style, 15 seconds..."></textarea>
+          </div>
+
+          <!-- 商品圖上傳 -->
+          <div class="card mb-16">
+            <label class="field-label">🖼️ 商品圖片（最多 4 張，圖生視頻用）</label>
+            <div id="video-img-preview" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px"></div>
+            <label style="display:inline-block;cursor:pointer;padding:8px 18px;border:1.5px dashed var(--border);border-radius:8px;font-size:12px;color:var(--text-muted);transition:all 0.2s" onmouseover="this.style.borderColor='var(--gold-dim)'" onmouseout="this.style.borderColor='var(--border)'">
+              ＋ 選擇圖片
+              <input type="file" id="video-img-input" accept="image/*" multiple style="display:none" onchange="handleVideoImgUpload(this)">
+            </label>
+            <p style="font-size:11px;color:var(--text-muted);margin-top:6px">上傳珠寶商品圖，可靈會以商品為主體生成帶貨視頻</p>
+          </div>
+
+          <!-- 設定 -->
+          <div class="card mb-16">
+            <label class="field-label">⚙️ 生成設定</label>
+            <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:8px">
+              <div style="flex:1;min-width:140px">
+                <label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">時長</label>
+                <select id="video-duration" style="width:100%;padding:7px 10px;background:#111;border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;font-family:inherit">
+                  <option value="5">5 秒</option>
+                  <option value="10" selected>10 秒</option>
+                </select>
+              </div>
+              <div style="flex:1;min-width:140px">
+                <label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">模式</label>
+                <select id="video-mode" style="width:100%;padding:7px 10px;background:#111;border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;font-family:inherit">
+                  <option value="img2video">圖生視頻（商品圖）</option>
+                  <option value="text2video">文生視頻（純腳本）</option>
+                </select>
+              </div>
+              <div style="flex:1;min-width:140px">
+                <label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">畫面比例</label>
+                <select id="video-ratio" style="width:100%;padding:7px 10px;background:#111;border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;font-family:inherit">
+                  <option value="9:16" selected>9:16（TikTok 直版）</option>
+                  <option value="16:9">16:9（橫版）</option>
+                  <option value="1:1">1:1（方形）</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- 生成按鈕 + 狀態 -->
+          <button class="btn" id="video-gen-btn" onclick="generateVideo()" style="width:100%;margin-bottom:16px">⚡ 一鍵生成視頻</button>
+          <div id="video-status" style="display:none" class="card mb-16">
+            <div id="video-status-text" style="font-size:13px;color:var(--text-muted);text-align:center;padding:10px 0">⏳ 生成中，約 1–3 分鐘…</div>
+            <div id="video-progress-bar" style="height:3px;background:var(--border);border-radius:3px;margin-top:10px;overflow:hidden">
+              <div id="video-progress-fill" style="height:100%;background:var(--gold);width:0%;transition:width 0.5s;border-radius:3px"></div>
+            </div>
+          </div>
+
+          <!-- 結果 -->
+          <div id="video-result" style="display:none" class="card">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+              <h3 style="margin:0;color:var(--gold)">✅ 視頻生成完成</h3>
+              <button class="btn btn-outline" style="font-size:11px;padding:4px 14px" onclick="document.getElementById('video-result').style.display='none'">清除</button>
+            </div>
+            <video id="video-player" controls style="width:100%;border-radius:8px;background:#000;max-height:500px"></video>
+            <div style="margin-top:10px;display:flex;gap:8px">
+              <a id="video-download-link" href="#" download="kling_video.mp4" class="btn" style="flex:1;text-align:center;text-decoration:none">⬇️ 下載視頻</a>
+            </div>
+          </div>
+
+          <!-- API Key 設定提示 -->
+          <div id="video-api-notice" class="card" style="border-color:rgba(212,168,67,0.3);margin-top:16px">
+            <p style="font-size:12px;color:var(--gold-dim);margin:0">⚠️ 需要設定可靈 API Key 才能使用。<br>拿到 Access Key + Secret Key 後告訴我，我幫你填進去。</p>
+          </div>
+
         </div>
       </div>
     </div>
@@ -1616,6 +1714,148 @@ async function confirmProSave() {
       body: JSON.stringify({ record_id: proRecordId, title, threads_copy: long, xhs_copy: xhs, video_script: short }) });
     setStatus('pro-save-status', '✅ 已全部三版存入語料庫！', 'success');
   } catch(e) { setStatus('pro-save-status', '❌ 失敗：' + e.message, 'error'); }
+}
+
+// ── STEP 05: 視頻生成（可靈 Kling AI）────────────────────
+const KLING_ACCESS_KEY = '';  // 待填入
+const KLING_SECRET_KEY = '';  // 待填入
+
+let videoTaskId = null;
+let videoPollTimer = null;
+let videoImgBase64List = [];
+
+function handleVideoImgUpload(input) {
+  const files = Array.from(input.files).slice(0, 4);
+  videoImgBase64List = [];
+  const preview = document.getElementById('video-img-preview');
+  preview.innerHTML = '';
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      videoImgBase64List.push(e.target.result);
+      const img = document.createElement('img');
+      img.src = e.target.result;
+      img.style = 'width:80px;height:80px;object-fit:cover;border-radius:6px;border:1px solid var(--border)';
+      preview.appendChild(img);
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function importScriptFromPro() {
+  const long  = document.getElementById('pro-long')?.value || '';
+  const short = document.getElementById('pro-short')?.value || '';
+  const topic = document.getElementById('pro-topic')?.value || '';
+  const text = short || long || topic;
+  if (text) {
+    document.getElementById('video-prompt').value = text;
+    setVideoStatus('✅ 已從 Step 04 帶入腳本', 'success');
+  } else {
+    setVideoStatus('⚠️ Step 04 尚未生成內容，請先生成腳本', 'warn');
+  }
+}
+
+function setVideoStatus(msg, type) {
+  const el = document.getElementById('video-status-text');
+  const bar = document.getElementById('video-status');
+  if (!el || !bar) return;
+  bar.style.display = 'block';
+  el.textContent = msg;
+  el.style.color = type === 'success' ? '#2ecc71' : type === 'warn' ? 'var(--gold)' : 'var(--text-muted)';
+}
+
+async function generateVideo() {
+  if (!KLING_ACCESS_KEY || !KLING_SECRET_KEY) {
+    alert('⚠️ 尚未設定可靈 API Key，請先告知我你的 Access Key + Secret Key');
+    return;
+  }
+  const prompt = document.getElementById('video-prompt').value.trim();
+  if (!prompt) { alert('請先輸入視頻腳本或描述'); return; }
+  const mode = document.getElementById('video-mode').value;
+  if (mode === 'img2video' && videoImgBase64List.length === 0) {
+    alert('圖生視頻模式請先上傳商品圖片');
+    return;
+  }
+
+  const btn = document.getElementById('video-gen-btn');
+  btn.disabled = true; btn.textContent = '⏳ 提交中…';
+  document.getElementById('video-status').style.display = 'block';
+  document.getElementById('video-result').style.display = 'none';
+  document.getElementById('video-progress-fill').style.width = '5%';
+  setVideoStatus('⏳ 提交生成任務中…', '');
+
+  try {
+    const duration = parseInt(document.getElementById('video-duration').value);
+    const ratio = document.getElementById('video-ratio').value;
+    const body = mode === 'img2video'
+      ? { model_name: 'kling-v1-6', image: videoImgBase64List[0], prompt, duration, aspect_ratio: ratio, cfg_scale: 0.5 }
+      : { model_name: 'kling-v1-6', prompt, duration, aspect_ratio: ratio, cfg_scale: 0.5 };
+
+    const endpoint = mode === 'img2video'
+      ? 'https://api.klingai.com/v1/videos/image2video'
+      : 'https://api.klingai.com/v1/videos/text2video';
+
+    const token = await getKlingJWT();
+    const r = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    const d = await r.json();
+    if (d.code !== 0) throw new Error(d.message || '提交失敗');
+    videoTaskId = d.data?.task_id;
+    setVideoStatus('✅ 任務已提交，生成中（約 1–3 分鐘）…', '');
+    document.getElementById('video-progress-fill').style.width = '15%';
+    btn.textContent = '⏳ 生成中…';
+    pollVideoStatus(token);
+  } catch(e) {
+    btn.disabled = false; btn.textContent = '⚡ 一鍵生成視頻';
+    setVideoStatus('❌ 失敗：' + e.message, 'warn');
+  }
+}
+
+async function getKlingJWT() {
+  // 產生 HS256 JWT（access_key + secret_key）
+  const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' })).replace(/=/g,'').replace(/\+/g,'-').replace(/\//g,'_');
+  const now = Math.floor(Date.now() / 1000);
+  const payload = btoa(JSON.stringify({ iss: KLING_ACCESS_KEY, exp: now + 1800, nbf: now - 5 })).replace(/=/g,'').replace(/\+/g,'-').replace(/\//g,'_');
+  const msg = header + '.' + payload;
+  const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(KLING_SECRET_KEY), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+  const sig = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(msg));
+  const sigB64 = btoa(String.fromCharCode(...new Uint8Array(sig))).replace(/=/g,'').replace(/\+/g,'-').replace(/\//g,'_');
+  return msg + '.' + sigB64;
+}
+
+function pollVideoStatus(token) {
+  let elapsed = 0;
+  videoPollTimer = setInterval(async () => {
+    elapsed += 5;
+    const pct = Math.min(15 + elapsed * 1.5, 90);
+    document.getElementById('video-progress-fill').style.width = pct + '%';
+    try {
+      const r = await fetch(`https://api.klingai.com/v1/videos/text2video/${videoTaskId}`, {
+        headers: { 'Authorization': `Bearer ${await getKlingJWT()}` }
+      });
+      const d = await r.json();
+      const status = d.data?.task_status;
+      if (status === 'succeed') {
+        clearInterval(videoPollTimer);
+        const url = d.data?.task_result?.videos?.[0]?.url;
+        document.getElementById('video-progress-fill').style.width = '100%';
+        setVideoStatus('✅ 視頻生成完成！', 'success');
+        document.getElementById('video-player').src = url;
+        document.getElementById('video-download-link').href = url;
+        document.getElementById('video-result').style.display = 'block';
+        document.getElementById('video-gen-btn').disabled = false;
+        document.getElementById('video-gen-btn').textContent = '⚡ 再次生成';
+      } else if (status === 'failed') {
+        clearInterval(videoPollTimer);
+        setVideoStatus('❌ 生成失敗：' + (d.data?.task_status_msg || '未知錯誤'), 'warn');
+        document.getElementById('video-gen-btn').disabled = false;
+        document.getElementById('video-gen-btn').textContent = '⚡ 一鍵生成視頻';
+      }
+    } catch(e) { /* 繼續 poll */ }
+  }, 5000);
 }
 
 // ── 故事庫 ────────────────────────────────────────────────
