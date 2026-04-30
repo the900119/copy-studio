@@ -210,6 +210,12 @@
     .tb-keyword:hover { color: var(--gold); text-decoration: underline; }
     .tb-add { font-size: 10px; padding: 2px 7px; border-radius: 5px; cursor: pointer; border: 1px solid rgba(212,168,67,0.2); background: transparent; color: var(--gold-dim); font-family: inherit; transition: all 0.15s; flex-shrink: 0; }
     .tb-add:hover { background: rgba(212,168,67,0.1); color: var(--gold); }
+    .tb-gen { font-size: 10px; padding: 2px 6px; border-radius: 5px; cursor: pointer; border: 1px solid rgba(212,168,67,0.35); background: rgba(212,168,67,0.08); color: var(--gold); font-family: inherit; transition: all 0.15s; flex-shrink: 0; }
+    .tb-gen:hover { background: rgba(212,168,67,0.22); }
+    .pro-mode-bar { display:flex; gap:8px; margin-bottom:16px; }
+    .pro-mode-btn { background:transparent; border:1px solid var(--gold-dim); color:var(--text-muted); border-radius:8px; padding:7px 16px; font-size:13px; cursor:pointer; font-family:inherit; transition:all .2s; }
+    .pro-mode-btn.active { background:var(--gold-dim); color:#1a1608; font-weight:600; }
+    .pro-mode-btn:hover:not(.active) { border-color:var(--gold-light); color:var(--gold-light); }
 
     /* ════ Tab 4: 腳本生成 Pro ════ */
     .selector-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
@@ -693,7 +699,33 @@
           <div class="source-body" id="source-display" style="max-height:300px;overflow-y:auto;white-space:pre-wrap;font-size:13px;line-height:1.75;color:var(--text-muted)">（無參考素材）</div>
         </div>
 
+        <!-- ── 模式切換 ── -->
+        <div class="pro-mode-bar">
+          <button id="pro-mode-idea" class="pro-mode-btn active" onclick="toggleProMode('idea')">📌 選題靈感模式</button>
+          <button id="pro-mode-free" class="pro-mode-btn" onclick="toggleProMode('free')">✏️ 直接輸入模式</button>
+        </div>
+
+        <!-- ── 直接輸入 (free mode) ── -->
+        <div class="card mb-16" id="pro-free-card" style="display:none">
+          <h2>直接輸入你的想法</h2>
+          <p style="font-size:12px;color:var(--text-muted);margin-bottom:12px">直接貼入素材、觀察、踩坑故事——不需要 URL，AI 自動整理成三版腳本</p>
+          <textarea id="pro-free-text" rows="8" placeholder="寫下你的想法、觀察、數據、故事片段……不用整理，貼進來就好。"></textarea>
+          <div style="margin-top:12px;display:flex;align-items:center;gap:12px">
+            <button class="btn" onclick="generatePro()">⚡ 一鍵生成長文 · 小紅書 · 短影音</button>
+            <div style="display:flex;gap:8px;align-items:center">
+              <select id="pro-hook-free" style="font-size:12px;padding:5px 8px;border-radius:6px;border:1px solid var(--gold-dim);background:var(--surface);color:var(--text);cursor:pointer">
+                <option value="">Hook 自動選</option>
+                <option value="01">01｜情緒登場</option>
+                <option value="03">03｜與我有關</option>
+                <option value="08">08｜偷窺內幕</option>
+                <option value="09">09｜反差反常</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
         <!-- ── Step 2：腳本設定 + 人設預覽 ── -->
+        <div id="pro-idea-section">
         <div class="grid-2 mb-16">
 
           <div class="card">
@@ -766,6 +798,7 @@
           </div>
 
         </div>
+        </div><!-- /pro-idea-section -->
 
         <!-- ── Loading ── -->
         <div class="loading" id="pro-loading">
@@ -1059,6 +1092,7 @@ function renderTrendingCol(elId, title, items) {
       return `<div class="tb-item">
         <span class="tb-rank${item.rank <= 3 ? ' top3' : ''}">${item.rank}</span>
         <a class="tb-keyword" href="${url}" target="_blank" rel="noopener" title="${esc(tipTitle)}">${kw}</a>
+        <button class="tb-gen" onclick="tbDirectGenerate(this,${kwJ},${srcJ},${urlJ},${descJ})">⚡</button>
         <button class="tb-add" onclick="tbAddToInbox(this,${kwJ},${srcJ},${urlJ},${descJ})">＋</button>
       </div>`;
     }).join('') + `</div>`;
@@ -1070,6 +1104,20 @@ function tbAddToInbox(btn, keyword, source, url, desc) {
   btn.style.color = '#2ecc71';
   btn.style.borderColor = '#2ecc71';
   btn.disabled = true;
+}
+
+async function tbDirectGenerate(btn, keyword, source, url, desc) {
+  btn.textContent = '⏳';
+  btn.disabled = true;
+  switchTab('pro');
+  toggleProMode('idea');
+  document.getElementById('pro-topic').value = keyword;
+  document.getElementById('pro-extra').value = desc ? `【${source}】${desc}` : '';
+  const srcCard = document.getElementById('pro-source-card');
+  if (srcCard) srcCard.style.display = 'none';
+  await generatePro();
+  btn.textContent = '⚡';
+  btn.disabled = false;
 }
 
 // 進入 Step 02 時自動載入一次
@@ -1429,13 +1477,45 @@ async function generateTopicIdeas() {
 }
 
 // ── STEP 04: 腳本生成 Pro ─────────────────────────────────
+function toggleProMode(mode) {
+  const ideaBtn  = document.getElementById('pro-mode-idea');
+  const freeBtn  = document.getElementById('pro-mode-free');
+  const freeCard = document.getElementById('pro-free-card');
+  const ideaSec  = document.getElementById('pro-idea-section');
+  if (mode === 'free') {
+    ideaBtn?.classList.remove('active');
+    freeBtn?.classList.add('active');
+    if (freeCard) freeCard.style.display = '';
+    if (ideaSec)  ideaSec.style.display  = 'none';
+  } else {
+    freeBtn?.classList.remove('active');
+    ideaBtn?.classList.add('active');
+    if (freeCard) freeCard.style.display = 'none';
+    if (ideaSec)  ideaSec.style.display  = '';
+  }
+}
+
 async function generatePro() {
-  const topic = document.getElementById('pro-topic').value.trim();
-  if (!topic) { alert('請輸入選題 / 主題'); return; }
+  const freeMode = document.getElementById('pro-mode-free')?.classList.contains('active');
+  let topic, extra, hook, skeleton;
+  if (freeMode) {
+    const freeText = (document.getElementById('pro-free-text')?.value || '').trim();
+    if (!freeText) { alert('請輸入你的想法'); return; }
+    topic    = freeText.slice(0, 50);
+    extra    = freeText;
+    hook     = document.getElementById('pro-hook-free')?.value || '';
+    skeleton = '';
+  } else {
+    topic = document.getElementById('pro-topic').value.trim();
+    if (!topic) { alert('請輸入選題 / 主題'); return; }
+    extra    = document.getElementById('pro-extra').value;
+    hook     = document.getElementById('pro-hook').value;
+    skeleton = document.getElementById('pro-skeleton').value;
+  }
   document.getElementById('pro-loading').style.display = 'block';
   document.getElementById('pro-output').style.display  = 'none';
   try {
-    const r = await fetch(WH_PRO, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ topic, hook: document.getElementById('pro-hook').value, skeleton: document.getElementById('pro-skeleton').value, extra: document.getElementById('pro-extra').value, persona: getPersona() }) });
+    const r = await fetch(WH_PRO, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ topic, hook, skeleton, extra, persona: getPersona() }) });
     const d = await r.json(); proRecordId = d.record_id || ''; renderProDrafts(d);
   } catch(e) { document.getElementById('pro-loading').style.display = 'none'; alert('需在 n8n 建立 webhook: copy-studio-generate-pro\n\n' + e.message); }
 }
