@@ -207,6 +207,10 @@
     .keyword-chip .angle { font-size: 11px; color: var(--text-muted); display: block; margin-top: 2px; }
     .keyword-chip:hover .angle { color: var(--gold-dim); }
 
+    /* ════ 地區模式按鈕 ════ */
+    .region-btn { font-size: 12px; padding: 5px 12px; border-radius: 20px; border: 1px solid var(--border); background: transparent; color: var(--text-muted); font-family: inherit; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+    .region-btn:hover { border-color: var(--gold-dim); color: var(--gold-dim); }
+    .region-btn.active { border-color: var(--gold-dim); color: var(--gold); background: rgba(212,168,67,0.08); }
     /* ════ 選題暫存區 (Inbox) ════ */
     .inbox-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 8px; background: #0e0e0e; }
     .inbox-badge { font-size: 10px; padding: 2px 8px; border-radius: 10px; background: rgba(212,168,67,0.08); color: var(--gold-dim); border: 1px solid rgba(212,168,67,0.18); white-space: nowrap; flex-shrink: 0; margin-top: 2px; }
@@ -796,7 +800,16 @@
               <label class="field-label">你的補充（素材、故事、數據）</label>
               <textarea id="pro-extra" rows="4" placeholder="看完原文後，加入你想融入的真實素材、踩坑故事、個人觀點或數據…"></textarea>
             </div>
-            <button class="btn" onclick="generatePro()">⚡ 一鍵生成長文 · 小紅書 · 短影音</button>
+            <div class="story-field" style="margin-top:6px">
+              <label class="field-label">生成地區</label>
+              <div style="display:flex;gap:6px;flex-wrap:wrap" id="region-mode-row">
+                <button class="region-btn active" onclick="setRegionMode('both',this)">🌐 通用</button>
+                <button class="region-btn" onclick="setRegionMode('tw',this)">🇹🇼 台灣版</button>
+                <button class="region-btn" onclick="setRegionMode('cn',this)">🇨🇳 中國版</button>
+                <button class="region-btn" onclick="setRegionMode('dual',this)">🇹🇼＋🇨🇳 雙版並生</button>
+              </div>
+            </div>
+            <button class="btn" id="generate-pro-btn" onclick="generatePro()">⚡ 一鍵生成長文 · 小紅書 · 短影音</button>
           </div>
 
           <div class="card">
@@ -835,7 +848,7 @@
         <!-- ── Step 3：輸出（全寬 tabs） ── -->
         <div class="pro-output" id="pro-output">
           <div class="card">
-            <div class="out-tab-bar">
+            <div class="out-tab-bar" id="out-tab-bar">
               <button class="out-tab active" onclick="switchOutTab('long',this)">📝 長文</button>
               <button class="out-tab"        onclick="switchOutTab('xhs',this)">📸 小紅書</button>
               <button class="out-tab"        onclick="switchOutTab('short',this)">🎵 抖音</button>
@@ -864,12 +877,36 @@
                 <button class="btn btn-sm btn-outline" style="margin:0" onclick="saveOneDraft('long')">📤 存這版到飛書</button>
               </div>
             </div>
+
+            <div id="out-cn-long" class="out-pane">
+              <textarea id="pro-cn-long" rows="16" oninput="updateCount(this,'cnt-cn-long')" style="width:100%"></textarea>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+                <div class="char-count" id="cnt-cn-long">0 字</div>
+                <button class="btn btn-sm btn-outline" style="margin:0" onclick="saveOneDraft('cn-long')">📤 存這版到飛書</button>
+              </div>
+            </div>
+
+            <div id="out-cn-xhs" class="out-pane">
+              <textarea id="pro-cn-xhs" rows="16" oninput="updateCount(this,'cnt-cn-xhs')" style="width:100%"></textarea>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+                <div class="char-count" id="cnt-cn-xhs">0 字</div>
+                <button class="btn btn-sm btn-outline" style="margin:0" onclick="saveOneDraft('cn-xhs')">📤 存這版到飛書</button>
+              </div>
+            </div>
+
+            <div id="out-cn-short" class="out-pane">
+              <textarea id="pro-cn-short" rows="16" oninput="updateCount(this,'cnt-cn-short')" style="width:100%"></textarea>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+                <div class="char-count" id="cnt-cn-short">0 字</div>
+                <button class="btn btn-sm btn-outline" style="margin:0" onclick="saveOneDraft('cn-short')">📤 存這版到飛書</button>
+              </div>
+            </div>
           </div>
 
           <div class="confirm-bar" style="margin-top:12px">
             <p style="font-size:12px;color:var(--text-muted)">可直接在上方編輯後存入語料庫</p>
             <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:center">
-              <button class="btn btn-success" style="max-width:240px" onclick="confirmProSave()">✅ 全部三版存飛書</button>
+              <button class="btn btn-success" style="max-width:240px" id="confirm-save-btn" onclick="confirmProSave()">✅ 全部三版存飛書</button>
               <a href="https://s08ys25zzzu.feishu.cn/wiki/E3kewFyupiqgoSku0KHcFvcenQp?fromScene=spaceOverview&table=tblptReo1ggZlDVY&view=vewwkYdhJF" target="_blank" class="btn btn-outline" style="max-width:160px;font-size:12px;padding:8px 16px">📂 查看語料庫</a>
             </div>
             <div class="status-msg" id="pro-save-status"></div>
@@ -1085,7 +1122,16 @@ let searchPlatform = 'yt', directPlatform = 'yt';
 const WH_DOUYIN_SEARCH = N8N + '/copy-studio-douyin-search';
 let activeInboxTab = 'all';
 let currentTranscript = '';
-let currentRecordId = '', currentTitle = '', proRecordId = '';
+let currentRecordId = '', currentTitle = '', proRecordId = '', proCnRecordId = '';
+let _regionMode = 'both'; // 'both' | 'tw' | 'cn' | 'dual'
+
+function setRegionMode(mode, btn) {
+  _regionMode = mode;
+  document.querySelectorAll('#region-mode-row .region-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  const genBtn = document.getElementById('generate-pro-btn');
+  if (genBtn) genBtn.textContent = mode === 'dual' ? '⚡ 雙版並生（台灣＋中國）' : '⚡ 一鍵生成長文 · 小紅書 · 短影音';
+}
 
 // ── Navigation ───────────────────────────────────────────
 function switchTab(id) {
@@ -1639,9 +1685,24 @@ async function generatePro() {
   }
   document.getElementById('pro-loading').style.display = 'block';
   document.getElementById('pro-output').style.display  = 'none';
+  const loadingMsg = document.querySelector('#pro-loading .loading-msg');
+  if (loadingMsg) loadingMsg.textContent = _regionMode === 'dual'
+    ? '正在同步生成台灣版 + 中國版（約 60–90 秒）...'
+    : '正在生成三版腳本（長文 · 小紅書 · 短影音，約 40–60 秒）...';
+  const regionParam = { both: 'both', tw: 'tw', cn: 'cn', dual: 'tw' }[_regionMode] || 'both';
   try {
-    const r = await fetch(WH_PRO, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ topic, hook, skeleton, extra, persona: getPersona() }) });
-    const d = await r.json(); proRecordId = d.record_id || ''; renderProDrafts(d);
+    if (_regionMode === 'dual') {
+      const [twData, cnData] = await Promise.all([
+        fetch(WH_PRO, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ topic, hook, skeleton, extra, persona: getPersona(), region: 'tw' }) }).then(r => r.json()),
+        fetch(WH_PRO, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ topic, hook, skeleton, extra, persona: getPersona(), region: 'cn' }) }).then(r => r.json())
+      ]);
+      proRecordId = twData.record_id || '';
+      proCnRecordId = cnData.record_id || '';
+      renderProDraftsDual(twData, cnData);
+    } else {
+      const r = await fetch(WH_PRO, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ topic, hook, skeleton, extra, persona: getPersona(), region: regionParam }) });
+      const d = await r.json(); proRecordId = d.record_id || ''; renderProDrafts(d);
+    }
   } catch(e) { document.getElementById('pro-loading').style.display = 'none'; alert('需在 n8n 建立 webhook: copy-studio-generate-pro\n\n' + e.message); }
 }
 
@@ -1674,10 +1735,55 @@ function renderProDrafts(data) {
       document.getElementById('pro-source-card').style.display = '';
     }
   }
-  // Show long tab first
-  switchOutTab('long', document.querySelector('.out-tab[onclick*="long"]'));
+  // Show long tab first (reset to single mode tab bar)
+  updateOutTabBar('single');
+  switchOutTab('long', document.querySelector('.out-tab[onclick*="\'long\'"]'));
   document.getElementById('pro-output').style.display = 'block';
   document.getElementById('pro-output').scrollIntoView({ behavior: 'smooth' });
+}
+
+function renderProDraftsDual(twData, cnData) {
+  document.getElementById('pro-loading').style.display = 'none';
+  const fill = (id, val) => { const el = document.getElementById(id); if (el) el.value = fmtOut(val||''); };
+  fill('pro-long',     twData.long_script  || twData.wechat_script || '');
+  fill('pro-xhs',      twData.xhs_script   || '');
+  fill('pro-short',    twData.short_script || '');
+  fill('pro-cn-long',  cnData.long_script  || cnData.wechat_script || '');
+  fill('pro-cn-xhs',   cnData.xhs_script   || '');
+  fill('pro-cn-short', cnData.short_script || '');
+  ['long','xhs','short','cn-long','cn-xhs','cn-short'].forEach(k => {
+    const el = document.getElementById('pro-' + k);
+    const cnt = document.getElementById('cnt-' + k);
+    if (el && cnt) cnt.textContent = el.value.length + ' 字';
+  });
+  updateOutTabBar('dual');
+  switchOutTab('long', null);
+  document.getElementById('pro-output').style.display = 'block';
+  document.getElementById('pro-output').scrollIntoView({ behavior: 'smooth' });
+}
+
+function updateOutTabBar(mode) {
+  const bar = document.getElementById('out-tab-bar');
+  if (!bar) return;
+  if (mode === 'dual') {
+    bar.innerHTML = `
+      <button class="out-tab active" onclick="switchOutTab('long',this)">🇹🇼 長文</button>
+      <button class="out-tab" onclick="switchOutTab('xhs',this)">🇹🇼 小紅書</button>
+      <button class="out-tab" onclick="switchOutTab('short',this)">🇹🇼 抖音</button>
+      <span style="display:inline-block;width:1px;background:var(--border);margin:0 4px;height:22px;vertical-align:middle"></span>
+      <button class="out-tab" onclick="switchOutTab('cn-long',this)">🇨🇳 長文</button>
+      <button class="out-tab" onclick="switchOutTab('cn-xhs',this)">🇨🇳 小紅書</button>
+      <button class="out-tab" onclick="switchOutTab('cn-short',this)">🇨🇳 抖音</button>`;
+    const confirmBtn = document.getElementById('confirm-save-btn');
+    if (confirmBtn) confirmBtn.textContent = '✅ 雙版全部存飛書（共 6 篇）';
+  } else {
+    bar.innerHTML = `
+      <button class="out-tab active" onclick="switchOutTab('long',this)">📝 長文</button>
+      <button class="out-tab" onclick="switchOutTab('xhs',this)">📸 小紅書</button>
+      <button class="out-tab" onclick="switchOutTab('short',this)">🎵 抖音</button>`;
+    const confirmBtn = document.getElementById('confirm-save-btn');
+    if (confirmBtn) confirmBtn.textContent = '✅ 全部三版存飛書';
+  }
 }
 
 function switchOutTab(key, btn) {
@@ -1686,6 +1792,7 @@ function switchOutTab(key, btn) {
   const pane = document.getElementById('out-' + key);
   if (pane) pane.classList.add('active');
   if (btn) btn.classList.add('active');
+  else { const first = document.querySelector('#out-tab-bar .out-tab'); if (first) first.classList.add('active'); }
 }
 
 async function saveOneDraft(format) {
@@ -1693,15 +1800,19 @@ async function saveOneDraft(format) {
   const title = document.getElementById('pro-topic').value;
   const content = document.getElementById('pro-' + format)?.value || '';
   if (!content) { alert('該版本內容為空'); return; }
-  const formatLabel = {long:'長文', xhs:'小紅書', short:'短影音'}[format] || format;
+  const isCN = format.startsWith('cn-');
+  const baseFormat = isCN ? format.slice(3) : format;
+  const formatLabel = {long:'長文', xhs:'小紅書', short:'短影音'}[baseFormat] || baseFormat;
+  const regionPrefix = isCN ? '[中] ' : (_regionMode === 'tw' ? '[台] ' : '');
+  const usedRecordId = isCN ? proCnRecordId : proRecordId;
   if (btn) { btn.textContent = '存入中…'; btn.disabled = true; }
   try {
     await fetch(WH_CONFIRM, { method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ record_id: proRecordId, title: `[${formatLabel}] ${title}`,
-        threads_copy: format==='long' ? content : '',
-        xhs_copy: format==='xhs' ? content : '',
-        video_script: format==='short' ? content : '',
-        format }) });
+      body: JSON.stringify({ record_id: usedRecordId, title: `${regionPrefix}[${formatLabel}] ${title}`,
+        threads_copy: baseFormat==='long' ? content : '',
+        xhs_copy: baseFormat==='xhs' ? content : '',
+        video_script: baseFormat==='short' ? content : '',
+        format: baseFormat }) });
     if (btn) { btn.textContent = '✅ 已存入！'; btn.style.color = '#2ecc71'; btn.style.borderColor = '#2ecc71'; }
     setTimeout(() => { if (btn) { btn.textContent = '📤 存這版到飛書'; btn.disabled = false; btn.style.color = ''; btn.style.borderColor = ''; } }, 2500);
   } catch(e) {
@@ -1716,9 +1827,25 @@ async function confirmProSave() {
   const long  = document.getElementById('pro-long')?.value  || '';
   const xhs   = document.getElementById('pro-xhs')?.value   || '';
   const short = document.getElementById('pro-short')?.value || '';
+  if (_regionMode === 'dual') {
+    const cnLong  = document.getElementById('pro-cn-long')?.value  || '';
+    const cnXhs   = document.getElementById('pro-cn-xhs')?.value   || '';
+    const cnShort = document.getElementById('pro-cn-short')?.value || '';
+    try {
+      await Promise.all([
+        fetch(WH_CONFIRM, { method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ record_id: proRecordId,   title: `[台] ${title}`, threads_copy: long,   xhs_copy: xhs,   video_script: short }) }),
+        fetch(WH_CONFIRM, { method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ record_id: proCnRecordId, title: `[中] ${title}`, threads_copy: cnLong, xhs_copy: cnXhs, video_script: cnShort }) })
+      ]);
+      setStatus('pro-save-status', '✅ 台灣版 + 中國版共 6 篇已存入語料庫！', 'success');
+    } catch(e) { setStatus('pro-save-status', '❌ 失敗：' + e.message, 'error'); }
+    return;
+  }
+  const regionPrefix = _regionMode === 'tw' ? '[台] ' : _regionMode === 'cn' ? '[中] ' : '';
   try {
     await fetch(WH_CONFIRM, { method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ record_id: proRecordId, title, threads_copy: long, xhs_copy: xhs, video_script: short }) });
+      body: JSON.stringify({ record_id: proRecordId, title: regionPrefix + title, threads_copy: long, xhs_copy: xhs, video_script: short }) });
     setStatus('pro-save-status', '✅ 已全部三版存入語料庫！', 'success');
   } catch(e) { setStatus('pro-save-status', '❌ 失敗：' + e.message, 'error'); }
 }
@@ -2053,7 +2180,9 @@ function renderInbox() {
     el.innerHTML = `<p style="font-size:12px;color:var(--text-muted);text-align:center;padding:20px 0">${list.length ? '此創作者暫無暫存選題。' : '暫無暫存選題。<br>在靈感收集結果中點「＋暫存」加入。'}</p>`;
     return;
   }
-  el.innerHTML = filtered.map(item => `
+  el.innerHTML = filtered.map(item => {
+    const regionEmoji = item.region === 'tw' ? '🇹🇼' : item.region === 'cn' ? '🇨🇳' : '🌐';
+    return `
     <div class="inbox-item">
       <span class="inbox-badge">${esc(item.source)}</span>
       <div style="flex:1;min-width:0">
@@ -2062,10 +2191,22 @@ function renderInbox() {
         ${item.word && item.word !== item.angle ? `<div class="inbox-sub">詞：${esc(item.word)}${item.hot ? ' · 🔥' + Number(item.hot).toLocaleString() : ''}</div>` : (item.hot ? `<div class="inbox-sub">🔥 ${Number(item.hot).toLocaleString()}</div>` : '')}
       </div>
       <div class="inbox-actions">
+        <button class="inbox-btn" title="點擊切換地區標籤" onclick="toggleInboxRegion('${esc(item.id)}')" style="font-size:14px;padding:2px 6px;min-width:30px">${regionEmoji}</button>
         <button class="inbox-btn primary" onclick="useInboxTopic('${esc(item.id)}')">帶入生成 →</button>
         <button class="inbox-btn del" onclick="removeFromInbox('${esc(item.id)}')">✕</button>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
+}
+
+function toggleInboxRegion(id) {
+  const list = loadInbox();
+  const item = list.find(i => i.id === id);
+  if (!item) return;
+  const cycle = { both: 'tw', tw: 'cn', cn: 'both' };
+  item.region = cycle[item.region || 'both'] || 'both';
+  _saveInboxRaw(list);
+  renderInbox();
 }
 
 function setInboxTab(tab) {
@@ -2213,6 +2354,13 @@ function useInboxTopic(id) {
   if (!item) return;
   document.getElementById('pro-topic').value = item.angle;
   document.getElementById('pro-extra').value = '';
+  // Pre-select region mode based on inbox item tag
+  if (item.region && item.region !== 'both') {
+    const modeMap = { tw: 'tw', cn: 'cn' };
+    const targetMode = modeMap[item.region] || 'both';
+    const btn = document.querySelector(`#region-mode-row .region-btn[onclick*="'${targetMode}'"]`);
+    setRegionMode(targetMode, btn);
+  }
 
   const sourceCard = document.getElementById('pro-source-card');
   const hint       = document.getElementById('source-fetch-hint');
