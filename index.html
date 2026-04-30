@@ -1222,7 +1222,7 @@ function selectPlatform(mode, platform, btn) {
   if (mode === 'search') {
     searchPlatform = platform;
     const inp = document.getElementById('search-input');
-    inp.placeholder = platform === 'xhs' ? '輸入小紅書號（如 644895069）' : platform === 'douyin' ? '輸入關鍵字（如：跨境珠寶 AI工具）' : '頻道 URL 或 @handle（如 @MrBeast）';
+    inp.placeholder = platform === 'xhs' ? '輸入創作者名稱（如 班長跨境）' : platform === 'douyin' ? '輸入關鍵字（如：跨境珠寶 AI工具）' : '頻道 URL 或 @handle（如 @MrBeast）';
     // Show/hide XHS history
     if (platform === 'xhs') renderXHSHistory();
     else document.getElementById('xhs-history').style.display = 'none';
