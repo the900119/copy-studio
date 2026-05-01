@@ -998,8 +998,8 @@
             </div>
           </div>
 
-          <!-- API Key 設定提示 -->
-          <div id="video-api-notice" class="card" style="border-color:rgba(212,168,67,0.3);margin-top:16px">
+          <!-- API Key 設定提示（已填入，隱藏） -->
+          <div id="video-api-notice" class="card" style="display:none;border-color:rgba(212,168,67,0.3);margin-top:16px">
             <p style="font-size:12px;color:var(--gold-dim);margin:0">⚠️ 需要設定可靈 API Key 才能使用。<br>拿到 Access Key + Secret Key 後告訴我，我幫你填進去。</p>
           </div>
 
@@ -1857,6 +1857,7 @@ const KLING_SECRET_KEY = 'QHMtKEPFmyphe9DBaKRArf3ppYCNNHLb';
 let videoTaskId = null;
 let videoPollTimer = null;
 let videoImgBase64List = [];
+let _videoMode = 'text2video';
 
 function handleVideoImgUpload(input) {
   const files = Array.from(input.files).slice(0, 4);
@@ -1921,18 +1922,17 @@ async function generateVideo() {
   try {
     const duration = parseInt(document.getElementById('video-duration').value);
     const ratio = document.getElementById('video-ratio').value;
+    _videoMode = mode === 'img2video' ? 'image2video' : 'text2video';
+    const imgBase64 = videoImgBase64List[0]?.replace(/^data:[^;]+;base64,/, '') || '';
     const body = mode === 'img2video'
-      ? { model_name: 'kling-v1-6', image: videoImgBase64List[0], prompt, duration, aspect_ratio: ratio, cfg_scale: 0.5 }
+      ? { model_name: 'kling-v1-6', image: imgBase64, prompt, duration, aspect_ratio: ratio, cfg_scale: 0.5 }
       : { model_name: 'kling-v1-6', prompt, duration, aspect_ratio: ratio, cfg_scale: 0.5 };
 
-    const endpoint = mode === 'img2video'
-      ? 'https://api.klingai.com/v1/videos/image2video'
-      : 'https://api.klingai.com/v1/videos/text2video';
+    const endpoint = `https://api.klingai.com/v1/videos/${_videoMode}`;
 
-    const token = await getKlingJWT();
     const r = await fetch(endpoint, {
       method: 'POST',
-      headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+      headers: { 'Authorization': `Bearer ${await getKlingJWT()}`, 'Content-Type': 'application/json' },
       body: JSON.stringify(body)
     });
     const d = await r.json();
@@ -1941,7 +1941,7 @@ async function generateVideo() {
     setVideoStatus('✅ 任務已提交，生成中（約 1–3 分鐘）…', '');
     document.getElementById('video-progress-fill').style.width = '15%';
     btn.textContent = '⏳ 生成中…';
-    pollVideoStatus(token);
+    pollVideoStatus();
   } catch(e) {
     btn.disabled = false; btn.textContent = '⚡ 一鍵生成視頻';
     setVideoStatus('❌ 失敗：' + e.message, 'warn');
@@ -1960,14 +1960,14 @@ async function getKlingJWT() {
   return msg + '.' + sigB64;
 }
 
-function pollVideoStatus(token) {
+function pollVideoStatus() {
   let elapsed = 0;
   videoPollTimer = setInterval(async () => {
     elapsed += 5;
     const pct = Math.min(15 + elapsed * 1.5, 90);
     document.getElementById('video-progress-fill').style.width = pct + '%';
     try {
-      const r = await fetch(`https://api.klingai.com/v1/videos/text2video/${videoTaskId}`, {
+      const r = await fetch(`https://api.klingai.com/v1/videos/${_videoMode}/${videoTaskId}`, {
         headers: { 'Authorization': `Bearer ${await getKlingJWT()}` }
       });
       const d = await r.json();
