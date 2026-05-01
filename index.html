@@ -802,11 +802,13 @@
             </div>
             <div class="story-field" style="margin-top:6px">
               <label class="field-label">生成地區</label>
-              <div style="display:flex;gap:6px;flex-wrap:wrap" id="region-mode-row">
-                <button class="region-btn active" onclick="setRegionMode('both',this)">🌐 通用</button>
-                <button class="region-btn" onclick="setRegionMode('tw',this)">🇹🇼 台灣版</button>
-                <button class="region-btn" onclick="setRegionMode('cn',this)">🇨🇳 中國版</button>
-                <button class="region-btn" onclick="setRegionMode('dual',this)">🇹🇼＋🇨🇳 雙版並生</button>
+              <div id="region-mode-row">
+                <select id="region-mode-select" onchange="setRegionMode(this.value,null)" style="width:100%;padding:7px 10px;background:#111;border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;font-family:inherit;cursor:pointer">
+                  <option value="both">🌐 通用</option>
+                  <option value="tw">🇹🇼 台灣版</option>
+                  <option value="cn">🇨🇳 中國版</option>
+                  <option value="dual">🇹🇼＋🇨🇳 雙版並生</option>
+                </select>
               </div>
             </div>
             <button class="btn" id="generate-pro-btn" onclick="generatePro()">⚡ 一鍵生成長文 · 小紅書 · 短影音</button>
@@ -1125,10 +1127,10 @@ let currentTranscript = '';
 let currentRecordId = '', currentTitle = '', proRecordId = '', proCnRecordId = '';
 let _regionMode = 'both'; // 'both' | 'tw' | 'cn' | 'dual'
 
-function setRegionMode(mode, btn) {
+function setRegionMode(mode, _unused) {
   _regionMode = mode;
-  document.querySelectorAll('#region-mode-row .region-btn').forEach(b => b.classList.remove('active'));
-  if (btn) btn.classList.add('active');
+  const sel = document.getElementById('region-mode-select');
+  if (sel && sel.value !== mode) sel.value = mode;
   const genBtn = document.getElementById('generate-pro-btn');
   if (genBtn) genBtn.textContent = mode === 'dual' ? '⚡ 雙版並生（台灣＋中國）' : '⚡ 一鍵生成長文 · 小紅書 · 短影音';
 }
@@ -2356,10 +2358,7 @@ function useInboxTopic(id) {
   document.getElementById('pro-extra').value = '';
   // Pre-select region mode based on inbox item tag
   if (item.region && item.region !== 'both') {
-    const modeMap = { tw: 'tw', cn: 'cn' };
-    const targetMode = modeMap[item.region] || 'both';
-    const btn = document.querySelector(`#region-mode-row .region-btn[onclick*="'${targetMode}'"]`);
-    setRegionMode(targetMode, btn);
+    setRegionMode(item.region, null);
   }
 
   const sourceCard = document.getElementById('pro-source-card');
