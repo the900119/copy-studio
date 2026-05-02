@@ -1105,6 +1105,26 @@
 </div><!-- /app-layout -->
 
 <script>
+// ── 寫作風格指南（場景衝突抵達體 × 餅妹用詞）────────────
+const WRITING_GUIDE = `【寫作架構：場景衝突抵達體】
+① 開場：直接跳進一個畫面或正在發生的狀態，不預告、不說「今天要聊」
+② 主體：場景→普世原則，每段有溫度轉換（緊→鬆、嚴肅→幽默），同一溫度不超過三句
+③ 結尾：抵達，不替讀者下結論，留最後一句讓讀者自己走
+
+【用詞規則】
+- 讀者稱「你」，第一人稱「我」，不用「大家」「各位」「我們」
+- 短句打頭，破折號（——）做轉折，不用逗號做緩衝
+- ▋ 用在有張力的轉折或鉤子，後面直接跟衝擊句，不當章節標題
+- 括號偶爾插閒話讓讀者喘氣：（我知道這聽起來很廢話，但你真的想過嗎？）
+- 直接說公司名、術語、數字，不做白話解釋
+- 類比顯形：用類比讓荒謬自己現身，不說教，讓讀者說「對欸」
+
+【絕對禁止】
+- 「不是X，是Y」或「不是X——是Y」對比句，一律改正面直述
+- 「先說⋯⋯」「首先⋯⋯」預告句
+- 「希望大家⋯⋯」「這讓我們學到⋯⋯」總結式結尾
+- ▋後面跟說明標籤（如「▋我自己怎麼做」「▋市場現況」）`;
+
 // ── Webhooks ─────────────────────────────────────────────
 const N8N = 'https://eglobal.app.n8n.cloud/webhook';
 const WH_SEARCH      = N8N + '/copy-studio-search';
@@ -1695,14 +1715,14 @@ async function generatePro() {
   try {
     if (_regionMode === 'dual') {
       const [twData, cnData] = await Promise.all([
-        fetch(WH_PRO, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ topic, hook, skeleton, extra, persona: getPersona(), region: 'tw' }) }).then(r => r.json()),
-        fetch(WH_PRO, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ topic, hook, skeleton, extra, persona: getPersona(), region: 'cn' }) }).then(r => r.json())
+        fetch(WH_PRO, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ topic, hook, skeleton, extra, persona: getPersona(), region: 'tw', writing_guide: WRITING_GUIDE }) }).then(r => r.json()),
+        fetch(WH_PRO, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ topic, hook, skeleton, extra, persona: getPersona(), region: 'cn', writing_guide: WRITING_GUIDE }) }).then(r => r.json())
       ]);
       proRecordId = twData.record_id || '';
       proCnRecordId = cnData.record_id || '';
       renderProDraftsDual(twData, cnData);
     } else {
-      const r = await fetch(WH_PRO, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ topic, hook, skeleton, extra, persona: getPersona(), region: regionParam }) });
+      const r = await fetch(WH_PRO, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ topic, hook, skeleton, extra, persona: getPersona(), region: regionParam, writing_guide: WRITING_GUIDE }) });
       const d = await r.json(); proRecordId = d.record_id || ''; renderProDrafts(d);
     }
   } catch(e) { document.getElementById('pro-loading').style.display = 'none'; alert('需在 n8n 建立 webhook: copy-studio-generate-pro\n\n' + e.message); }
