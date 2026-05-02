@@ -1708,12 +1708,17 @@ async function generatePro() {
   } catch(e) { document.getElementById('pro-loading').style.display = 'none'; alert('需在 n8n 建立 webhook: copy-studio-generate-pro\n\n' + e.message); }
 }
 
+const _BANNED_HEADERS = ['▋我自己怎麼做', '▋ 我自己怎麼做'];
+
 function fmtOut(text) {
   if (!text) return '';
   return text
-    .replace(/([。！？…]+)\s*/g, '$1\n')   // 句尾加換行
-    .replace(/([^\n])\n(▋)/g, '$1\n\n$2') // ▋ 前確保有空行
-    .replace(/\n{3,}/g, '\n\n')            // 最多兩個連續換行
+    .split('\n')
+    .filter(line => !_BANNED_HEADERS.some(h => line.trim().startsWith(h)))
+    .join('\n')
+    .replace(/([。！？…]+)\s*/g, '$1\n')
+    .replace(/([^\n])\n(▋)/g, '$1\n\n$2')
+    .replace(/\n{3,}/g, '\n\n')
     .trim();
 }
 
