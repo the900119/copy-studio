@@ -1710,8 +1710,11 @@ async function generatePro() {
 
 function fmtOut(text) {
   if (!text) return '';
-  // Add newline after sentence-ending punctuation, collapse excess blanks
-  return text.replace(/([。！？…]+)\s*/g, '$1\n').replace(/\n{3,}/g, '\n\n').trim();
+  return text
+    .replace(/([。！？…]+)\s*/g, '$1\n')   // 句尾加換行
+    .replace(/([^\n])\n(▋)/g, '$1\n\n$2') // ▋ 前確保有空行
+    .replace(/\n{3,}/g, '\n\n')            // 最多兩個連續換行
+    .trim();
 }
 
 function renderProDrafts(data) {
