@@ -850,6 +850,11 @@
             <div class="story-field">
               <label class="field-label">選題 / 主題</label>
               <input type="text" id="pro-topic" placeholder="從選題庫點擊帶入，或自己輸入">
+              <div style="margin-top:8px;display:flex;align-items:center;gap:8px">
+                <button onclick="factCheckTopic()" id="factcheck-btn" style="font-size:12px;padding:5px 12px;background:transparent;border:1px solid var(--gold-dim);border-radius:6px;color:var(--gold);cursor:pointer;white-space:nowrap">🔍 查證來源</button>
+                <span id="factcheck-status" style="font-size:12px;color:var(--text-muted)"></span>
+              </div>
+              <div id="factcheck-panel" style="display:none;margin-top:10px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:8px;padding:12px;font-size:12px;line-height:1.8"></div>
             </div>
             <div class="selector-row">
               <div>
@@ -1193,60 +1198,28 @@
       <div class="container">
 
         <div class="card mb-16">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
             <span style="font-size:22px">🎠</span>
             <div>
               <h2 style="margin:0">輪播貼文生成器</h2>
-              <p style="font-size:12px;color:var(--text-muted);margin:2px 0 0">VIRAL爆紅架構 · 8張卡片 · 60秒產出</p>
+              <p style="font-size:12px;color:var(--text-muted);margin:2px 0 0">貼入長文 → AI 自動拆解 → VIRAL 8 張卡片</p>
             </div>
           </div>
 
-          <div class="carousel-form">
-            <div class="full-width">
-              <label class="field-label">主題（一句話說清楚你要教什麼）</label>
-              <input id="c-topic" class="input-field" placeholder="例：如何用輪播貼文在3個月內漲粉5000" style="width:100%">
-            </div>
-
-            <div>
-              <label class="field-label">你的身份定位</label>
-              <input id="c-identity" class="input-field" placeholder="例：幫創業者用AI做內容的行銷教練" style="width:100%">
-            </div>
-
-            <div>
-              <label class="field-label">核心方法 / 解法（3步驟）</label>
-              <input id="c-method" class="input-field" placeholder="例：①定位受眾痛點 ②VIRAL框架排版 ③3-2-1互動策略" style="width:100%">
-            </div>
-
-            <div>
-              <label class="field-label">社會證明（客戶成果）</label>
-              <input id="c-proof" class="input-field" placeholder="例：學員小美3個月從0做到月營收30萬" style="width:100%">
-            </div>
-
-            <div>
-              <label class="field-label">封面鉤子公式</label>
-              <div class="hook-pills">
-                <button class="hook-pill selected" onclick="selectHook(this,'殺很大真相')">殺很大真相</button>
-                <button class="hook-pill" onclick="selectHook(this,'內行人才知道')">內行人才知道</button>
-                <button class="hook-pill" onclick="selectHook(this,'成功預告')">成功預告</button>
-                <button class="hook-pill" onclick="selectHook(this,'失敗經驗分享')">失敗經驗</button>
-                <button class="hook-pill" onclick="selectHook(this,'成果搶先看')">成果搶先看</button>
-              </div>
-              <input id="c-hook" type="hidden" value="殺很大真相">
-            </div>
-
-            <div>
-              <label class="field-label">CTA類型</label>
-              <div class="cta-pills">
-                <button class="cta-pill selected" onclick="selectCTA(this,'免費好康')">免費好康</button>
-                <button class="cta-pill" onclick="selectCTA(this,'限量機會')">限量機會</button>
-                <button class="cta-pill" onclick="selectCTA(this,'挑戰檢測')">挑戰檢測</button>
-              </div>
-              <input id="c-cta" type="hidden" value="免費好康">
-            </div>
+          <div style="margin-bottom:16px">
+            <label class="field-label" style="margin-bottom:6px;display:block">貼入長文 / 文章 / 筆記</label>
+            <textarea id="c-longtext" class="input-field" rows="8"
+              placeholder="直接把文章、IG 貼文、語音逐字稿、新聞報導貼進來。AI 會自動萃取主題、方法、社會證明，輸出 8 張 VIRAL 輪播卡片。"
+              style="width:100%;resize:vertical;min-height:160px;font-size:13px;line-height:1.6"></textarea>
           </div>
 
-          <button class="btn" id="carousel-gen-btn" onclick="generateCarousel()" style="max-width:280px">
-            ⚡ 生成 VIRAL 輪播貼文
+          <div style="margin-bottom:20px">
+            <label class="field-label" style="margin-bottom:6px;display:block">你的身份定位 <span style="color:var(--text-muted);font-weight:400">（選填，不填 AI 自動判斷）</span></label>
+            <input id="c-identity" class="input-field" placeholder="例：用AI做跨境生意的台灣女老闆，第一手觀察科技趨勢" style="width:100%">
+          </div>
+
+          <button class="btn" id="carousel-gen-btn" onclick="generateCarousel()" style="max-width:260px;font-size:15px;padding:12px 24px">
+            ⚡ 生成輪播貼文
           </button>
           <div class="status-msg" id="carousel-status"></div>
         </div>
@@ -1315,6 +1288,55 @@ const WH_XHS_SEARCH     = N8N + '/copy-studio-xhs-search';
 const WH_XHS_TRANSCRIBE = N8N + '/copy-studio-xhs-transcribe';
 const WH_XHS_REWRITE    = N8N + '/copy-studio-xhs-rewrite';
 const WH_TRENDING_BOARD = N8N + '/copy-studio-trending-board';
+const WH_FACTCHECK      = N8N + '/copy-studio-factcheck';
+
+// ── 查證來源 ─────────────────────────────────────────────
+async function factCheckTopic() {
+  const topic = document.getElementById('pro-topic').value.trim();
+  if (!topic) { alert('請先輸入選題'); return; }
+  const btn    = document.getElementById('factcheck-btn');
+  const status = document.getElementById('factcheck-status');
+  const panel  = document.getElementById('factcheck-panel');
+  btn.disabled = true;
+  status.textContent = '查證中⋯⋯';
+  panel.style.display = 'none';
+  try {
+    const r = await fetch(WH_FACTCHECK, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ topic }) });
+    const data = await r.json();
+    const sources = data.sources || [];
+    const iconMap  = { confirmed:'✓', uncertain:'⚠️', unknown:'？' };
+    const colorMap = { confirmed:'#4ade80', uncertain:'#f59e0b', unknown:'#94a3b8' };
+    let html = sources.map(s => {
+      const icon  = iconMap[s.status]  || '•';
+      const color = colorMap[s.status] || 'var(--text)';
+      const link  = s.url ? `<a href="${s.url}" target="_blank" style="color:var(--gold);text-decoration:none;margin-left:6px">↗ ${s.title||'來源'}</a>` : '';
+      const qBtn  = s.search_query ? `<button onclick="window.open('https://www.google.com/search?q='+encodeURIComponent('${s.search_query.replace(/'/g,"\\'")}'),'_blank')" style="font-size:11px;padding:2px 6px;background:transparent;border:1px solid var(--border);border-radius:4px;color:var(--text-muted);cursor:pointer;margin-left:6px">🔍 查</button>` : '';
+      return `<div style="padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.06)"><span style="color:${color};font-weight:600">${icon}</span><span style="margin-left:6px">${s.claim}</span>${link}${qBtn}</div>`;
+    }).join('');
+    const hasConfirmed = sources.some(s => s.status === 'confirmed' && s.url);
+    if (hasConfirmed) html += `<div style="margin-top:10px"><button onclick="injectSourcesToExtra()" style="font-size:12px;padding:5px 12px;background:rgba(212,175,55,0.12);border:1px solid var(--gold-dim);border-radius:6px;color:var(--gold);cursor:pointer">📥 帶入素材補充</button></div>`;
+    panel.innerHTML = html || '<span style="color:var(--text-muted)">無結果</span>';
+    panel._sources = sources;
+    panel.style.display = 'block';
+    status.textContent = `找到 ${sources.length} 項主張`;
+  } catch(e) {
+    panel.innerHTML = `<span style="color:#f87171">查證失敗：${e.message}</span>`;
+    panel.style.display = 'block';
+    status.textContent = '';
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function injectSourcesToExtra() {
+  const panel   = document.getElementById('factcheck-panel');
+  const sources = (panel._sources || []).filter(s => s.status === 'confirmed' && s.url);
+  if (!sources.length) return;
+  const text = '【查證來源】\n' + sources.map(s => `• ${s.claim}\n  ${s.url}`).join('\n');
+  const extra = document.getElementById('pro-extra');
+  extra.value = extra.value ? extra.value + '\n\n' + text : text;
+  extra.scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
 
 let searchPlatform = 'yt', directPlatform = 'yt';
 const WH_DOUYIN_SEARCH = N8N + '/copy-studio-douyin-search';
@@ -2813,40 +2835,22 @@ const CAROUSEL_WEBHOOK = 'https://eglobal.app.n8n.cloud/webhook/copy-studio-caro
 let _carouselSlides = [];
 let _carouselRecordId = '';
 
-function selectHook(el, val) {
-  document.querySelectorAll('.hook-pill').forEach(p => p.classList.remove('selected'));
-  el.classList.add('selected');
-  document.getElementById('c-hook').value = val;
-}
-
-function selectCTA(el, val) {
-  document.querySelectorAll('.cta-pill').forEach(p => p.classList.remove('selected'));
-  el.classList.add('selected');
-  document.getElementById('c-cta').value = val;
-}
-
 async function generateCarousel() {
-  const topic = document.getElementById('c-topic').value.trim();
+  const longtext = document.getElementById('c-longtext').value.trim();
   const identity = document.getElementById('c-identity').value.trim();
-  const method = document.getElementById('c-method').value.trim();
-  const proof = document.getElementById('c-proof').value.trim();
-  const hook = document.getElementById('c-hook').value;
-  const cta = document.getElementById('c-cta').value;
 
-  if (!topic) { showCarouselStatus('請填入主題', 'error'); return; }
-  if (!identity) { showCarouselStatus('請填入身份定位', 'error'); return; }
-  if (!method) { showCarouselStatus('請填入核心方法', 'error'); return; }
+  if (!longtext) { showCarouselStatus('請貼入長文內容', 'error'); return; }
 
   const btn = document.getElementById('carousel-gen-btn');
-  btn.disabled = true; btn.textContent = '⏳ Claude 生成中...';
-  showCarouselStatus('正在用 VIRAL 框架生成 8 張卡片，約 20-40 秒...', 'loading');
+  btn.disabled = true; btn.textContent = '⏳ AI 分析中...';
+  showCarouselStatus('Claude 正在讀取文章、拆解 VIRAL 結構、配圖，約 30-50 秒...', 'loading');
   document.getElementById('carousel-output').style.display = 'none';
 
   try {
     const res = await fetch(CAROUSEL_WEBHOOK, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ topic, identity, hook_type: hook, core_method: method, social_proof: proof, cta_type: cta, slides_count: 8 })
+      body: JSON.stringify({ long_text: longtext, identity: identity || '不限定', mode: 'from_article' })
     });
     const data = await res.json();
     if (!data.success || !data.slides) throw new Error('回應格式異常: ' + JSON.stringify(data).substring(0, 100));
@@ -2858,7 +2862,7 @@ async function generateCarousel() {
   } catch(e) {
     showCarouselStatus('❌ 生成失敗：' + e.message, 'error');
   } finally {
-    btn.disabled = false; btn.textContent = '⚡ 生成 VIRAL 輪播貼文';
+    btn.disabled = false; btn.textContent = '⚡ 生成輪播貼文';
   }
 }
 
