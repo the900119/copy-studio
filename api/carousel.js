@@ -1,9 +1,7 @@
 // Vercel serverless proxy → n8n carousel webhook
-// Solves n8n Cloud geographic routing issue (browser hits hkg1, webhook on different node)
-
 const N8N_WEBHOOK = 'https://eglobal.app.n8n.cloud/webhook/copy-studio-carousel';
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   if (req.method === 'OPTIONS') {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -20,7 +18,7 @@ export default async function handler(req, res) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(req.body),
-      signal: AbortSignal.timeout(90000) // 90s timeout
+      signal: AbortSignal.timeout(90000)
     });
 
     const text = await n8nRes.text();
@@ -38,4 +36,4 @@ export default async function handler(req, res) {
   } catch (e) {
     return res.status(500).json({ success: false, error: e.message });
   }
-}
+};
