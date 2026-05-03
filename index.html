@@ -312,6 +312,86 @@
       .grid-2, .grid-3, .selector-row { grid-template-columns: 1fr; }
       .container { padding: 14px; }
     }
+
+    /* ════ Carousel Tab ════ */
+    .carousel-form { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+    .carousel-form .full-width { grid-column: 1 / -1; }
+    .carousel-slides-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; margin-top: 20px; }
+
+    /* 電影海報卡片 */
+    .slide-card {
+      border-radius: 12px; overflow: hidden; position: relative;
+      width: 100%; padding-top: 100%; /* 1:1 square */
+      box-shadow: 0 8px 32px rgba(0,0,0,0.6); cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .slide-card:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(0,0,0,0.7); }
+    .slide-card-inner { position: absolute; inset: 0; display: flex; flex-direction: column; }
+
+    /* 背景照片 */
+    .slide-bg { position: absolute; inset: 0; background-size: cover; background-position: center; }
+    /* 漸層遮罩 */
+    .slide-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(
+        to bottom,
+        rgba(0,0,0,0.15) 0%,
+        rgba(0,0,0,0.05) 30%,
+        rgba(0,0,0,0.55) 65%,
+        rgba(0,0,0,0.88) 100%
+      );
+    }
+    /* 內容層 */
+    .slide-content { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-between; padding: 0; }
+    .slide-top-bar { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px 0; }
+    .slide-num-label { font-size: 9px; letter-spacing: 3px; color: rgba(255,255,255,0.6); text-transform: uppercase; font-weight: 600; }
+    .slide-role-label { font-size: 9px; color: rgba(255,255,255,0.5); letter-spacing: 1px; }
+    .slide-text-area { padding: 16px 20px 20px; }
+    .slide-headline-big {
+      font-size: clamp(22px, 4.5vw, 34px);
+      font-weight: 900;
+      color: #fff;
+      line-height: 1.15;
+      letter-spacing: -0.5px;
+      font-family: 'Noto Sans TC', sans-serif;
+      margin-bottom: 8px;
+      text-shadow: 0 2px 12px rgba(0,0,0,0.5);
+    }
+    .slide-subtext-sm {
+      font-size: 12px;
+      color: rgba(255,255,255,0.75);
+      font-family: 'Noto Serif TC', serif;
+      line-height: 1.5;
+      margin-bottom: 6px;
+    }
+    .slide-body-sm {
+      font-size: 11px;
+      color: rgba(255,255,255,0.65);
+      line-height: 1.6;
+      white-space: pre-wrap;
+      display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .slide-photo-credit { font-size: 8px; color: rgba(255,255,255,0.3); padding: 0 20px 8px; }
+
+    /* 操作按鈕 */
+    .slide-action-bar { display: flex; gap: 6px; padding: 8px 12px; background: rgba(0,0,0,0.5); border-top: 1px solid rgba(255,255,255,0.06); }
+    .slide-btn { flex: 1; padding: 5px; border: 1px solid rgba(255,255,255,0.15); background: transparent; color: rgba(255,255,255,0.7); border-radius: 5px; font-size: 10px; cursor: pointer; transition: all 0.18s; font-family: inherit; }
+    .slide-btn:hover { background: rgba(255,255,255,0.12); color: #fff; }
+    .slide-btn.primary { border-color: rgba(212,168,67,0.5); color: #D4A843; }
+    .slide-btn.primary:hover { background: rgba(212,168,67,0.15); }
+
+    /* 換圖浮層 */
+    .slide-swap-btn { position: absolute; top: 12px; right: 12px; background: rgba(0,0,0,0.45); border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.8); border-radius: 6px; padding: 4px 9px; font-size: 10px; cursor: pointer; backdrop-filter: blur(4px); transition: all 0.18s; }
+    .slide-swap-btn:hover { background: rgba(0,0,0,0.65); color: #fff; }
+
+    .carousel-actions { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+    .hook-pills { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
+    .hook-pill { padding: 5px 12px; border: 1.5px solid var(--border); border-radius: 16px; font-size: 12px; color: var(--text-muted); cursor: pointer; background: transparent; transition: all 0.18s; font-family: inherit; }
+    .hook-pill.selected { border-color: var(--gold-dim); background: rgba(212,168,67,0.08); color: var(--gold); }
+    .cta-pills { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
+    .cta-pill { padding: 5px 12px; border: 1.5px solid var(--border); border-radius: 16px; font-size: 12px; color: var(--text-muted); cursor: pointer; background: transparent; transition: all 0.18s; font-family: inherit; }
+    .cta-pill.selected { border-color: var(--gold-dim); background: rgba(212,168,67,0.08); color: var(--gold); }
+    @media(max-width:768px) { .carousel-form { grid-template-columns: 1fr; } .carousel-slides-grid { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
@@ -364,6 +444,13 @@
       <div class="step-num">STEP 05</div>
       <div class="step-row"><span class="step-icon">🎬</span><span class="step-title">視頻生成</span></div>
       <div class="step-desc">腳本 + 商品圖 → 影片</div>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <div class="step-item" data-tab="carousel" onclick="switchTab('carousel')">
+      <div class="step-row"><span class="step-icon">🎠</span><span class="step-title">輪播貼文</span></div>
+      <div class="step-desc">VIRAL架構 · 60秒產8張</div>
     </div>
 
     <div class="sidebar-divider"></div>
@@ -1101,29 +1188,118 @@
       </div>
     </div>
 
+    <!-- ════ 輪播貼文 ════ -->
+    <div class="tab-panel" id="tab-carousel">
+      <div class="container">
+
+        <div class="card mb-16">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+            <span style="font-size:22px">🎠</span>
+            <div>
+              <h2 style="margin:0">輪播貼文生成器</h2>
+              <p style="font-size:12px;color:var(--text-muted);margin:2px 0 0">VIRAL爆紅架構 · 8張卡片 · 60秒產出</p>
+            </div>
+          </div>
+
+          <div class="carousel-form">
+            <div class="full-width">
+              <label class="field-label">主題（一句話說清楚你要教什麼）</label>
+              <input id="c-topic" class="input-field" placeholder="例：如何用輪播貼文在3個月內漲粉5000" style="width:100%">
+            </div>
+
+            <div>
+              <label class="field-label">你的身份定位</label>
+              <input id="c-identity" class="input-field" placeholder="例：幫創業者用AI做內容的行銷教練" style="width:100%">
+            </div>
+
+            <div>
+              <label class="field-label">核心方法 / 解法（3步驟）</label>
+              <input id="c-method" class="input-field" placeholder="例：①定位受眾痛點 ②VIRAL框架排版 ③3-2-1互動策略" style="width:100%">
+            </div>
+
+            <div>
+              <label class="field-label">社會證明（客戶成果）</label>
+              <input id="c-proof" class="input-field" placeholder="例：學員小美3個月從0做到月營收30萬" style="width:100%">
+            </div>
+
+            <div>
+              <label class="field-label">封面鉤子公式</label>
+              <div class="hook-pills">
+                <button class="hook-pill selected" onclick="selectHook(this,'殺很大真相')">殺很大真相</button>
+                <button class="hook-pill" onclick="selectHook(this,'內行人才知道')">內行人才知道</button>
+                <button class="hook-pill" onclick="selectHook(this,'成功預告')">成功預告</button>
+                <button class="hook-pill" onclick="selectHook(this,'失敗經驗分享')">失敗經驗</button>
+                <button class="hook-pill" onclick="selectHook(this,'成果搶先看')">成果搶先看</button>
+              </div>
+              <input id="c-hook" type="hidden" value="殺很大真相">
+            </div>
+
+            <div>
+              <label class="field-label">CTA類型</label>
+              <div class="cta-pills">
+                <button class="cta-pill selected" onclick="selectCTA(this,'免費好康')">免費好康</button>
+                <button class="cta-pill" onclick="selectCTA(this,'限量機會')">限量機會</button>
+                <button class="cta-pill" onclick="selectCTA(this,'挑戰檢測')">挑戰檢測</button>
+              </div>
+              <input id="c-cta" type="hidden" value="免費好康">
+            </div>
+          </div>
+
+          <button class="btn" id="carousel-gen-btn" onclick="generateCarousel()" style="max-width:280px">
+            ⚡ 生成 VIRAL 輪播貼文
+          </button>
+          <div class="status-msg" id="carousel-status"></div>
+        </div>
+
+        <!-- 輸出區 -->
+        <div id="carousel-output" style="display:none">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+            <h3 style="margin:0;font-size:15px;color:var(--gold)">8 張卡片草稿</h3>
+            <div class="carousel-actions">
+              <button class="btn btn-outline" style="font-size:12px;padding:7px 14px" onclick="downloadAllSlides()">⬇ 下載全部 PNG</button>
+              <button class="btn btn-outline" style="font-size:12px;padding:7px 14px" onclick="copyAllSlides()">📋 複製全部文案</button>
+              <button class="btn btn-outline" style="font-size:12px;padding:7px 14px" onclick="saveCarouselToFeishu()">☁️ 存飛書</button>
+            </div>
+          </div>
+          <div class="carousel-slides-grid" id="carousel-slides-grid"></div>
+          <div class="status-msg" id="carousel-save-status" style="margin-top:12px"></div>
+        </div>
+
+      </div>
+    </div>
+
   </div><!-- /main-content -->
 </div><!-- /app-layout -->
 
 <script>
-// ── 寫作風格指南（場景衝突抵達體 × 餅妹用詞）────────────
-const WRITING_GUIDE = `【寫作架構：場景衝突抵達體】
-① 開場：直接跳進一個畫面或正在發生的狀態，不預告、不說「今天要聊」
-② 主體：場景→普世原則，每段有溫度轉換（緊→鬆、嚴肅→幽默），同一溫度不超過三句
-③ 結尾：抵達，不替讀者下結論，留最後一句讓讀者自己走
+// ── 寫作風格指南（MUMU兩型 × 餅妹用詞）────────────
+const WRITING_GUIDE = `【第一步：根據選題判斷類型，套用對應架構】
 
-【用詞規則】
+━ MUMU情緒敘事型（適用：個人事件／觀察判斷／某件事觸發的思考）
+① 開場：直接跳進一個正在發生的畫面，不預告、不說「今天要聊」
+② 主體：場景→普世原則，每段有溫度轉換（緊→鬆、嚴肅→幽默），同一溫度不超過三句
+③ 結尾：抵達——留一句讓讀者自己再走一步，不替讀者下結論
+▋ 只用在情緒轉折點或鉤子，後面跟衝擊句，不當章節標題
+
+━ MUMU知識型（適用：平台比較／工具清單／市場數據／操作步驟）
+① 開場：同樣跳進畫面——用一個具體場景引出「為什麼這件事重要」
+② 主體：場景推進，知識點在衝突解決的瞬間自然現身，不是目錄式丟出來
+③ 結尾：抵達——知識落地後留一句行動方向，不替讀者整理清單
+▋ 可在知識點出現的轉折處使用，帶讀者進入下一個「發現」
+
+【用詞規則（兩型通用）】
 - 讀者稱「你」，第一人稱「我」，不用「大家」「各位」「我們」
 - 短句打頭，破折號（——）做轉折，不用逗號做緩衝
-- ▋ 用在有張力的轉折或鉤子，後面直接跟衝擊句，不當章節標題
-- 括號偶爾插閒話讓讀者喘氣：（我知道這聽起來很廢話，但你真的想過嗎？）
+- 括號偶爾插閒話讓讀者喘氣
 - 直接說公司名、術語、數字，不做白話解釋
 - 類比顯形：用類比讓荒謬自己現身，不說教，讓讀者說「對欸」
 
-【絕對禁止】
+【絕對禁止（兩型通用）】
 - 「不是X，是Y」或「不是X——是Y」對比句，一律改正面直述
 - 「先說⋯⋯」「首先⋯⋯」預告句
 - 「希望大家⋯⋯」「這讓我們學到⋯⋯」總結式結尾
-- ▋後面跟說明標籤（如「▋我自己怎麼做」「▋市場現況」）`;
+- ▋後面跟說明標籤（如「▋我自己怎麼做」「▋市場現況」「▋接下來」）
+- 自行發明案例：禁止捏造公司名、人名、數字、事件細節——只能用素材補充中已提供的內容；素材為空時，描述現象與邏輯即可，不舉未經核實的具體例子`;
 
 // ── Webhooks ─────────────────────────────────────────────
 const N8N = 'https://eglobal.app.n8n.cloud/webhook';
@@ -2630,6 +2806,211 @@ initPositioning();
   renderInbox();
 })();
 renderFavs();
+
+// ── Carousel Generator ────────────────────────────────────
+const CAROUSEL_WEBHOOK = 'https://eglobal.app.n8n.cloud/webhook/copy-studio-carousel';
+
+let _carouselSlides = [];
+let _carouselRecordId = '';
+
+function selectHook(el, val) {
+  document.querySelectorAll('.hook-pill').forEach(p => p.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('c-hook').value = val;
+}
+
+function selectCTA(el, val) {
+  document.querySelectorAll('.cta-pill').forEach(p => p.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('c-cta').value = val;
+}
+
+async function generateCarousel() {
+  const topic = document.getElementById('c-topic').value.trim();
+  const identity = document.getElementById('c-identity').value.trim();
+  const method = document.getElementById('c-method').value.trim();
+  const proof = document.getElementById('c-proof').value.trim();
+  const hook = document.getElementById('c-hook').value;
+  const cta = document.getElementById('c-cta').value;
+
+  if (!topic) { showCarouselStatus('請填入主題', 'error'); return; }
+  if (!identity) { showCarouselStatus('請填入身份定位', 'error'); return; }
+  if (!method) { showCarouselStatus('請填入核心方法', 'error'); return; }
+
+  const btn = document.getElementById('carousel-gen-btn');
+  btn.disabled = true; btn.textContent = '⏳ Claude 生成中...';
+  showCarouselStatus('正在用 VIRAL 框架生成 8 張卡片，約 20-40 秒...', 'loading');
+  document.getElementById('carousel-output').style.display = 'none';
+
+  try {
+    const res = await fetch(CAROUSEL_WEBHOOK, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ topic, identity, hook_type: hook, core_method: method, social_proof: proof, cta_type: cta, slides_count: 8 })
+    });
+    const data = await res.json();
+    if (!data.ok || !data.slides) throw new Error('回應格式異常');
+    _carouselSlides = data.slides;
+    _carouselRecordId = data.record_id || '';
+    renderCarouselSlides(_carouselSlides);
+    document.getElementById('carousel-output').style.display = 'block';
+    showCarouselStatus('✅ 生成完成！已存飛書草稿庫', 'success');
+  } catch(e) {
+    showCarouselStatus('❌ 生成失敗：' + e.message, 'error');
+  } finally {
+    btn.disabled = false; btn.textContent = '⚡ 生成 VIRAL 輪播貼文';
+  }
+}
+
+function renderCarouselSlides(slides) {
+  const grid = document.getElementById('carousel-slides-grid');
+  grid.innerHTML = slides.map((s, i) => {
+    const photo = s.photo || {};
+    const bgUrl = photo.url || '';
+    const bgStyle = bgUrl
+      ? `background-image: url('${bgUrl}')`
+      : `background-color: #1a1a2e`;
+    const credit = photo.credit ? `Photo: ${esc(photo.credit)} / Unsplash` : '';
+    return `
+    <div class="slide-card" id="slide-card-${i}">
+      <div class="slide-card-inner">
+        <div class="slide-bg" style="${bgStyle}"></div>
+        <div class="slide-overlay"></div>
+        <div class="slide-content">
+          <div class="slide-top-bar">
+            <span class="slide-num-label">${String(s.slide).padStart(2,'0')} / ${slides.length}</span>
+            <span class="slide-role-label">${esc((s.role||'').replace(/^[VIRAL]\s*[-–]\s*/,''))}</span>
+          </div>
+          <div class="slide-text-area">
+            <div class="slide-headline-big">${esc(s.headline||'')}</div>
+            ${s.subtext ? `<div class="slide-subtext-sm">${esc(s.subtext)}</div>` : ''}
+            ${s.body ? `<div class="slide-body-sm">${esc(s.body)}</div>` : ''}
+          </div>
+        </div>
+        ${credit ? `<div class="slide-photo-credit">${credit}</div>` : ''}
+        <button class="slide-swap-btn" onclick="swapPhoto(${i}, event)" title="換一張照片">↻ 換圖</button>
+        <div class="slide-action-bar">
+          <button class="slide-btn primary" onclick="downloadSlide(${i})">⬇ 下載PNG</button>
+          <button class="slide-btn" onclick="copySlide(${i})">複製文案</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// Unsplash 換圖
+const UNSPLASH_KEY = 'mdbqeAIQoqyEGFzt9sBCIgl50mlMWkv03zPZPG7RM5g';
+const SLIDE_QUERIES = {
+  0: 'editorial dramatic portrait moody cinematic',
+  1: 'frustrated stressed lifestyle candid',
+  2: 'window light morning hope inspiration',
+  3: 'working focused productive desk',
+  4: 'success achievement celebration confident',
+  5: 'happy woman smile warm',
+  6: 'mysterious dramatic night moody',
+  7: 'confident professional portrait editorial'
+};
+
+async function swapPhoto(idx, e) {
+  e.stopPropagation();
+  const card = document.getElementById(`slide-card-${idx}`);
+  const bg = card.querySelector('.slide-bg');
+  bg.style.opacity = '0.3';
+  try {
+    const q = encodeURIComponent(SLIDE_QUERIES[idx] || 'editorial atmospheric');
+    const res = await fetch(`https://api.unsplash.com/photos/random?query=${q}&orientation=squarish&count=1`, {
+      headers: { 'Authorization': `Client-ID ${UNSPLASH_KEY}` }
+    });
+    const data = await res.json();
+    if (Array.isArray(data) && data[0]) {
+      const newUrl = data[0].urls.regular;
+      bg.style.backgroundImage = `url('${newUrl}')`;
+      if (_carouselSlides[idx]) _carouselSlides[idx].photo = { url: newUrl, credit: data[0].user.name };
+      const credit = card.querySelector('.slide-photo-credit');
+      if (credit) credit.textContent = `Photo: ${data[0].user.name} / Unsplash`;
+    }
+  } catch(e) { console.error(e); }
+  bg.style.opacity = '1';
+}
+
+// 下載單張卡片 PNG（使用 html2canvas）
+async function downloadSlide(idx) {
+  if (typeof html2canvas === 'undefined') {
+    showCarouselStatus('⏳ 載入截圖工具中...', 'loading');
+    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js');
+  }
+  const card = document.getElementById(`slide-card-${idx}`);
+  showCarouselStatus(`⏳ 正在生成第 ${idx+1} 張 PNG...`, 'loading');
+  try {
+    const canvas = await html2canvas(card.querySelector('.slide-card-inner'), {
+      width: card.offsetWidth,
+      height: card.offsetWidth, // square
+      scale: 2, // 2x for quality
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: '#1a1a1a'
+    });
+    const link = document.createElement('a');
+    link.download = `carousel-slide-${idx+1}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    showCarouselStatus(`✅ 第 ${idx+1} 張已下載`, 'success');
+  } catch(e) {
+    showCarouselStatus('❌ 下載失敗，請截圖代替：' + e.message, 'error');
+  }
+}
+
+async function downloadAllSlides() {
+  if (typeof html2canvas === 'undefined') {
+    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js');
+  }
+  showCarouselStatus('⏳ 正在生成全部 8 張 PNG，請稍候...', 'loading');
+  for (let i = 0; i < _carouselSlides.length; i++) {
+    await downloadSlide(i);
+    await new Promise(r => setTimeout(r, 400));
+  }
+  showCarouselStatus('✅ 全部 8 張已下載完成', 'success');
+}
+
+function loadScript(src) {
+  return new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = src; s.onload = resolve; s.onerror = reject;
+    document.head.appendChild(s);
+  });
+}
+
+function copySlide(idx) {
+  const s = _carouselSlides[idx];
+  if (!s) return;
+  const text = `【第${s.slide}張｜${s.role}】\n標題：${s.headline}\n${s.subtext ? '副標：'+s.subtext+'\n' : ''}${s.body ? '內文：'+s.body+'\n' : ''}設計：${s.design_note||''}`;
+  navigator.clipboard.writeText(text).then(() => {
+    const btns = document.querySelectorAll('.slide-copy-btn');
+    if (btns[idx]) { btns[idx].textContent = '✓'; setTimeout(() => btns[idx].textContent = '複製', 1500); }
+  });
+}
+
+function copyAllSlides() {
+  if (!_carouselSlides.length) return;
+  const text = _carouselSlides.map(s =>
+    `【第${s.slide}張｜${s.role}】\n標題：${s.headline}\n${s.subtext?'副標：'+s.subtext+'\n':''}${s.body?'內文：'+s.body+'\n':''}設計：${s.design_note||''}`
+  ).join('\n\n---\n\n');
+  navigator.clipboard.writeText(text).then(() => showCarouselStatus('✅ 已複製全部 8 張文案到剪貼簿', 'success'));
+}
+
+function showCarouselStatus(msg, type) {
+  const el = document.getElementById('carousel-status');
+  el.textContent = msg;
+  el.style.color = type === 'error' ? 'var(--error-color)' : type === 'success' ? 'var(--success-color)' : 'var(--text-muted)';
+}
+
+async function saveCarouselToFeishu() {
+  if (_carouselRecordId) {
+    showCarouselStatus('✅ 已在生成時存入飛書草稿庫（record: ' + _carouselRecordId + '）', 'success');
+    return;
+  }
+  showCarouselStatus('⚠️ 找不到記錄ID，請重新生成', 'error');
+}
 </script>
 </body>
 </html>
