@@ -2852,7 +2852,10 @@ async function generateCarousel() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ long_text: longtext, identity: identity || '不限定', mode: 'from_article' })
     });
-    const data = await res.json();
+    const rawText = await res.text();
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${rawText.substring(0, 150)}`);
+    let data;
+    try { data = JSON.parse(rawText); } catch(je) { throw new Error(`非JSON回應(${res.status}): ${rawText.substring(0, 150)}`); }
     if (!data.success || !data.slides) throw new Error('回應格式異常: ' + JSON.stringify(data).substring(0, 100));
     _carouselSlides = data.slides;
     _carouselRecordId = data.record_id || '';
