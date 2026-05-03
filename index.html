@@ -2849,7 +2849,7 @@ async function generateCarousel() {
       body: JSON.stringify({ topic, identity, hook_type: hook, core_method: method, social_proof: proof, cta_type: cta, slides_count: 8 })
     });
     const data = await res.json();
-    if (!data.ok || !data.slides) throw new Error('回應格式異常');
+    if (!data.success || !data.slides) throw new Error('回應格式異常: ' + JSON.stringify(data).substring(0, 100));
     _carouselSlides = data.slides;
     _carouselRecordId = data.record_id || '';
     renderCarouselSlides(_carouselSlides);
@@ -2870,7 +2870,7 @@ function renderCarouselSlides(slides) {
     const bgStyle = bgUrl
       ? `background-image: url('${bgUrl}')`
       : `background-color: #1a1a2e`;
-    const credit = photo.credit ? `Photo: ${esc(photo.credit)} / Unsplash` : '';
+    const credit = (photo.author||photo.credit) ? `Photo: ${esc(photo.author||photo.credit)} / Unsplash` : '';
     return `
     <div class="slide-card" id="slide-card-${i}">
       <div class="slide-card-inner">
@@ -2878,12 +2878,12 @@ function renderCarouselSlides(slides) {
         <div class="slide-overlay"></div>
         <div class="slide-content">
           <div class="slide-top-bar">
-            <span class="slide-num-label">${String(s.slide).padStart(2,'0')} / ${slides.length}</span>
+            <span class="slide-num-label">${String(s.slide_num||i+1).padStart(2,'0')} / ${slides.length}</span>
             <span class="slide-role-label">${esc((s.role||'').replace(/^[VIRAL]\s*[-–]\s*/,''))}</span>
           </div>
           <div class="slide-text-area">
             <div class="slide-headline-big">${esc(s.headline||'')}</div>
-            ${s.subtext ? `<div class="slide-subtext-sm">${esc(s.subtext)}</div>` : ''}
+            ${(s.subheadline||s.subtext) ? `<div class="slide-subtext-sm">${esc(s.subheadline||s.subtext)}</div>` : ''}
             ${s.body ? `<div class="slide-body-sm">${esc(s.body)}</div>` : ''}
           </div>
         </div>
