@@ -1950,15 +1950,28 @@ function fmtOut(text) {
     .trim();
 }
 
+function normalizeProScripts(data) {
+  let long  = (data.long_script  || data.wechat_script || '').trim();
+  let xhs   = (data.xhs_script   || '').trim();
+  let short = (data.short_script || '').trim();
+  // If long is nearly empty but xhs is substantial, Claude likely reversed the order.
+  // XHS format always has 【標題】 or 【正文】 markers; 長文 uses ▋ or is just longer.
+  const isXhsFormat = t => t.includes('【標題】') || t.includes('【正文】') || t.includes('【標籤】');
+  if (long.length < 100 && xhs.length > 300 && !isXhsFormat(xhs)) {
+    [long, xhs] = [xhs, long];
+  }
+  return { long, xhs, short };
+}
+
 function renderProDrafts(data) {
   document.getElementById('pro-loading').style.display = 'none';
-  // Fill three panes
+  const { long, xhs, short } = normalizeProScripts(data);
   const longEl  = document.getElementById('pro-long');
   const xhsEl   = document.getElementById('pro-xhs');
   const shortEl = document.getElementById('pro-short');
-  longEl.value  = fmtOut(data.long_script  || data.wechat_script || '');
-  xhsEl.value   = fmtOut(data.xhs_script   || '');
-  shortEl.value = fmtOut(data.short_script  || '');
+  longEl.value  = fmtOut(long);
+  xhsEl.value   = fmtOut(xhs);
+  shortEl.value = fmtOut(short);
   ['long','xhs','short'].forEach(k => {
     const el = document.getElementById('pro-' + k);
     const cnt = document.getElementById('cnt-' + k);
@@ -1973,9 +1986,9 @@ function renderProDrafts(data) {
       document.getElementById('pro-source-card').style.display = '';
     }
   }
-  // Show long tab first (reset to single mode tab bar)
+  // Show long tab first — scope selector to out-tab-bar to avoid matching draft section tabs
   updateOutTabBar('single');
-  switchOutTab('long', document.querySelector('.out-tab[onclick*="\'long\'"]'));
+  switchOutTab('long', document.querySelector('#out-tab-bar .out-tab'));
   document.getElementById('pro-output').style.display = 'block';
   document.getElementById('pro-output').scrollIntoView({ behavior: 'smooth' });
 }
