@@ -980,6 +980,16 @@
             </div>
           </div>
 
+          <!-- 事實查核面板 -->
+          <div id="auto-factcheck-panel" style="display:none;margin-top:16px;background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.3);border-radius:10px;padding:14px 16px">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+              <span style="font-size:15px">⚠️</span>
+              <span style="font-size:13px;font-weight:600;color:#f59e0b">需核實的聲明</span>
+              <span id="auto-factcheck-status" style="font-size:11px;color:var(--text-muted);margin-left:4px"></span>
+            </div>
+            <div id="auto-factcheck-content" style="font-size:12px;line-height:1.9;color:var(--text-muted)"></div>
+          </div>
+
           <div class="confirm-bar" style="margin-top:12px">
             <p style="font-size:12px;color:var(--text-muted)">可直接在上方編輯後存入語料庫</p>
             <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:center">
@@ -1246,7 +1256,7 @@ async function factCheckTopic() {
   status.textContent = '查證中⋯⋯';
   panel.style.display = 'none';
   try {
-    const r = await fetch(WH_FACTCHECK, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ topic }) });
+    const r = await fetch('/api/factcheck', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ text: topic, mode: 'topic' }) });
     const data = await r.json();
     const sources = data.sources || [];
     const iconMap  = { confirmed:'✓', uncertain:'⚠️', unknown:'？' };
@@ -1281,6 +1291,45 @@ function injectSourcesToExtra() {
   const extra = document.getElementById('pro-extra');
   extra.value = extra.value ? extra.value + '\n\n' + text : text;
   extra.scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
+
+async function autoFactCheckContent(text) {
+  const panel   = document.getElementById('auto-factcheck-panel');
+  const content = document.getElementById('auto-factcheck-content');
+  const status  = document.getElementById('auto-factcheck-status');
+  if (!text || text.length < 100) return;
+  panel.style.display = 'block';
+  content.innerHTML = '<span style="color:var(--text-muted)">掃描中⋯⋯</span>';
+  status.textContent = '';
+  try {
+    const r = await fetch('/api/factcheck', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: text.substring(0, 2000), mode: 'content' })
+    });
+    const data = await r.json();
+    const sources = data.sources || [];
+    if (!sources.length) {
+      panel.style.display = 'none';
+      return;
+    }
+    const colorMap = { uncertain: '#f59e0b', unknown: '#94a3b8' };
+    const labelMap = { uncertain: '⚠️ 可能有誤', unknown: '？ 建議查證' };
+    content.innerHTML = sources.map(s => {
+      const color = colorMap[s.status] || '#94a3b8';
+      const label = labelMap[s.status] || '？';
+      const qBtn  = s.search_query
+        ? `<button onclick="window.open('https://www.google.com/search?q='+encodeURIComponent('${s.search_query.replace(/'/g,"\\'")}'),'_blank')" style="font-size:10px;padding:2px 7px;background:transparent;border:1px solid var(--border);border-radius:4px;color:var(--text-muted);cursor:pointer;margin-left:6px">🔍 查</button>` : '';
+      const note = s.note ? `<span style="color:rgba(148,163,184,0.7);margin-left:4px">（${s.note}）</span>` : '';
+      return `<div style="padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
+        <span style="color:${color};font-size:11px;font-weight:600">${label}</span>
+        <span style="margin-left:6px">${s.claim}</span>${note}${qBtn}
+      </div>`;
+    }).join('');
+    status.textContent = `${sources.length} 項需留意`;
+  } catch(e) {
+    panel.style.display = 'none';
+  }
 }
 
 let searchPlatform = 'yt', directPlatform = 'yt';
@@ -1926,6 +1975,9 @@ function renderProDrafts(data) {
   switchOutTab('long', document.querySelector('#out-tab-bar .out-tab'));
   document.getElementById('pro-output').style.display = 'block';
   document.getElementById('pro-output').scrollIntoView({ behavior: 'smooth' });
+  // Auto fact-check generated content
+  document.getElementById('auto-factcheck-panel').style.display = 'none';
+  autoFactCheckContent(long);
 }
 
 function renderProDraftsDual(twData, cnData) {
