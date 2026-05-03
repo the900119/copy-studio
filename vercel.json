@@ -14,6 +14,7 @@
   "functions": {
     "api/carousel.js": { "maxDuration": 120 },
     "api/factcheck.js": { "maxDuration": 30 },
+    "api/rewrite.js": { "maxDuration": 90 },
     "api/index.js": { "maxDuration": 10 }
   }
 }

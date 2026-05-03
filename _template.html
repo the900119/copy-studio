@@ -428,8 +428,14 @@
       <div class="step-desc">Hook · 骨架 · 情緒刺點</div>
     </div>
 
-    <div class="step-item" data-tab="video" onclick="switchTab('video')">
+    <div class="step-item" data-tab="rewrite" onclick="switchTab('rewrite')">
       <div class="step-num">STEP 05</div>
+      <div class="step-row"><span class="step-icon">✍️</span><span class="step-title">改稿 Pro</span></div>
+      <div class="step-desc">貼草稿 + 來源 → 查證改寫</div>
+    </div>
+
+    <div class="step-item" data-tab="video" onclick="switchTab('video')">
+      <div class="step-num">STEP 06</div>
       <div class="step-row"><span class="step-icon">🎬</span><span class="step-title">視頻生成</span></div>
       <div class="step-desc">腳本 + 商品圖 → 影片</div>
     </div>
@@ -1002,7 +1008,77 @@
       </div>
     </div>
 
-    <!-- ════ STEP 05: 視頻生成 ════ -->
+    <!-- ════ STEP 05: 改稿 Pro ════ -->
+    <div class="tab-panel" id="tab-rewrite">
+      <div class="container">
+        <div style="max-width:860px;margin:0 auto">
+
+          <div class="card mb-16">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+              <span style="font-size:22px">✍️</span>
+              <div>
+                <h2 style="margin:0">改稿 Pro</h2>
+                <p style="font-size:12px;color:var(--text-muted);margin:2px 0 0">貼入草稿 + 來源文章網址 → 自動查證事實 + 融合原始資料 → 輸出升級版</p>
+              </div>
+            </div>
+
+            <div style="margin-bottom:16px">
+              <label class="field-label" style="margin-bottom:6px;display:block">你的草稿</label>
+              <textarea id="rw-draft" class="input-field" rows="12"
+                placeholder="把你寫好的草稿貼進來。AI 會對照來源文章修正事實、融合關鍵細節，保持你的風格和論點結構。"
+                style="width:100%;resize:vertical;min-height:200px;font-size:13px;line-height:1.7"></textarea>
+            </div>
+
+            <div style="margin-bottom:16px">
+              <label class="field-label" style="margin-bottom:6px;display:block">來源文章網址 <span style="color:var(--text-muted);font-weight:400">（選填）</span></label>
+              <input id="rw-url" class="input-field" placeholder="https://... 貼入原始文章的網址，AI 會自動抓取並對照查證" style="width:100%;font-size:13px">
+              <p style="font-size:11px;color:var(--text-muted);margin-top:5px">沒有網址也可以直接改稿——AI 會根據自身知識做事實查核</p>
+            </div>
+
+            <div style="margin-bottom:20px">
+              <label class="field-label" style="margin-bottom:6px;display:block">你的身份定位 <span style="color:var(--text-muted);font-weight:400">（選填）</span></label>
+              <input id="rw-identity" class="input-field" placeholder="例：用AI做跨境生意的台灣女老闆，第一手觀察科技趨勢" style="width:100%;font-size:13px">
+            </div>
+
+            <button class="btn" id="rw-btn" onclick="runRewrite()" style="max-width:280px;font-size:15px;padding:12px 24px">
+              ✍️ 查證並改稿
+            </button>
+            <div class="status-msg" id="rw-status" style="margin-top:10px"></div>
+          </div>
+
+          <!-- 輸出區 -->
+          <div id="rw-output" style="display:none">
+
+            <!-- 修正清單 -->
+            <div id="rw-corrections-panel" style="display:none;background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.3);border-radius:10px;padding:14px 16px;margin-bottom:16px">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+                <span style="font-size:14px">🔧</span>
+                <span style="font-size:13px;font-weight:600;color:#f59e0b">已修正的事實</span>
+              </div>
+              <div id="rw-corrections-list" style="font-size:12px;line-height:1.9"></div>
+              <div id="rw-insights" style="font-size:12px;color:var(--gold-dim);margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.06)"></div>
+            </div>
+
+            <!-- 改稿結果 -->
+            <div class="card">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+                <h3 style="margin:0;font-size:14px;color:var(--gold)">改稿結果</h3>
+                <span id="rw-wordcount" style="font-size:12px;color:var(--text-muted)"></span>
+              </div>
+              <textarea id="rw-result" rows="20" oninput="document.getElementById('rw-wordcount').textContent=this.value.length+' 字'"
+                style="width:100%;font-size:13px;line-height:1.75;resize:vertical;min-height:300px"></textarea>
+              <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
+                <button class="btn btn-outline" style="font-size:12px;padding:7px 16px" onclick="copyRewriteResult()">📋 複製全文</button>
+                <button class="btn btn-outline" style="font-size:12px;padding:7px 16px" onclick="sendRewriteToProGen()">⚡ 送到腳本生成器拆三版</button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ STEP 06: 視頻生成 ════ -->
     <div class="tab-panel" id="tab-video">
       <div class="container">
         <div style="max-width:720px;margin:0 auto">
@@ -2904,6 +2980,102 @@ initPositioning();
   renderInbox();
 })();
 renderFavs();
+
+// ── 改稿 Pro ─────────────────────────────────────────────
+async function runRewrite() {
+  const draft    = document.getElementById('rw-draft').value.trim();
+  const url      = document.getElementById('rw-url').value.trim();
+  const identity = document.getElementById('rw-identity').value.trim();
+  const btn      = document.getElementById('rw-btn');
+  const status   = document.getElementById('rw-status');
+
+  if (!draft) { status.textContent = '請先貼入草稿'; status.style.color = 'var(--error-color)'; return; }
+
+  btn.disabled = true;
+  btn.textContent = '⏳ AI 查證改稿中...';
+  status.style.color = 'var(--text-muted)';
+  status.textContent = url ? '正在抓取來源文章 + 查證改稿，約 30–60 秒...' : '查證改稿中，約 20–40 秒...';
+  document.getElementById('rw-output').style.display = 'none';
+
+  try {
+    const r = await fetch('/api/rewrite', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ draft, source_url: url || '', identity, writing_guide: WRITING_GUIDE })
+    });
+    const d = await r.json();
+    if (!d.success) throw new Error(d.error || '改稿失敗');
+
+    // Fill result
+    const resultEl = document.getElementById('rw-result');
+    resultEl.value = d.rewritten || '';
+    document.getElementById('rw-wordcount').textContent = resultEl.value.length + ' 字';
+
+    // Show corrections
+    const corrections = d.corrections || [];
+    const corrPanel   = document.getElementById('rw-corrections-panel');
+    const corrList    = document.getElementById('rw-corrections-list');
+    const insightEl   = document.getElementById('rw-insights');
+
+    if (corrections.length) {
+      corrList.innerHTML = corrections.map(c =>
+        `<div style="padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
+          <span style="color:#f87171;text-decoration:line-through">${c.original}</span>
+          <span style="margin:0 6px;color:var(--text-muted)">→</span>
+          <span style="color:#4ade80">${c.fixed}</span>
+          <span style="color:rgba(148,163,184,0.6);margin-left:6px;font-size:11px">（${c.reason}）</span>
+        </div>`
+      ).join('');
+      corrPanel.style.display = 'block';
+    } else {
+      corrPanel.style.display = 'none';
+    }
+
+    if (d.added_insights) {
+      insightEl.textContent = '✦ ' + d.added_insights;
+      insightEl.style.display = 'block';
+    } else {
+      insightEl.style.display = 'none';
+    }
+
+    document.getElementById('rw-output').style.display = 'block';
+    document.getElementById('rw-output').scrollIntoView({ behavior: 'smooth' });
+    status.textContent = corrections.length
+      ? `✅ 完成，修正了 ${corrections.length} 處事實${d.source_fetched ? '（已抓取來源文章）' : ''}`
+      : `✅ 完成${d.source_fetched ? '（已抓取來源文章，無需修正）' : ''}`;
+    status.style.color = 'var(--success-color)';
+
+  } catch(e) {
+    status.textContent = '❌ ' + e.message;
+    status.style.color = 'var(--error-color)';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '✍️ 查證並改稿';
+  }
+}
+
+function copyRewriteResult() {
+  const el = document.getElementById('rw-result');
+  navigator.clipboard.writeText(el.value).then(() => {
+    const s = document.getElementById('rw-status');
+    s.textContent = '✅ 已複製到剪貼簿';
+    s.style.color = 'var(--success-color)';
+    setTimeout(() => { s.textContent = ''; }, 2000);
+  });
+}
+
+function sendRewriteToProGen() {
+  const text = document.getElementById('rw-result').value.trim();
+  if (!text) return;
+  document.getElementById('pro-extra').value = text;
+  document.getElementById('pro-topic').value = text.substring(0, 40) + '...';
+  switchTab('pro');
+  setTimeout(() => {
+    document.getElementById('pro-topic').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    setStatus('pro-save-status', '✅ 改稿結果已帶入！可選 Hook / 骨架後生成三版', 'success');
+    setTimeout(() => setStatus('pro-save-status', '', ''), 5000);
+  }, 300);
+}
 
 </script>
 </body>
