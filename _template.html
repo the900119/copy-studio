@@ -428,14 +428,8 @@
       <div class="step-desc">Hook · 骨架 · 情緒刺點</div>
     </div>
 
-    <div class="step-item" data-tab="rewrite" onclick="switchTab('rewrite')">
-      <div class="step-num">STEP 05</div>
-      <div class="step-row"><span class="step-icon">✍️</span><span class="step-title">改稿 Pro</span></div>
-      <div class="step-desc">貼草稿 + 來源 → 查證改寫</div>
-    </div>
-
     <div class="step-item" data-tab="video" onclick="switchTab('video')">
-      <div class="step-num">STEP 06</div>
+      <div class="step-num">STEP 05</div>
       <div class="step-row"><span class="step-icon">🎬</span><span class="step-title">視頻生成</span></div>
       <div class="step-desc">腳本 + 商品圖 → 影片</div>
     </div>
@@ -482,6 +476,31 @@
               <button class="btn btn-outline btn-sm" onclick="resetPositioning()" style="margin-top:8px">重新定位</button>
               <div class="status-msg" id="pos-save-status"></div>
             </div>
+          </div>
+
+          <!-- 人設快速預覽 -->
+          <div class="card" style="margin-top:20px">
+            <h2>人設快速預覽</h2>
+            <p style="font-size:12px;color:var(--text-muted);margin-bottom:12px">腳本生成時自動帶入以下資料（在故事庫編輯）</p>
+            <div style="margin-bottom:12px">
+              <span class="persona-tag">醫療出身</span>
+              <span class="persona-tag">科技PM</span>
+              <span class="persona-tag">珠寶跨境</span>
+              <span class="persona-tag">台灣視角</span>
+              <span class="persona-tag">西班牙倉</span>
+              <span class="persona-tag">AI管理</span>
+              <span class="persona-tag">同行者</span>
+            </div>
+            <div class="divider"></div>
+            <p style="font-size:11px;color:var(--text-muted);margin-bottom:5px">定位一句話</p>
+            <p style="font-size:13px;color:var(--gold-light);line-height:1.7;margin-bottom:14px" id="pro-positioning-preview">「醫療出身、用 AI 管珠寶跨境的台灣女老闆，帶深圳工廠主從供應鏈優勢跨出去——我就在路上，把親歷的坑和機會第一時間告訴你。」</p>
+            <div class="divider"></div>
+            <p style="font-size:11px;color:var(--text-muted);margin-bottom:5px">核心立場</p>
+            <p style="font-size:13px;color:var(--text);line-height:1.6;margin-bottom:14px">反對限制性信念。資源給願意行動的人，不浪費在藉口上。</p>
+            <div class="divider"></div>
+            <p style="font-size:11px;color:var(--text-muted);margin-bottom:5px">與觀眾關係</p>
+            <p style="font-size:13px;color:var(--text)">同行者——我在路上，把學到的分享給你</p>
+            <button class="btn btn-outline" style="margin-top:16px" onclick="switchTab('story')">編輯故事庫 →</button>
           </div>
 
         </div>
@@ -832,7 +851,7 @@
 
         <!-- ── Step 2：腳本設定 + 人設預覽 ── -->
         <div id="pro-idea-section">
-        <div class="grid-2 mb-16">
+        <div class="mb-16">
 
           <div class="card">
             <h2>腳本設定</h2>
@@ -893,30 +912,6 @@
               </div>
             </div>
             <button class="btn" id="generate-pro-btn" onclick="generatePro()">⚡ 一鍵生成長文 · 小紅書 · 短影音</button>
-          </div>
-
-          <div class="card">
-            <h2>人設快速預覽</h2>
-            <p style="font-size:12px;color:var(--text-muted);margin-bottom:12px">腳本生成時自動帶入以下資料（在故事庫編輯）</p>
-            <div style="margin-bottom:12px">
-              <span class="persona-tag">醫療出身</span>
-              <span class="persona-tag">科技PM</span>
-              <span class="persona-tag">珠寶跨境</span>
-              <span class="persona-tag">台灣視角</span>
-              <span class="persona-tag">西班牙倉</span>
-              <span class="persona-tag">AI管理</span>
-              <span class="persona-tag">同行者</span>
-            </div>
-            <div class="divider"></div>
-            <p style="font-size:11px;color:var(--text-muted);margin-bottom:5px">定位一句話</p>
-            <p style="font-size:13px;color:var(--gold-light);line-height:1.7;margin-bottom:14px" id="pro-positioning-preview">「醫療出身、用 AI 管珠寶跨境的台灣女老闆，帶深圳工廠主從供應鏈優勢跨出去——我就在路上，把親歷的坑和機會第一時間告訴你。」</p>
-            <div class="divider"></div>
-            <p style="font-size:11px;color:var(--text-muted);margin-bottom:5px">核心立場</p>
-            <p style="font-size:13px;color:var(--text);line-height:1.6;margin-bottom:14px">反對限制性信念。資源給願意行動的人，不浪費在藉口上。</p>
-            <div class="divider"></div>
-            <p style="font-size:11px;color:var(--text-muted);margin-bottom:5px">與觀眾關係</p>
-            <p style="font-size:13px;color:var(--text)">同行者——我在路上，把學到的分享給你</p>
-            <button class="btn btn-outline" style="margin-top:16px" onclick="switchTab('story')">編輯故事庫 →</button>
           </div>
 
         </div>
@@ -1005,42 +1000,36 @@
             <div class="status-msg" id="pro-save-status"></div>
           </div>
         </div>
-      </div>
-    </div>
 
-    <!-- ════ STEP 05: 改稿 Pro ════ -->
-    <div class="tab-panel" id="tab-rewrite">
-      <div class="container">
-        <div style="max-width:860px;margin:0 auto">
+        <!-- ════ 改稿 Pro ════ -->
+        <div style="border-top:1px solid var(--border);margin-top:32px;padding-top:28px">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
+            <span style="font-size:20px">✍️</span>
+            <div>
+              <h2 style="margin:0;font-size:16px">改稿 Pro</h2>
+              <p style="font-size:12px;color:var(--text-muted);margin:3px 0 0">貼入草稿 + 來源網址 → 查證事實 + 融合原始資料 → 輸出升級版</p>
+            </div>
+          </div>
 
           <div class="card mb-16">
-            <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
-              <span style="font-size:22px">✍️</span>
-              <div>
-                <h2 style="margin:0">改稿 Pro</h2>
-                <p style="font-size:12px;color:var(--text-muted);margin:2px 0 0">貼入草稿 + 來源文章網址 → 自動查證事實 + 融合原始資料 → 輸出升級版</p>
-              </div>
-            </div>
-
-            <div style="margin-bottom:16px">
+            <div style="margin-bottom:14px">
               <label class="field-label" style="margin-bottom:6px;display:block">你的草稿</label>
-              <textarea id="rw-draft" class="input-field" rows="12"
+              <textarea id="rw-draft" class="input-field" rows="10"
                 placeholder="把你寫好的草稿貼進來。AI 會對照來源文章修正事實、融合關鍵細節，保持你的風格和論點結構。"
-                style="width:100%;resize:vertical;min-height:200px;font-size:13px;line-height:1.7"></textarea>
+                style="width:100%;resize:vertical;min-height:180px;font-size:13px;line-height:1.7"></textarea>
             </div>
 
-            <div style="margin-bottom:16px">
+            <div style="margin-bottom:14px">
               <label class="field-label" style="margin-bottom:6px;display:block">來源文章網址 <span style="color:var(--text-muted);font-weight:400">（選填）</span></label>
               <input id="rw-url" class="input-field" placeholder="https://... 貼入原始文章的網址，AI 會自動抓取並對照查證" style="width:100%;font-size:13px">
-              <p style="font-size:11px;color:var(--text-muted);margin-top:5px">沒有網址也可以直接改稿——AI 會根據自身知識做事實查核</p>
             </div>
 
-            <div style="margin-bottom:20px">
+            <div style="margin-bottom:18px">
               <label class="field-label" style="margin-bottom:6px;display:block">你的身份定位 <span style="color:var(--text-muted);font-weight:400">（選填）</span></label>
               <input id="rw-identity" class="input-field" placeholder="例：用AI做跨境生意的台灣女老闆，第一手觀察科技趨勢" style="width:100%;font-size:13px">
             </div>
 
-            <button class="btn" id="rw-btn" onclick="runRewrite()" style="max-width:280px;font-size:15px;padding:12px 24px">
+            <button class="btn" id="rw-btn" onclick="runRewrite()" style="max-width:220px">
               ✍️ 查證並改稿
             </button>
             <div class="status-msg" id="rw-status" style="margin-top:10px"></div>
@@ -1065,16 +1054,17 @@
                 <h3 style="margin:0;font-size:14px;color:var(--gold)">改稿結果</h3>
                 <span id="rw-wordcount" style="font-size:12px;color:var(--text-muted)"></span>
               </div>
-              <textarea id="rw-result" rows="20" oninput="document.getElementById('rw-wordcount').textContent=this.value.length+' 字'"
-                style="width:100%;font-size:13px;line-height:1.75;resize:vertical;min-height:300px"></textarea>
+              <textarea id="rw-result" rows="16" oninput="document.getElementById('rw-wordcount').textContent=this.value.length+' 字'"
+                style="width:100%;font-size:13px;line-height:1.75;resize:vertical;min-height:260px"></textarea>
               <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
                 <button class="btn btn-outline" style="font-size:12px;padding:7px 16px" onclick="copyRewriteResult()">📋 複製全文</button>
-                <button class="btn btn-outline" style="font-size:12px;padding:7px 16px" onclick="sendRewriteToProGen()">⚡ 送到腳本生成器拆三版</button>
+                <button class="btn btn-outline" style="font-size:12px;padding:7px 16px" onclick="sendRewriteToProGen()">⚡ 帶入腳本生成器</button>
               </div>
             </div>
 
           </div>
         </div>
+
       </div>
     </div>
 
@@ -3069,12 +3059,9 @@ function sendRewriteToProGen() {
   if (!text) return;
   document.getElementById('pro-extra').value = text;
   document.getElementById('pro-topic').value = text.substring(0, 40) + '...';
-  switchTab('pro');
-  setTimeout(() => {
-    document.getElementById('pro-topic').scrollIntoView({ behavior: 'smooth', block: 'center' });
-    setStatus('pro-save-status', '✅ 改稿結果已帶入！可選 Hook / 骨架後生成三版', 'success');
-    setTimeout(() => setStatus('pro-save-status', '', ''), 5000);
-  }, 300);
+  document.getElementById('pro-topic').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  setStatus('pro-save-status', '✅ 改稿結果已帶入！可選 Hook / 骨架後生成三版', 'success');
+  setTimeout(() => setStatus('pro-save-status', '', ''), 5000);
 }
 
 </script>
