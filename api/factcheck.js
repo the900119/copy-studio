@@ -11,40 +11,58 @@ module.exports = async function handler(req, res) {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return res.status(500).json({ error: 'ANTHROPIC_API_KEY not configured' });
 
-  const { text, mode } = req.body || {};
-  if (!text) return res.status(400).json({ error: 'text is required' });
+  const { text, mode, claim, context } = req.body || {};
+  if (!text && !claim) return res.status(400).json({ error: 'text or claim is required' });
 
-  const isContent = mode === 'content';
+  let prompt;
 
-  const prompt = isContent
-    ? `你是一位嚴格的事實查核員。請仔細閱讀以下生成的內容，找出所有「可能有誤或需要核實」的具體聲明。
+  if (mode === 'verify_and_fix') {
+    // Single claim verification + correction
+    prompt = `你是嚴格的事實查核員。請查核以下具體聲明是否正確。
+
+【聲明】${claim}
+${context ? `【上下文】${context}` : ''}
+
+查核規則：
+- 只根據你訓練資料中高可信度的知識回答
+- 如果你不確定或這是近期事件，誠實說「無法確定」，不要猜
+- 如果是個人引言或對話內容（無法查核），回傳 cannot_verify
+
+輸出JSON（不要markdown code block）：
+{
+  "verdict": "correct 或 incorrect 或 cannot_verify",
+  "confidence": "high 或 medium 或 low",
+  "correction": "如果incorrect，給出正確版本的完整替換文字；否則為null",
+  "explanation": "一句話說明（30字以內）"
+}`;
+  } else if (mode === 'content') {
+    // Scan full generated content for issues
+    prompt = `你是嚴格的事實查核員。請仔細閱讀以下內容，找出所有「可能有誤或需要核實」的具體聲明。
 
 重點關注：
 - 具體年份、日期（如「2020年」「去年」「三年前」）
 - 具體數字、統計、百分比
 - 公司名稱、產品名稱、人名
-- 具體事件或新聞（「XX宣布」「XX發生了」）
-- 任何帶有「XX研究顯示」「根據XX」的引用
+- 具體事件（「XX宣布」「XX發生了」）
+- 引用來源（「根據XX研究」）
 
 【內容】
 ${text}
 
 輸出JSON（不要markdown code block）：
-{"sources":[{"claim":"具體聲明原文","status":"uncertain或unknown","search_query":"建議搜尋關鍵詞（英文或中文）","note":"為什麼需要核實"}]}
+{"sources":[{"claim":"從文中抓取的原文片段（10-30字）","status":"uncertain或unknown","search_query":"建議搜尋關鍵詞","note":"為什麼需要核實（20字以內）"}]}
 
-status說明：
-- uncertain = 可能不準確，需要核實
-- unknown = 無法判斷真偽，建議查證
-
-如果內容完全是個人觀點、情緒描述，沒有具體事實聲明，回傳 {"sources":[]}`
-    : `你是一位事實查核員。以下是一個內容創作的選題，請找出這個選題中隱含的「具體可查核事實聲明」，並評估真偽。
+status：uncertain=可能不準確，unknown=無法判斷
+如果內容全是個人觀點無具體事實，回傳 {"sources":[]}`;
+  } else {
+    // Topic pre-check (default)
+    prompt = `你是事實查核員。以下是一個內容創作選題，找出其中「具體可查核的事實聲明」，評估真偽。
 
 選題：${text}
 
-找出其中涉及的具體數字、年份、事件、人物、公司——這些是生成文案時容易出錯的地方。
-
 輸出JSON（不要markdown code block）：
-{"sources":[{"claim":"具體可查核的主張","status":"confirmed或uncertain或unknown","url":"如果你確定有來源的話填（否則留空字串）","title":"來源標題（選填）","search_query":"建議搜尋關鍵詞","note":"補充說明"}]}`;
+{"sources":[{"claim":"具體主張","status":"confirmed或uncertain或unknown","url":"確定有來源則填，否則空字串","title":"來源標題（選填）","search_query":"建議搜尋關鍵詞","note":"補充說明"}]}`;
+  }
 
   try {
     const r = await fetch('https://api.anthropic.com/v1/messages', {
@@ -56,7 +74,7 @@ status說明：
       },
       body: JSON.stringify({
         model: 'claude-haiku-4-5-20251001',
-        max_tokens: 1500,
+        max_tokens: 1000,
         messages: [{ role: 'user', content: prompt }]
       }),
       signal: AbortSignal.timeout(30000)
@@ -76,7 +94,9 @@ status說明：
       const end = raw.lastIndexOf('}');
       result = JSON.parse(raw.substring(start, end + 1));
     } catch {
-      return res.status(200).json({ sources: [] });
+      return res.status(200).json(mode === 'verify_and_fix'
+        ? { verdict: 'cannot_verify', confidence: 'low', correction: null, explanation: '解析失敗' }
+        : { sources: [] });
     }
 
     return res.status(200).json(result);

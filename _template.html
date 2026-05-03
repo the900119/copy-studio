@@ -1309,26 +1309,92 @@ async function autoFactCheckContent(text) {
     });
     const data = await r.json();
     const sources = data.sources || [];
-    if (!sources.length) {
-      panel.style.display = 'none';
-      return;
-    }
+    if (!sources.length) { panel.style.display = 'none'; return; }
     const colorMap = { uncertain: '#f59e0b', unknown: '#94a3b8' };
     const labelMap = { uncertain: '⚠️ 可能有誤', unknown: '？ 建議查證' };
-    content.innerHTML = sources.map(s => {
+    content.innerHTML = sources.map((s, i) => {
       const color = colorMap[s.status] || '#94a3b8';
       const label = labelMap[s.status] || '？';
+      const safeQ = (s.search_query || '').replace(/'/g, "\\'");
       const qBtn  = s.search_query
-        ? `<button onclick="window.open('https://www.google.com/search?q='+encodeURIComponent('${s.search_query.replace(/'/g,"\\'")}'),'_blank')" style="font-size:10px;padding:2px 7px;background:transparent;border:1px solid var(--border);border-radius:4px;color:var(--text-muted);cursor:pointer;margin-left:6px">🔍 查</button>` : '';
-      const note = s.note ? `<span style="color:rgba(148,163,184,0.7);margin-left:4px">（${s.note}）</span>` : '';
-      return `<div style="padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
-        <span style="color:${color};font-size:11px;font-weight:600">${label}</span>
-        <span style="margin-left:6px">${s.claim}</span>${note}${qBtn}
+        ? `<button onclick="window.open('https://www.google.com/search?q='+encodeURIComponent('${safeQ}'),'_blank')" style="font-size:10px;padding:2px 7px;background:transparent;border:1px solid var(--border);border-radius:4px;color:var(--text-muted);cursor:pointer;margin-left:4px">🔍</button>` : '';
+      const note = s.note ? `<span style="color:rgba(148,163,184,0.6);font-size:11px;margin-left:4px">（${s.note}）</span>` : '';
+      const fixBtn = `<button id="fixbtn-${i}" onclick="verifyAndFix(${i},'${s.claim.replace(/'/g,"\\'")}','auto-factcheck-content')" style="font-size:10px;padding:2px 9px;background:rgba(212,168,67,0.1);border:1px solid var(--gold-dim);border-radius:4px;color:var(--gold);cursor:pointer;margin-left:4px">查證並修正</button>`;
+      return `<div id="fcrow-${i}" style="padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05);display:flex;align-items:flex-start;flex-wrap:wrap;gap:2px">
+        <span style="color:${color};font-size:11px;font-weight:600;white-space:nowrap">${label}</span>
+        <span style="margin-left:6px;flex:1">${s.claim}${note}</span>
+        <span style="white-space:nowrap">${qBtn}${fixBtn}</span>
       </div>`;
     }).join('');
+    // store sources for verifyAndFix
+    panel._sources = sources;
     status.textContent = `${sources.length} 項需留意`;
   } catch(e) {
     panel.style.display = 'none';
+  }
+}
+
+async function verifyAndFix(idx, claim, panelContentId) {
+  const btn = document.getElementById(`fixbtn-${idx}`);
+  if (!btn) return;
+  btn.disabled = true;
+  btn.textContent = '查證中⋯';
+
+  // Get context: current long textarea content
+  const textarea = document.getElementById('pro-long') || document.getElementById('pro-xhs');
+  const context  = textarea ? textarea.value.substring(0, 500) : '';
+
+  try {
+    const r = await fetch('/api/factcheck', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ claim, context, mode: 'verify_and_fix' })
+    });
+    const d = await r.json();
+
+    if (d.verdict === 'correct') {
+      btn.textContent = '✅ 正確';
+      btn.style.color = '#4ade80';
+      btn.style.borderColor = '#4ade80';
+      btn.style.background = 'rgba(74,222,128,0.08)';
+      // Strike through the row label
+      const row = document.getElementById(`fcrow-${idx}`);
+      if (row) row.style.opacity = '0.4';
+
+    } else if (d.verdict === 'incorrect' && d.correction) {
+      // Apply fix to all visible textareas
+      ['pro-long','pro-xhs','pro-short','pro-cn-long','pro-cn-xhs','pro-cn-short'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el && el.value.includes(claim)) {
+          el.value = el.value.split(claim).join(d.correction);
+          const cnt = document.getElementById('cnt-' + id.replace('pro-',''));
+          if (cnt) cnt.textContent = el.value.length + ' 字';
+        }
+      });
+      btn.textContent = '✏️ 已修正';
+      btn.style.color = '#4ade80';
+      btn.style.borderColor = '#4ade80';
+      btn.style.background = 'rgba(74,222,128,0.08)';
+      // Update the row to show correction
+      const row = document.getElementById(`fcrow-${idx}`);
+      if (row) {
+        const expl = d.explanation || '';
+        row.innerHTML += `<div style="width:100%;font-size:11px;color:#4ade80;margin-top:3px;padding-left:6px">→ 已改為：「${d.correction}」${expl ? '（'+expl+'）' : ''}</div>`;
+      }
+
+    } else {
+      // cannot_verify
+      btn.textContent = '⚠️ 無法確定';
+      btn.style.color = '#94a3b8';
+      btn.disabled = false;
+      const row = document.getElementById(`fcrow-${idx}`);
+      if (row && d.explanation) {
+        row.innerHTML += `<div style="width:100%;font-size:11px;color:#94a3b8;margin-top:3px;padding-left:6px">${d.explanation}，建議手動查證</div>`;
+      }
+    }
+  } catch(e) {
+    btn.textContent = '失敗';
+    btn.disabled = false;
   }
 }
 
