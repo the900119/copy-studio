@@ -350,8 +350,32 @@ function setSort(by, el) {
   if (cache[ck]) render(cache[ck]);
 }
 
+const RAW_TOKENS = {
+  sys:  'EAAXmIx9iQ8sBRY1j3QRrZAJimNUJZCd7sZAOmnOnZBinmVfzUp8cOzj3Cnfz9nQ5RbVI8vGwqqOAFh3PpqgXYVY0ZAQsLAz5aZBdDzmoH6KkDZAXcZB5U1wkYKViVDUJQNZCSvt85ytBBqWN2g9W8EHBplLgtZB1jQaMi5yZAFznMLZCi0fGW0B7eI05JueMO9v7QwZDZD',
+  life: 'EAAbpW8uJVKYBRVdnuTGm4jvj8ygGxX6Mu9SdJxhXYJtIXejlaNj1IradMrRSXdZBVJxYjHzyZAZCPSZAARIOoLZBpZAXo8CL86OXzb1BFZBtCK1GI0oWZBGmy8naWPZBKCwIJDOuHgvvSFHnMDMxM1Sbv3xGpDwlZCaEN1nv0CiZCcgecSm2qsQ3ZBZC9alDhtWv90gZDZD',
+};
+const PAGE_TOKEN_CACHE = {};
+
+async function getPageToken(pageId, baseTokenKey) {
+  if (PAGE_TOKEN_CACHE[pageId]) return PAGE_TOKEN_CACHE[pageId];
+  const base = RAW_TOKENS[baseTokenKey];
+  const r = await fetch(`https://graph.facebook.com/v25.0/${pageId}?fields=access_token&access_token=${base}`);
+  const d = await r.json();
+  if (d.access_token) { PAGE_TOKEN_CACHE[pageId] = d.access_token; return d.access_token; }
+  return base;
+}
+
+async function resolveToken(token) {
+  if (token === 'sys')    return RAW_TOKENS.sys;
+  if (token === 'life')   return RAW_TOKENS.life;
+  if (token === 'fbpro')  return getPageToken('572262375977582',  'sys');
+  if (token === 'fblife') return getPageToken('733529933726748', 'life');
+}
+
 async function apiFetch(path, token) {
-  const r = await fetch(`/api/meta-proxy?path=${encodeURIComponent(path)}&token=${token}`);
+  const accessToken = await resolveToken(token);
+  const sep = path.includes('?') ? '&' : '?';
+  const r = await fetch(`https://graph.facebook.com${path}${sep}access_token=${accessToken}`);
   const d = await r.json();
   if (d.error && typeof d.error === 'object') throw new Error(d.error.message || JSON.stringify(d.error));
   if (d.error && typeof d.error === 'string') throw new Error(d.error);
