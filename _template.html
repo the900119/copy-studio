@@ -265,39 +265,42 @@
       gap: 16px;
       align-items: start;
     }
+    /* wrap both columns at the same top level */
+    .long-preview-grid > div:first-child {
+      display: flex; flex-direction: column;
+    }
+    .long-preview-grid > div:first-child textarea {
+      flex: 1;
+    }
     .social-preview-pane {
-      background: #f0f2f5;
+      background: #e9ebee;
       border-radius: 10px;
-      padding: 12px;
-      position: sticky;
-      top: 16px;
+      padding: 12px 10px;
       overflow-y: auto;
-      max-height: 80vh;
     }
     .preview-label {
-      font-size: 9px; color: #888; text-transform: uppercase;
+      font-size: 9px; color: #999; text-transform: uppercase;
       letter-spacing: 1.5px; margin-bottom: 8px; text-align: center;
     }
-    /* FB post card */
+    /* FB post card — matches Launchill style */
     .fb-post-card {
       background: #fff;
       border-radius: 8px;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-      padding: 12px 16px 14px;
-      max-width: 506px;
-      margin: 0 auto;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.15), 0 1px 2px rgba(0,0,0,0.1);
+      padding: 12px 16px 16px;
     }
     .fb-post-header {
-      display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+      display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
     }
     .fb-avatar {
       width: 40px; height: 40px; border-radius: 50%;
       background: linear-gradient(135deg,#5C6BC0,#2D3580);
       flex-shrink: 0; display: flex; align-items: center; justify-content: center;
-      color: #fff; font-size: 16px; font-weight: 700;
+      color: #fff; font-size: 15px; font-weight: 700; font-family: 'Noto Serif TC',serif;
     }
-    .fb-name { font-size: 14px; font-weight: 600; color: #050505; line-height: 1.2; }
-    .fb-meta { font-size: 12px; color: #65676b; }
+    .fb-name { font-size: 14px; font-weight: 700; color: #050505; line-height: 1.3; font-family: -apple-system,sans-serif; }
+    .fb-meta { font-size: 12px; color: #65676b; display: flex; align-items: center; gap: 4px; font-family: -apple-system,sans-serif; }
+    .fb-meta-dot { font-size: 8px; color: #bcc0c4; }
     .fb-post-body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
       font-size: 15px;
@@ -308,8 +311,10 @@
       overflow-wrap: break-word;
     }
     .fb-post-body .hashtag { color: #216fdb; }
-    .fb-post-body .see-more { color: #65676b; cursor: pointer; font-size: 14px; }
-    .preview-placeholder { color: #bbb; font-size: 13px; text-align: center; padding: 50px 0; font-family: -apple-system,sans-serif; }
+    .fb-divider { height: 1px; background: #ced0d4; margin: 10px 0; }
+    .fb-actions { display: flex; justify-content: space-around; }
+    .fb-action-btn { font-size: 13px; color: #65676b; font-family: -apple-system,sans-serif; font-weight: 600; display: flex; align-items: center; gap: 5px; padding: 6px 0; }
+    .preview-placeholder { color: #bcc0c4; font-size: 13px; text-align: center; padding: 50px 0; font-family: -apple-system,sans-serif; }
     .source-panel { background: #0a0a0a; border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; margin-bottom: 20px; }
     .source-label { font-size: 10px; color: var(--gold-dim); text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
     .source-body { font-size: 13px; color: var(--text-muted); line-height: 1.8; max-height: 160px; overflow-y: auto; white-space: pre-wrap; word-break: break-all; }
@@ -946,11 +951,21 @@
                       <div class="fb-avatar">餅</div>
                       <div>
                         <div class="fb-name">餅妹跨境商業筆記</div>
-                        <div class="fb-meta">剛剛 · 🌐</div>
+                        <div class="fb-meta">
+                          <span>剛剛</span>
+                          <span class="fb-meta-dot">●</span>
+                          <span>🌐</span>
+                        </div>
                       </div>
                     </div>
                     <div class="fb-post-body" id="social-preview-content">
                       <div class="preview-placeholder">生成長文後<br>這裡即時顯示排版預覽</div>
+                    </div>
+                    <div class="fb-divider"></div>
+                    <div class="fb-actions">
+                      <div class="fb-action-btn">👍 讚</div>
+                      <div class="fb-action-btn">💬 留言</div>
+                      <div class="fb-action-btn">↗️ 分享</div>
                     </div>
                   </div>
                 </div>
