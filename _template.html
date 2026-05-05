@@ -266,34 +266,50 @@
       align-items: start;
     }
     .social-preview-pane {
-      background: #111318;
-      border: 1px solid #1e2235;
+      background: #f0f2f5;
       border-radius: 10px;
-      padding: 14px 16px;
-      min-height: 360px;
+      padding: 12px;
       position: sticky;
       top: 16px;
-    }
-    .preview-platform-bar { display: flex; gap: 6px; margin-bottom: 10px; }
-    .preview-platform-btn {
-      font-size: 11px; padding: 4px 12px; border-radius: 14px;
-      border: 1px solid #2a2d3a; background: transparent;
-      color: #8A9AC4; cursor: pointer; font-family: inherit; transition: all .15s;
-    }
-    .preview-platform-btn.active {
-      background: rgba(92,107,192,0.15);
-      border-color: #5C6BC0; color: #a0aec8;
+      overflow-y: auto;
+      max-height: 80vh;
     }
     .preview-label {
-      font-size: 9px; color: #3A4580; text-transform: uppercase;
-      letter-spacing: 1.5px; margin-bottom: 10px;
+      font-size: 9px; color: #888; text-transform: uppercase;
+      letter-spacing: 1.5px; margin-bottom: 8px; text-align: center;
     }
-    .preview-body {
-      font-size: 13px; line-height: 1.9; color: #C8CFDF;
-      white-space: pre-wrap; word-break: break-word;
+    /* FB post card */
+    .fb-post-card {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+      padding: 12px 16px 14px;
+      max-width: 506px;
+      margin: 0 auto;
     }
-    .preview-body .hashtag { color: #5C6BC0; }
-    .preview-placeholder { color: #2d3250; font-size: 12px; text-align: center; padding: 60px 0; }
+    .fb-post-header {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+    }
+    .fb-avatar {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: linear-gradient(135deg,#5C6BC0,#2D3580);
+      flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 16px; font-weight: 700;
+    }
+    .fb-name { font-size: 14px; font-weight: 600; color: #050505; line-height: 1.2; }
+    .fb-meta { font-size: 12px; color: #65676b; }
+    .fb-post-body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      font-size: 15px;
+      line-height: 1.47;
+      color: #050505;
+      white-space: pre-wrap;
+      word-break: break-word;
+      overflow-wrap: break-word;
+    }
+    .fb-post-body .hashtag { color: #216fdb; }
+    .fb-post-body .see-more { color: #65676b; cursor: pointer; font-size: 14px; }
+    .preview-placeholder { color: #bbb; font-size: 13px; text-align: center; padding: 50px 0; font-family: -apple-system,sans-serif; }
     .source-panel { background: #0a0a0a; border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; margin-bottom: 20px; }
     .source-label { font-size: 10px; color: var(--gold-dim); text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
     .source-body { font-size: 13px; color: var(--text-muted); line-height: 1.8; max-height: 160px; overflow-y: auto; white-space: pre-wrap; word-break: break-all; }
@@ -922,15 +938,20 @@
                     </div>
                   </div>
                 </div>
-                <!-- 右：即時排版預覽 -->
+                <!-- 右：FB 排版預覽 -->
                 <div class="social-preview-pane">
-                  <div class="preview-platform-bar">
-                    <button class="preview-platform-btn active" onclick="setPreviewPlatform('fb',this)">📘 FB</button>
-                    <button class="preview-platform-btn" onclick="setPreviewPlatform('threads',this)">🧵 Threads</button>
-                  </div>
-                  <div class="preview-label" id="preview-platform-label">Facebook 排版預覽</div>
-                  <div class="preview-body" id="social-preview-content">
-                    <div class="preview-placeholder">生成長文後<br>這裡即時顯示排版預覽</div>
+                  <div class="preview-label">Facebook 排版預覽</div>
+                  <div class="fb-post-card">
+                    <div class="fb-post-header">
+                      <div class="fb-avatar">餅</div>
+                      <div>
+                        <div class="fb-name">餅妹跨境商業筆記</div>
+                        <div class="fb-meta">剛剛 · 🌐</div>
+                      </div>
+                    </div>
+                    <div class="fb-post-body" id="social-preview-content">
+                      <div class="preview-placeholder">生成長文後<br>這裡即時顯示排版預覽</div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -2938,16 +2959,6 @@ function updateSocialPreview() {
   const escaped = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   const rendered = escaped.replace(/(#[一-龥\w]+)/g,'<span class="hashtag">$1</span>');
   el.innerHTML = rendered;
-}
-
-let _previewPlatform = 'fb';
-function setPreviewPlatform(platform, btn) {
-  _previewPlatform = platform;
-  document.querySelectorAll('.preview-platform-btn').forEach(b => b.classList.remove('active'));
-  if (btn) btn.classList.add('active');
-  const label = document.getElementById('preview-platform-label');
-  if (label) label.textContent = platform === 'fb' ? 'Facebook 排版預覽' : 'Threads 排版預覽';
-  updateSocialPreview();
 }
 
 function sendLongToRewrite() {
