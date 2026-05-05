@@ -263,14 +263,17 @@
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 16px;
-      align-items: start;
+      align-items: stretch;
     }
-    /* wrap both columns at the same top level */
     .long-preview-grid > div:first-child {
-      display: flex; flex-direction: column;
+      display: flex;
+      flex-direction: column;
     }
     .long-preview-grid > div:first-child textarea {
       flex: 1;
+      min-height: 420px;
+      resize: none;
+      overflow: hidden;
     }
     .social-preview-pane {
       background: #e9ebee;
@@ -933,7 +936,7 @@
                       <button class="btn btn-sm btn-outline" style="margin:0" onclick="saveOneDraft('long')">📤 存飛書</button>
                     </div>
                   </div>
-                  <textarea id="pro-long" rows="20" oninput="updateCount(this,'cnt-long');updateSocialPreview()" style="width:100%"></textarea>
+                  <textarea id="pro-long" rows="20" oninput="autoExpand(this);updateCount(this,'cnt-long');updateSocialPreview()" style="width:100%"></textarea>
                   <div class="char-count" id="cnt-long" style="margin-top:6px">0 字</div>
                 </div>
                 <!-- 右：FB 排版預覽 -->
@@ -2053,6 +2056,8 @@ function renderProDrafts(data) {
   switchOutTab('long', document.querySelector('#out-tab-bar .out-tab'));
   document.getElementById('pro-output').style.display = 'block';
   document.getElementById('pro-output').scrollIntoView({ behavior: 'smooth' });
+  const longEl2 = document.getElementById('pro-long');
+  if (longEl2) autoExpand(longEl2);
   updateSocialPreview();
   // Auto fact-check generated content
   document.getElementById('auto-factcheck-panel').style.display = 'none';
@@ -2077,6 +2082,8 @@ function renderProDraftsDual(twData, cnData) {
   switchOutTab('long', null);
   document.getElementById('pro-output').style.display = 'block';
   document.getElementById('pro-output').scrollIntoView({ behavior: 'smooth' });
+  const longEl3 = document.getElementById('pro-long');
+  if (longEl3) autoExpand(longEl3);
   updateSocialPreview();
 }
 
@@ -2954,6 +2961,11 @@ function sendRewriteToProGen() {
   document.getElementById('pro-topic').scrollIntoView({ behavior: 'smooth', block: 'center' });
   setStatus('pro-save-status', '✅ 改稿結果已帶入！可選 Hook / 骨架後生成三版', 'success');
   setTimeout(() => setStatus('pro-save-status', '', ''), 5000);
+}
+
+function autoExpand(el) {
+  el.style.height = 'auto';
+  el.style.height = el.scrollHeight + 'px';
 }
 
 function updateSocialPreview() {
