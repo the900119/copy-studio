@@ -251,6 +251,49 @@
     .out-tab.active { border-color: var(--gold); color: var(--gold); background: rgba(212,168,67,0.08); font-weight: 600; }
     .out-pane { display: none; }
     .out-pane.active { display: block; }
+
+    /* ── Pro Tab Two-Column Layout ── */
+    .pro-top-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+    .long-preview-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+    .social-preview-pane {
+      background: #111318;
+      border: 1px solid #1e2235;
+      border-radius: 10px;
+      padding: 14px 16px;
+      min-height: 360px;
+      position: sticky;
+      top: 16px;
+    }
+    .preview-platform-bar { display: flex; gap: 6px; margin-bottom: 10px; }
+    .preview-platform-btn {
+      font-size: 11px; padding: 4px 12px; border-radius: 14px;
+      border: 1px solid #2a2d3a; background: transparent;
+      color: #8A9AC4; cursor: pointer; font-family: inherit; transition: all .15s;
+    }
+    .preview-platform-btn.active {
+      background: rgba(92,107,192,0.15);
+      border-color: #5C6BC0; color: #a0aec8;
+    }
+    .preview-label {
+      font-size: 9px; color: #3A4580; text-transform: uppercase;
+      letter-spacing: 1.5px; margin-bottom: 10px;
+    }
+    .preview-body {
+      font-size: 13px; line-height: 1.9; color: #C8CFDF;
+      white-space: pre-wrap; word-break: break-word;
+    }
+    .preview-body .hashtag { color: #5C6BC0; }
+    .preview-placeholder { color: #2d3250; font-size: 12px; text-align: center; padding: 60px 0; }
     .source-panel { background: #0a0a0a; border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; margin-bottom: 20px; }
     .source-label { font-size: 10px; color: var(--gold-dim); text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
     .source-body { font-size: 13px; color: var(--text-muted); line-height: 1.8; max-height: 160px; overflow-y: auto; white-space: pre-wrap; word-break: break-all; }
@@ -309,7 +352,7 @@
       .step-num { font-size: 8px; opacity: 1; }
       .step-title { font-size: 11px; opacity: 1; }
       .main-content { margin-left: 0; }
-      .grid-2, .grid-3, .selector-row { grid-template-columns: 1fr; }
+      .grid-2, .grid-3, .selector-row, .pro-top-grid, .long-preview-grid { grid-template-columns: 1fr; }
       .container { padding: 14px; }
     }
 
@@ -695,7 +738,11 @@
           </div>
         </div>
 
-        <!-- ── Step 2：腳本設定 + 人設預覽 ── -->
+        <!-- ── Top Grid: 腳本設定 | 改稿 Pro ── -->
+        <div class="pro-top-grid">
+
+        <!-- ── Left: 腳本設定 ── -->
+        <div>
         <div id="pro-idea-section">
         <div class="mb-16">
 
@@ -768,9 +815,77 @@
           <div class="spinner"></div>
           <p class="loading-msg">正在生成三版腳本（長文 · 小紅書 · 短影音，約 40–60 秒）...</p>
         </div>
+        </div><!-- /pro-grid-left -->
+
+        <!-- ── Right: 改稿 Pro ── -->
+        <div class="pro-grid-right">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+            <span style="font-size:18px">✍️</span>
+            <div>
+              <h2 style="margin:0;font-size:15px;font-weight:600;color:var(--gold-light);font-family:'Noto Serif TC',serif">改稿 Pro</h2>
+              <p style="font-size:12px;color:var(--text-muted);margin:3px 0 0">貼入草稿 + 來源網址 → 查證事實 + 融合原始資料 → 輸出升級版</p>
+            </div>
+          </div>
+
+          <div class="card mb-16">
+            <div style="margin-bottom:14px">
+              <label class="field-label" style="margin-bottom:6px;display:block">你的草稿</label>
+              <textarea id="rw-draft" class="input-field" rows="8"
+                placeholder="把你寫好的草稿貼進來，或從長文輸出區點「✍️ 送改稿 Pro」自動帶入。"
+                style="width:100%;resize:vertical;min-height:140px;font-size:13px;line-height:1.7"></textarea>
+            </div>
+
+            <div style="margin-bottom:14px">
+              <label class="field-label" style="margin-bottom:6px;display:block">來源文章網址 <span style="color:var(--text-muted);font-weight:400">（選填）</span></label>
+              <input id="rw-url" class="input-field" placeholder="https://... AI 會自動抓取並對照查證" style="width:100%;font-size:13px">
+            </div>
+
+            <div style="margin-bottom:18px">
+              <label class="field-label" style="margin-bottom:6px;display:block">你的身份定位 <span style="color:var(--text-muted);font-weight:400">（選填）</span></label>
+              <input id="rw-identity" class="input-field" placeholder="例：用AI做跨境生意的台灣女老闆，第一手觀察科技趨勢" style="width:100%;font-size:13px">
+            </div>
+
+            <button class="btn" id="rw-btn" onclick="runRewrite()" style="max-width:200px">
+              ✍️ 查證並改稿
+            </button>
+            <div class="status-msg" id="rw-status" style="margin-top:10px"></div>
+          </div>
+
+          <!-- 輸出區 -->
+          <div id="rw-output" style="display:none">
+
+            <!-- 修正清單 -->
+            <div id="rw-corrections-panel" style="display:none;background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.3);border-radius:10px;padding:14px 16px;margin-bottom:16px">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+                <span style="font-size:14px">🔧</span>
+                <span style="font-size:13px;font-weight:600;color:#f59e0b">已修正的事實</span>
+              </div>
+              <div id="rw-corrections-list" style="font-size:12px;line-height:1.9"></div>
+              <div id="rw-insights" style="font-size:12px;color:var(--gold-dim);margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.06)"></div>
+            </div>
+
+            <!-- 改稿結果 -->
+            <div class="card">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+                <h3 style="margin:0;font-size:14px;color:var(--gold)">改稿結果</h3>
+                <span id="rw-wordcount" style="font-size:12px;color:var(--text-muted)"></span>
+              </div>
+              <textarea id="rw-result" rows="14" oninput="document.getElementById('rw-wordcount').textContent=this.value.length+' 字'"
+                style="width:100%;font-size:13px;line-height:1.75;resize:vertical;min-height:220px"></textarea>
+              <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+                <button class="btn btn-outline" style="font-size:12px;padding:7px 14px" onclick="sendRewriteToLong()">⬅️ 帶回長文編輯</button>
+                <button class="btn btn-outline" style="font-size:12px;padding:7px 14px" onclick="copyRewriteResult()">📋 複製全文</button>
+                <button class="btn btn-outline" style="font-size:12px;padding:7px 14px" onclick="sendRewriteToProGen()">⚡ 帶入腳本生成器</button>
+              </div>
+            </div>
+
+          </div>
+        </div><!-- /pro-grid-right -->
+
+        </div><!-- /pro-top-grid -->
 
         <!-- ── Step 3：輸出（全寬 tabs） ── -->
-        <div class="pro-output" id="pro-output">
+        <div class="pro-output" id="pro-output" style="margin-top:20px">
           <div class="card">
             <div class="out-tab-bar" id="out-tab-bar">
               <button class="out-tab active" onclick="switchOutTab('long',this)">📝 長文</button>
@@ -795,10 +910,29 @@
             </div>
 
             <div id="out-long" class="out-pane active">
-              <textarea id="pro-long" rows="16" oninput="updateCount(this,'cnt-long')" style="width:100%"></textarea>
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
-                <div class="char-count" id="cnt-long">0 字</div>
-                <button class="btn btn-sm btn-outline" style="margin:0" onclick="saveOneDraft('long')">📤 存這版到飛書</button>
+              <div class="long-preview-grid">
+                <!-- 左：可編輯長文 -->
+                <div>
+                  <textarea id="pro-long" rows="20" oninput="updateCount(this,'cnt-long');updateSocialPreview()" style="width:100%"></textarea>
+                  <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;flex-wrap:wrap;gap:8px">
+                    <div class="char-count" id="cnt-long">0 字</div>
+                    <div style="display:flex;gap:8px;align-items:center">
+                      <button class="btn btn-sm btn-outline" style="margin:0;font-size:11px;padding:5px 10px" onclick="sendLongToRewrite()">✍️ 送改稿 Pro</button>
+                      <button class="btn btn-sm btn-outline" style="margin:0" onclick="saveOneDraft('long')">📤 存飛書</button>
+                    </div>
+                  </div>
+                </div>
+                <!-- 右：即時排版預覽 -->
+                <div class="social-preview-pane">
+                  <div class="preview-platform-bar">
+                    <button class="preview-platform-btn active" onclick="setPreviewPlatform('fb',this)">📘 FB</button>
+                    <button class="preview-platform-btn" onclick="setPreviewPlatform('threads',this)">🧵 Threads</button>
+                  </div>
+                  <div class="preview-label" id="preview-platform-label">Facebook 排版預覽</div>
+                  <div class="preview-body" id="social-preview-content">
+                    <div class="preview-placeholder">生成長文後<br>這裡即時顯示排版預覽</div>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -847,69 +981,6 @@
           </div>
         </div>
 
-        <!-- ════ 改稿 Pro ════ -->
-        <div style="border-top:1px solid var(--border);margin-top:32px;padding-top:28px">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
-            <span style="font-size:20px">✍️</span>
-            <div>
-              <h2 style="margin:0;font-size:16px">改稿 Pro</h2>
-              <p style="font-size:12px;color:var(--text-muted);margin:3px 0 0">貼入草稿 + 來源網址 → 查證事實 + 融合原始資料 → 輸出升級版</p>
-            </div>
-          </div>
-
-          <div class="card mb-16">
-            <div style="margin-bottom:14px">
-              <label class="field-label" style="margin-bottom:6px;display:block">你的草稿</label>
-              <textarea id="rw-draft" class="input-field" rows="10"
-                placeholder="把你寫好的草稿貼進來。AI 會對照來源文章修正事實、融合關鍵細節，保持你的風格和論點結構。"
-                style="width:100%;resize:vertical;min-height:180px;font-size:13px;line-height:1.7"></textarea>
-            </div>
-
-            <div style="margin-bottom:14px">
-              <label class="field-label" style="margin-bottom:6px;display:block">來源文章網址 <span style="color:var(--text-muted);font-weight:400">（選填）</span></label>
-              <input id="rw-url" class="input-field" placeholder="https://... 貼入原始文章的網址，AI 會自動抓取並對照查證" style="width:100%;font-size:13px">
-            </div>
-
-            <div style="margin-bottom:18px">
-              <label class="field-label" style="margin-bottom:6px;display:block">你的身份定位 <span style="color:var(--text-muted);font-weight:400">（選填）</span></label>
-              <input id="rw-identity" class="input-field" placeholder="例：用AI做跨境生意的台灣女老闆，第一手觀察科技趨勢" style="width:100%;font-size:13px">
-            </div>
-
-            <button class="btn" id="rw-btn" onclick="runRewrite()" style="max-width:220px">
-              ✍️ 查證並改稿
-            </button>
-            <div class="status-msg" id="rw-status" style="margin-top:10px"></div>
-          </div>
-
-          <!-- 輸出區 -->
-          <div id="rw-output" style="display:none">
-
-            <!-- 修正清單 -->
-            <div id="rw-corrections-panel" style="display:none;background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.3);border-radius:10px;padding:14px 16px;margin-bottom:16px">
-              <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
-                <span style="font-size:14px">🔧</span>
-                <span style="font-size:13px;font-weight:600;color:#f59e0b">已修正的事實</span>
-              </div>
-              <div id="rw-corrections-list" style="font-size:12px;line-height:1.9"></div>
-              <div id="rw-insights" style="font-size:12px;color:var(--gold-dim);margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.06)"></div>
-            </div>
-
-            <!-- 改稿結果 -->
-            <div class="card">
-              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-                <h3 style="margin:0;font-size:14px;color:var(--gold)">改稿結果</h3>
-                <span id="rw-wordcount" style="font-size:12px;color:var(--text-muted)"></span>
-              </div>
-              <textarea id="rw-result" rows="16" oninput="document.getElementById('rw-wordcount').textContent=this.value.length+' 字'"
-                style="width:100%;font-size:13px;line-height:1.75;resize:vertical;min-height:260px"></textarea>
-              <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
-                <button class="btn btn-outline" style="font-size:12px;padding:7px 16px" onclick="copyRewriteResult()">📋 複製全文</button>
-                <button class="btn btn-outline" style="font-size:12px;padding:7px 16px" onclick="sendRewriteToProGen()">⚡ 帶入腳本生成器</button>
-              </div>
-            </div>
-
-          </div>
-        </div>
 
       </div>
     </div>
@@ -1953,6 +2024,7 @@ function renderProDrafts(data) {
   switchOutTab('long', document.querySelector('#out-tab-bar .out-tab'));
   document.getElementById('pro-output').style.display = 'block';
   document.getElementById('pro-output').scrollIntoView({ behavior: 'smooth' });
+  updateSocialPreview();
   // Auto fact-check generated content
   document.getElementById('auto-factcheck-panel').style.display = 'none';
   autoFactCheckContent(long);
@@ -1976,6 +2048,7 @@ function renderProDraftsDual(twData, cnData) {
   switchOutTab('long', null);
   document.getElementById('pro-output').style.display = 'block';
   document.getElementById('pro-output').scrollIntoView({ behavior: 'smooth' });
+  updateSocialPreview();
 }
 
 function updateOutTabBar(mode) {
@@ -2852,6 +2925,53 @@ function sendRewriteToProGen() {
   document.getElementById('pro-topic').scrollIntoView({ behavior: 'smooth', block: 'center' });
   setStatus('pro-save-status', '✅ 改稿結果已帶入！可選 Hook / 骨架後生成三版', 'success');
   setTimeout(() => setStatus('pro-save-status', '', ''), 5000);
+}
+
+function updateSocialPreview() {
+  const text = document.getElementById('pro-long').value;
+  const el = document.getElementById('social-preview-content');
+  if (!el) return;
+  if (!text.trim()) {
+    el.innerHTML = '<div class="preview-placeholder">生成長文後<br>這裡即時顯示排版預覽</div>';
+    return;
+  }
+  const escaped = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const rendered = escaped.replace(/(#[一-龥\w]+)/g,'<span class="hashtag">$1</span>');
+  el.innerHTML = rendered;
+}
+
+let _previewPlatform = 'fb';
+function setPreviewPlatform(platform, btn) {
+  _previewPlatform = platform;
+  document.querySelectorAll('.preview-platform-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  const label = document.getElementById('preview-platform-label');
+  if (label) label.textContent = platform === 'fb' ? 'Facebook 排版預覽' : 'Threads 排版預覽';
+  updateSocialPreview();
+}
+
+function sendLongToRewrite() {
+  const text = document.getElementById('pro-long').value.trim();
+  if (!text) return;
+  document.getElementById('rw-draft').value = text;
+  const rw = document.querySelector('.pro-grid-right');
+  if (rw) rw.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  setStatus('pro-save-status', '✅ 已帶入右側改稿 Pro', 'success');
+  setTimeout(() => setStatus('pro-save-status', '', ''), 4000);
+}
+
+function sendRewriteToLong() {
+  const text = document.getElementById('rw-result').value.trim();
+  if (!text) return;
+  const longEl = document.getElementById('pro-long');
+  longEl.value = text;
+  updateCount(longEl, 'cnt-long');
+  updateSocialPreview();
+  const firstLongTab = document.querySelector('#out-tab-bar .out-tab');
+  if (firstLongTab) switchOutTab('long', firstLongTab);
+  document.getElementById('pro-output').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  setStatus('rw-status', '✅ 已帶回長文編輯區', 'success');
+  setTimeout(() => setStatus('rw-status', '', ''), 3000);
 }
 
 </script>
