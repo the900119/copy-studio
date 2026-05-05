@@ -17,6 +17,7 @@
     "api/factcheck.js": { "maxDuration": 30 },
     "api/rewrite.js": { "maxDuration": 90 },
     "api/index.js": { "maxDuration": 10 },
-    "api/meta-proxy.js": { "maxDuration": 30 }
+    "api/meta-proxy.js": { "maxDuration": 30 },
+    "api/feishu-tag.js": { "maxDuration": 10 }
   }
 }

@@ -2145,6 +2145,10 @@ async function saveOneDraft(format) {
         xhs_copy: baseFormat==='xhs' ? content : '',
         video_script: baseFormat==='short' ? content : '',
         format: baseFormat }) });
+    if (baseFormat === 'xhs' && usedRecordId) {
+      fetch('/api/feishu-tag', { method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ record_id: usedRecordId, tag: '已製作' }) }).catch(() => {});
+    }
     if (btn) { btn.textContent = '✅ 已存入！'; btn.style.color = '#2ecc71'; btn.style.borderColor = '#2ecc71'; }
     setTimeout(() => { if (btn) { btn.textContent = '📤 存這版到飛書'; btn.disabled = false; btn.style.color = ''; btn.style.borderColor = ''; } }, 2500);
   } catch(e) {
@@ -2170,6 +2174,8 @@ async function confirmProSave() {
         fetch(WH_CONFIRM, { method:'POST', headers:{'Content-Type':'application/json'},
           body: JSON.stringify({ record_id: proCnRecordId, title: `[中] ${title}`, threads_copy: cnLong, xhs_copy: cnXhs, video_script: cnShort }) })
       ]);
+      if (xhs   && proRecordId)   fetch('/api/feishu-tag', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ record_id: proRecordId,   tag: '已製作' }) }).catch(() => {});
+      if (cnXhs && proCnRecordId) fetch('/api/feishu-tag', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ record_id: proCnRecordId, tag: '已製作' }) }).catch(() => {});
       setStatus('pro-save-status', '✅ 台灣版 + 中國版共 6 篇已存入語料庫！', 'success');
     } catch(e) { setStatus('pro-save-status', '❌ 失敗：' + e.message, 'error'); }
     return;
@@ -2178,6 +2184,7 @@ async function confirmProSave() {
   try {
     await fetch(WH_CONFIRM, { method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ record_id: proRecordId, title: regionPrefix + title, threads_copy: long, xhs_copy: xhs, video_script: short }) });
+    if (xhs && proRecordId) fetch('/api/feishu-tag', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ record_id: proRecordId, tag: '已製作' }) }).catch(() => {});
     setStatus('pro-save-status', '✅ 已全部三版存入語料庫！', 'success');
   } catch(e) { setStatus('pro-save-status', '❌ 失敗：' + e.message, 'error'); }
 }
