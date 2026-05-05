@@ -1,7 +1,8 @@
 {
   "rewrites": [
     { "source": "/", "destination": "/api/index" },
-    { "source": "/index.html", "destination": "/api/index" }
+    { "source": "/index.html", "destination": "/api/index" },
+    { "source": "/analytics", "destination": "/analytics.html" }
   ],
   "headers": [
     {
@@ -15,6 +16,7 @@
     "api/carousel.js": { "maxDuration": 120 },
     "api/factcheck.js": { "maxDuration": 30 },
     "api/rewrite.js": { "maxDuration": 90 },
-    "api/index.js": { "maxDuration": 10 }
+    "api/index.js": { "maxDuration": 10 },
+    "api/meta-proxy.js": { "maxDuration": 30 }
   }
 }
