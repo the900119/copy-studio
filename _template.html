@@ -765,7 +765,6 @@
         <!-- ── Left: 腳本設定 ── -->
         <div>
         <div id="pro-idea-section">
-        <div class="mb-16">
 
           <div class="card">
             <h2>腳本設定</h2>
@@ -828,7 +827,6 @@
             <button class="btn" id="generate-pro-btn" onclick="generatePro()">⚡ 一鍵生成長文 · 小紅書 · 短影音</button>
           </div>
 
-        </div>
         </div><!-- /pro-idea-section -->
 
         <!-- ── Loading ── -->
@@ -840,35 +838,29 @@
 
         <!-- ── Right: 改稿 Pro ── -->
         <div class="pro-grid-right">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
-            <span style="font-size:18px">✍️</span>
-            <div>
-              <h2 style="margin:0;font-size:15px;font-weight:600;color:var(--gold-light);font-family:'Noto Serif TC',serif">改稿 Pro</h2>
-              <p style="font-size:12px;color:var(--text-muted);margin:3px 0 0">貼入草稿 + 來源網址 → 查證事實 + 融合原始資料 → 輸出升級版</p>
-            </div>
-          </div>
 
           <div class="card mb-16">
-            <div style="margin-bottom:14px">
-              <label class="field-label" style="margin-bottom:6px;display:block">你的草稿</label>
-              <textarea id="rw-draft" class="input-field" rows="8"
+            <h2>✍️ 改稿 Pro</h2>
+            <p style="font-size:12px;color:var(--text-muted);margin:-8px 0 14px">貼入草稿 + 來源網址 → 查證事實 + 融合原始資料 → 輸出升級版</p>
+
+            <div style="margin-bottom:12px">
+              <label class="field-label">你的草稿</label>
+              <textarea id="rw-draft" rows="8"
                 placeholder="把你寫好的草稿貼進來，或從長文輸出區點「✍️ 送改稿 Pro」自動帶入。"
-                style="width:100%;resize:vertical;min-height:140px;font-size:13px;line-height:1.7"></textarea>
+                style="resize:vertical;min-height:140px;font-size:13px;line-height:1.7"></textarea>
             </div>
 
-            <div style="margin-bottom:14px">
-              <label class="field-label" style="margin-bottom:6px;display:block">來源文章網址 <span style="color:var(--text-muted);font-weight:400">（選填）</span></label>
-              <input id="rw-url" class="input-field" placeholder="https://... AI 會自動抓取並對照查證" style="width:100%;font-size:13px">
+            <div style="margin-bottom:12px">
+              <label class="field-label">來源文章網址 <span style="color:var(--text-muted);font-weight:400;text-transform:none">（選填）</span></label>
+              <input id="rw-url" placeholder="https://... AI 會自動抓取並對照查證">
             </div>
 
-            <div style="margin-bottom:18px">
-              <label class="field-label" style="margin-bottom:6px;display:block">你的身份定位 <span style="color:var(--text-muted);font-weight:400">（選填）</span></label>
-              <input id="rw-identity" class="input-field" placeholder="例：用AI做跨境生意的台灣女老闆，第一手觀察科技趨勢" style="width:100%;font-size:13px">
+            <div style="margin-bottom:16px">
+              <label class="field-label">你的身份定位 <span style="color:var(--text-muted);font-weight:400;text-transform:none">（選填）</span></label>
+              <input id="rw-identity" placeholder="例：用AI做跨境生意的台灣女老闆，第一手觀察科技趨勢">
             </div>
 
-            <button class="btn" id="rw-btn" onclick="runRewrite()" style="max-width:200px">
-              ✍️ 查證並改稿
-            </button>
+            <button class="btn" id="rw-btn" onclick="runRewrite()">✍️ 查證並改稿</button>
             <div class="status-msg" id="rw-status" style="margin-top:10px"></div>
           </div>
 
@@ -934,14 +926,15 @@
               <div class="long-preview-grid">
                 <!-- 左：可編輯長文 -->
                 <div>
-                  <textarea id="pro-long" rows="20" oninput="updateCount(this,'cnt-long');updateSocialPreview()" style="width:100%"></textarea>
-                  <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;flex-wrap:wrap;gap:8px">
-                    <div class="char-count" id="cnt-long">0 字</div>
+                  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+                    <span style="font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1.5px">長文編輯</span>
                     <div style="display:flex;gap:8px;align-items:center">
                       <button class="btn btn-sm btn-outline" style="margin:0;font-size:11px;padding:5px 10px" onclick="sendLongToRewrite()">✍️ 送改稿 Pro</button>
                       <button class="btn btn-sm btn-outline" style="margin:0" onclick="saveOneDraft('long')">📤 存飛書</button>
                     </div>
                   </div>
+                  <textarea id="pro-long" rows="20" oninput="updateCount(this,'cnt-long');updateSocialPreview()" style="width:100%"></textarea>
+                  <div class="char-count" id="cnt-long" style="margin-top:6px">0 字</div>
                 </div>
                 <!-- 右：FB 排版預覽 -->
                 <div class="social-preview-pane">
