@@ -5,22 +5,23 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>社群數據看板</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Serif+TC:wght@700;900&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg:      #0D1020;
-  --surface: #141626;
-  --surf2:   #1A1E36;
-  --border:  #252A4A;
-  --accent:  #5C6BC0;
-  --adim:    rgba(92,107,192,0.15);
-  --aborder: rgba(92,107,192,0.35);
-  --white:   #F8F9FA;
-  --text:    #E4E8F5;
-  --muted:   #8A9AC4;
+  --bg:       #0D0D0D;
+  --bg-card:  #1A1A1A;
+  --bg-hero:  #141414;
+  --border:   #2A2A2A;
+  --border-g: rgba(212,168,67,0.25);
+  --gold:     #D4A843;
+  --gold-l:   #E8C97E;
+  --gold-dim: #7A5C1A;
+  --gold-bg:  rgba(212,168,67,0.07);
+  --white:    #F0EEE8;
+  --text:     #CCCCCC;
+  --muted:    #606060;
 }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
 body {
   background: var(--bg);
   color: var(--text);
@@ -31,7 +32,7 @@ body {
 
 /* ── Top bar ── */
 .topbar {
-  background: var(--surface);
+  background: #080808;
   border-bottom: 1px solid var(--border);
   height: 52px;
   display: flex;
@@ -51,12 +52,13 @@ body {
   gap: 4px;
   transition: color 0.15s;
 }
-.topbar-back:hover { color: var(--accent); }
+.topbar-back:hover { color: var(--gold); }
 .topbar-title {
   font-size: 14px;
-  font-weight: 600;
-  color: var(--white);
-  letter-spacing: 0.04em;
+  font-weight: 700;
+  color: var(--gold);
+  font-family: 'Noto Serif TC', serif;
+  letter-spacing: 0.05em;
 }
 .topbar-spacer { flex: 1; }
 .month-nav { display: flex; align-items: center; gap: 8px; }
@@ -71,7 +73,7 @@ body {
   line-height: 1;
   transition: all 0.15s;
 }
-.month-btn:hover { border-color: var(--accent); color: var(--accent); }
+.month-btn:hover { border-color: var(--gold-dim); color: var(--gold); }
 .month-label {
   font-size: 13px;
   font-weight: 500;
@@ -83,9 +85,9 @@ body {
 /* ── Account tabs ── */
 .acc-tabs {
   display: flex;
-  gap: 2px;
+  gap: 0;
   padding: 0 24px;
-  background: var(--surface);
+  background: #080808;
   border-bottom: 1px solid var(--border);
   overflow-x: auto;
 }
@@ -107,18 +109,18 @@ body {
   gap: 6px;
 }
 .acc-tab:hover { color: var(--text); }
-.acc-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+.acc-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
 .pb { font-size: 10px; padding: 1px 5px; border-radius: 3px; font-weight: 700; }
-.pb-fb { background: rgba(24,119,242,0.18); color: #5aaeff; }
-.pb-ig { background: rgba(192,80,130,0.18); color: #e06aa0; }
+.pb-fb { background: rgba(24,119,242,0.15); color: #5aaeff; }
+.pb-ig { background: rgba(192,80,130,0.15); color: #e06aa0; }
 
 /* ── Main ── */
-.main { padding: 24px; max-width: 1100px; margin: 0 auto; }
+.main { padding: 20px 24px; max-width: 960px; margin: 0 auto; }
 
-/* Summary */
+/* Summary row */
 .summary-row { display: flex; gap: 10px; margin-bottom: 20px; }
 .summary-card {
-  background: var(--surface);
+  background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: 10px;
   padding: 14px 20px;
@@ -126,7 +128,7 @@ body {
   text-align: center;
 }
 .summary-val { font-size: 22px; font-weight: 700; color: var(--white); }
-.summary-lbl { font-size: 10px; color: var(--muted); margin-top: 3px; letter-spacing: 0.04em; }
+.summary-lbl { font-size: 10px; color: var(--muted); margin-top: 3px; }
 
 /* Sort bar */
 .sort-bar { display: flex; align-items: center; gap: 6px; margin-bottom: 14px; }
@@ -142,126 +144,153 @@ body {
   font-family: inherit;
   transition: all 0.15s;
 }
-.sort-btn:hover { border-color: var(--aborder); color: var(--text); }
-.sort-btn.active { border-color: var(--accent); color: var(--accent); background: var(--adim); }
+.sort-btn:hover { border-color: var(--gold-dim); color: var(--text); }
+.sort-btn.active { border-color: var(--gold); color: var(--gold); background: var(--gold-bg); }
 
-/* Post list */
-.post-list { display: flex; flex-direction: column; gap: 8px; }
-.post-item {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 14px 16px;
+/* ── Hero post (#1) ── */
+.hero-wrap {
+  background: var(--bg-hero);
+  border: 1px solid var(--border-g);
+  border-radius: 12px;
+  padding: 18px;
   display: grid;
-  grid-template-columns: 64px 1fr auto;
-  gap: 14px;
+  grid-template-columns: 150px 1fr;
+  gap: 18px;
+  margin-bottom: 10px;
+  position: relative;
+}
+.hero-crown {
+  position: absolute;
+  top: -11px; left: 16px;
+  background: var(--gold);
+  color: #000;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 10px;
+  border-radius: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.hero-thumb {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 9px;
+  object-fit: cover;
+  background: #222;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 44px;
+}
+.hero-right { display: flex; flex-direction: column; justify-content: space-between; }
+.hero-tag { font-size: 9px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px; }
+.hero-text {
+  font-family: 'Noto Serif TC', serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--white);
+  line-height: 1.65;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  flex: 1;
+  margin-bottom: 14px;
+}
+.hero-metrics { display: flex; gap: 14px; align-items: flex-end; flex-wrap: wrap; }
+.hero-m { text-align: center; }
+.hero-mv { font-size: 20px; font-weight: 700; color: var(--white); }
+.hero-ml { font-size: 10px; color: var(--muted); }
+.hero-score {
+  margin-left: auto;
+  background: var(--gold-bg);
+  border: 1px solid var(--border-g);
+  border-radius: 9px;
+  padding: 7px 16px;
+  text-align: center;
+}
+.hero-sv { font-size: 22px; font-weight: 700; color: var(--gold); }
+.hero-sl { font-size: 10px; color: var(--muted); }
+
+/* ── Compact list (#2+) ── */
+.post-list { display: flex; flex-direction: column; gap: 7px; }
+.post-row {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  padding: 11px 14px;
+  display: grid;
+  grid-template-columns: 24px 40px 1fr auto;
+  gap: 12px;
   align-items: center;
   transition: border-color 0.15s;
 }
-.post-item:hover { border-color: var(--aborder); }
-
-.rank-wrap { display: flex; flex-direction: column; align-items: center; gap: 6px; }
-.rank-num {
+.post-row:hover { border-color: var(--gold-dim); }
+.post-rank {
   font-size: 11px;
   color: var(--muted);
-  font-weight: 500;
-  line-height: 1;
+  font-weight: 600;
+  text-align: center;
 }
-.rank-1 .rank-num { color: #FFD700; font-weight: 700; font-size: 12px; }
-.rank-2 .rank-num { color: #B8C0CC; font-weight: 600; }
-.rank-3 .rank-num { color: #CD9A60; font-weight: 600; }
+.rank-2 .post-rank { color: #B8C0CC; }
+.rank-3 .post-rank { color: #CD9A60; }
 
 .post-thumb {
-  width: 44px;
-  height: 44px;
-  border-radius: 7px;
+  width: 40px; height: 40px;
+  border-radius: 6px;
   object-fit: cover;
-  background: var(--surf2);
-}
-.post-thumb-ph {
-  width: 44px;
-  height: 44px;
-  border-radius: 7px;
-  background: var(--surf2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-}
-
-.post-info {}
-.post-text {
-  font-size: 13px;
-  color: var(--text);
-  line-height: 1.55;
-  margin-bottom: 5px;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-.post-date { font-size: 11px; color: var(--muted); }
-
-.post-metrics {
-  display: flex;
-  gap: 14px;
-  align-items: center;
+  background: #222;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 17px;
   flex-shrink: 0;
 }
-.metric { text-align: center; min-width: 42px; }
-.metric-icon { font-size: 11px; margin-bottom: 2px; }
-.metric-val { font-size: 15px; font-weight: 600; color: var(--white); line-height: 1.2; }
-.metric-lbl { font-size: 10px; color: var(--muted); }
-
-.score-badge {
-  background: var(--adim);
-  border: 1px solid var(--aborder);
-  border-radius: 7px;
-  padding: 5px 12px;
-  text-align: center;
-  min-width: 62px;
+.post-info {}
+.post-text {
+  font-size: 12px;
+  color: var(--text);
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-bottom: 3px;
 }
-.score-val { font-size: 15px; font-weight: 700; color: var(--accent); line-height: 1.2; }
-.score-lbl { font-size: 10px; color: var(--muted); }
+.post-date { font-size: 10px; color: var(--muted); }
+.post-metrics { display: flex; gap: 10px; align-items: center; flex-shrink: 0; }
+.post-m { text-align: center; min-width: 34px; }
+.post-mv { font-size: 13px; font-weight: 600; color: var(--white); }
+.post-ml { font-size: 9px; color: var(--muted); }
+.post-score {
+  background: var(--gold-bg);
+  border: 1px solid rgba(212,168,67,0.18);
+  border-radius: 6px;
+  padding: 3px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--gold);
+  min-width: 52px;
+  text-align: center;
+}
 
 /* Loading / empty */
 .loading-wrap {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 70px 0;
-  gap: 14px;
-  color: var(--muted);
-  font-size: 13px;
+  display: flex; flex-direction: column;
+  align-items: center; padding: 70px 0;
+  gap: 14px; color: var(--muted); font-size: 13px;
 }
 .spinner {
   width: 26px; height: 26px;
   border: 2px solid var(--border);
-  border-top-color: var(--accent);
+  border-top-color: var(--gold);
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
-.empty-state {
-  text-align: center;
-  padding: 70px 0;
-  color: var(--muted);
-  line-height: 2;
-}
-
-/* Responsive */
-@media (max-width: 700px) {
-  .post-item { grid-template-columns: 50px 1fr; }
-  .post-metrics { display: none; }
-  .main { padding: 16px; }
-}
+.empty-state { text-align: center; padding: 70px 0; color: var(--muted); line-height: 2; }
 </style>
 </head>
 <body>
 
 <div class="topbar">
   <a href="/" class="topbar-back">← Copy Studio</a>
-  <span class="topbar-title">📊 社群數據看板</span>
+  <span class="topbar-title">◆ 社群數據看板</span>
   <div class="topbar-spacer"></div>
   <div class="month-nav">
     <button class="month-btn" onclick="changeMonth(-1)">‹</button>
@@ -294,7 +323,7 @@ body {
     <button class="sort-btn" onclick="setSort('likes',this)">❤️ 讚</button>
     <button class="sort-btn" onclick="setSort('date',this)">📅 時間</button>
   </div>
-  <div class="post-list" id="postList"></div>
+  <div id="postList"></div>
 </div>
 
 <script>
@@ -304,6 +333,37 @@ const ACCOUNTS = {
   fb_life: { name: '餅妹大剌剌',         platform: 'FB', id: '733529933726748',  token: 'fblife' },
   ig_life: { name: 'bingmei_dalala',    platform: 'IG', id: '17841401919046692', token: 'life'   },
 };
+
+const RAW_TOKENS = {
+  sys:  'EAAXmIx9iQ8sBRY1j3QRrZAJimNUJZCd7sZAOmnOnZBinmVfzUp8cOzj3Cnfz9nQ5RbVI8vGwqqOAFh3PpqgXYVY0ZAQsLAz5aZBdDzmoH6KkDZAXcZB5U1wkYKViVDUJQNZCSvt85ytBBqWN2g9W8EHBplLgtZB1jQaMi5yZAFznMLZCi0fGW0B7eI05JueMO9v7QwZDZD',
+  life: 'EAAbpW8uJVKYBRVdnuTGm4jvj8ygGxX6Mu9SdJxhXYJtIXejlaNj1IradMrRSXdZBVJxYjHzyZAZCPSZAARIOoLZBpZAXo8CL86OXzb1BFZBtCK1GI0oWZBGmy8naWPZBKCwIJDOuHgvvSFHnMDMxM1Sbv3xGpDwlZCaEN1nv0CiZCcgecSm2qsQ3ZBZC9alDhtWv90gZDZD',
+};
+const PAGE_TOKEN_CACHE = {};
+
+async function getPageToken(pageId, baseTokenKey) {
+  if (PAGE_TOKEN_CACHE[pageId]) return PAGE_TOKEN_CACHE[pageId];
+  const r = await fetch(`https://graph.facebook.com/v25.0/${pageId}?fields=access_token&access_token=${RAW_TOKENS[baseTokenKey]}`);
+  const d = await r.json();
+  if (d.access_token) { PAGE_TOKEN_CACHE[pageId] = d.access_token; return d.access_token; }
+  return RAW_TOKENS[baseTokenKey];
+}
+
+async function resolveToken(token) {
+  if (token === 'sys')    return RAW_TOKENS.sys;
+  if (token === 'life')   return RAW_TOKENS.life;
+  if (token === 'fbpro')  return getPageToken('572262375977582',  'sys');
+  if (token === 'fblife') return getPageToken('733529933726748', 'life');
+}
+
+async function apiFetch(path, token) {
+  const accessToken = await resolveToken(token);
+  const sep = path.includes('?') ? '&' : '?';
+  const r = await fetch(`https://graph.facebook.com${path}${sep}access_token=${accessToken}`);
+  const d = await r.json();
+  if (d.error && typeof d.error === 'object') throw new Error(d.error.message || JSON.stringify(d.error));
+  if (d.error && typeof d.error === 'string') throw new Error(d.error);
+  return d;
+}
 
 let curAcc  = 'fb_pro';
 let curYear, curMonth;
@@ -350,38 +410,6 @@ function setSort(by, el) {
   if (cache[ck]) render(cache[ck]);
 }
 
-const RAW_TOKENS = {
-  sys:  'EAAXmIx9iQ8sBRY1j3QRrZAJimNUJZCd7sZAOmnOnZBinmVfzUp8cOzj3Cnfz9nQ5RbVI8vGwqqOAFh3PpqgXYVY0ZAQsLAz5aZBdDzmoH6KkDZAXcZB5U1wkYKViVDUJQNZCSvt85ytBBqWN2g9W8EHBplLgtZB1jQaMi5yZAFznMLZCi0fGW0B7eI05JueMO9v7QwZDZD',
-  life: 'EAAbpW8uJVKYBRVdnuTGm4jvj8ygGxX6Mu9SdJxhXYJtIXejlaNj1IradMrRSXdZBVJxYjHzyZAZCPSZAARIOoLZBpZAXo8CL86OXzb1BFZBtCK1GI0oWZBGmy8naWPZBKCwIJDOuHgvvSFHnMDMxM1Sbv3xGpDwlZCaEN1nv0CiZCcgecSm2qsQ3ZBZC9alDhtWv90gZDZD',
-};
-const PAGE_TOKEN_CACHE = {};
-
-async function getPageToken(pageId, baseTokenKey) {
-  if (PAGE_TOKEN_CACHE[pageId]) return PAGE_TOKEN_CACHE[pageId];
-  const base = RAW_TOKENS[baseTokenKey];
-  const r = await fetch(`https://graph.facebook.com/v25.0/${pageId}?fields=access_token&access_token=${base}`);
-  const d = await r.json();
-  if (d.access_token) { PAGE_TOKEN_CACHE[pageId] = d.access_token; return d.access_token; }
-  return base;
-}
-
-async function resolveToken(token) {
-  if (token === 'sys')    return RAW_TOKENS.sys;
-  if (token === 'life')   return RAW_TOKENS.life;
-  if (token === 'fbpro')  return getPageToken('572262375977582',  'sys');
-  if (token === 'fblife') return getPageToken('733529933726748', 'life');
-}
-
-async function apiFetch(path, token) {
-  const accessToken = await resolveToken(token);
-  const sep = path.includes('?') ? '&' : '?';
-  const r = await fetch(`https://graph.facebook.com${path}${sep}access_token=${accessToken}`);
-  const d = await r.json();
-  if (d.error && typeof d.error === 'object') throw new Error(d.error.message || JSON.stringify(d.error));
-  if (d.error && typeof d.error === 'string') throw new Error(d.error);
-  return d;
-}
-
 async function load(key) {
   const ck = cacheKey();
   if (cache[ck]) return render(cache[ck]);
@@ -403,8 +431,10 @@ async function loadFB(pageId, token, year, month) {
   const since = Math.floor(new Date(year, month - 1, 1).getTime() / 1000);
   const until = Math.floor(new Date(year, month,     1).getTime() / 1000);
   const fields = 'id,message,created_time,full_picture,likes.summary(true),comments.summary(true),shares';
-  const path = `/v25.0/${pageId}/posts?fields=${encodeURIComponent(fields)}&since=${since}&until=${until}&limit=50`;
-  const data = await apiFetch(path, token);
+  const data = await apiFetch(
+    `/v25.0/${pageId}/posts?fields=${encodeURIComponent(fields)}&since=${since}&until=${until}&limit=50`,
+    token
+  );
   return (data.data || []).map(p => norm({
     id: p.id, platform: 'FB',
     text:     p.message || '',
@@ -419,10 +449,11 @@ async function loadFB(pageId, token, year, month) {
 
 async function loadIG(igId, token, year, month) {
   const fields = 'id,caption,timestamp,like_count,comments_count,media_type,media_url,thumbnail_url,permalink';
-  const path = `/v25.0/${igId}/media?fields=${encodeURIComponent(fields)}&limit=50`;
-  const data = await apiFetch(path, token);
-  const all = data.data || [];
-  const filtered = all.filter(p => {
+  const data = await apiFetch(
+    `/v25.0/${igId}/media?fields=${encodeURIComponent(fields)}&limit=50`,
+    token
+  );
+  const filtered = (data.data || []).filter(p => {
     const d = new Date(p.timestamp);
     return d.getFullYear() === year && d.getMonth() + 1 === month;
   });
@@ -433,7 +464,7 @@ async function loadIG(igId, token, year, month) {
     thumb:    p.media_type === 'VIDEO' ? (p.thumbnail_url || null) : (p.media_url || null),
     likes:    p.like_count || 0,
     comments: p.comments_count || 0,
-    shares:   null, reach: null, saves: null,
+    shares: null, reach: null, saves: null,
     insightsLoading: true,
   }));
 }
@@ -442,8 +473,7 @@ async function loadIGInsights(posts, token, ck) {
   if (!posts.length) return;
   const results = await Promise.allSettled(posts.map(async p => {
     try {
-      const path = `/v25.0/${p.id}/insights?metric=reach,saved,shares,total_interactions`;
-      const data = await apiFetch(path, token);
+      const data = await apiFetch(`/v25.0/${p.id}/insights?metric=reach,saved,shares,total_interactions`, token);
       const m = {};
       (data.data || []).forEach(x => { m[x.name] = x.values?.[0]?.value ?? x.value ?? 0; });
       return { id: p.id, ...m };
@@ -460,17 +490,13 @@ async function loadIGInsights(posts, token, ck) {
   if (cacheKey() === ck) render(posts);
 }
 
-function norm(p) {
-  return { ...p, score: score(p) };
-}
+function norm(p) { return { ...p, score: score(p) }; }
 
 function score(p) {
-  const { platform, reach, likes, comments, saves, shares } = p;
-  const l = likes || 0, c = comments || 0, sv = saves || 0, sh = shares || 0;
-  if (platform === 'IG' && reach > 0) {
-    return +((l + c * 2 + sv * 2 + sh * 3) / reach * 100).toFixed(2);
-  }
-  return l + c * 2 + sv * 2 + sh * 3;
+  const l = p.likes||0, c = p.comments||0, sv = p.saves||0, sh = p.shares||0;
+  if (p.platform === 'IG' && p.reach > 0)
+    return +((l + c*2 + sv*2 + sh*3) / p.reach * 100).toFixed(2);
+  return l + c*2 + sv*2 + sh*3;
 }
 
 function sorted(posts) {
@@ -478,45 +504,40 @@ function sorted(posts) {
     if (sortBy === 'reach')  return (b.reach  || 0) - (a.reach  || 0);
     if (sortBy === 'likes')  return (b.likes  || 0) - (a.likes  || 0);
     if (sortBy === 'date')   return new Date(b.date) - new Date(a.date);
-    return (parseFloat(b.score) || 0) - (parseFloat(a.score) || 0);
+    return (parseFloat(b.score)||0) - (parseFloat(a.score)||0);
   });
 }
 
 function fmt(n) {
   if (n === null || n === undefined) return '—';
-  if (n >= 10000) return (n / 10000).toFixed(1) + 'w';
-  if (n >= 1000)  return (n / 1000).toFixed(1) + 'k';
+  if (n >= 10000) return (n/10000).toFixed(1)+'w';
+  if (n >= 1000)  return (n/1000).toFixed(1)+'k';
   return String(n);
 }
-
-function fmtDate(s) {
-  const d = new Date(s);
-  return `${d.getMonth() + 1}/${d.getDate()}`;
+function fmtDate(s) { const d=new Date(s); return `${d.getMonth()+1}/${d.getDate()}`; }
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-function esc(s) {
-  return String(s)
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+function thumbHtml(p, size) {
+  if (p.thumb) return `<img class="post-thumb" style="width:${size}px;height:${size}px" src="${esc(p.thumb)}" loading="lazy" onerror="this.style.display='none'">`;
+  return `<div class="post-thumb" style="width:${size}px;height:${size}px;font-size:${size/2.8|0}px">${p.platform==='IG'?'📷':'📘'}</div>`;
 }
 
 function render(posts) {
   const s = sorted(posts);
-  const acc = ACCOUNTS[curAcc];
-
-  // Summary
-  const total   = posts.length;
-  const withRch = posts.filter(p => p.reach !== null);
-  const avgRch  = withRch.length ? Math.round(withRch.reduce((a,p) => a + p.reach, 0) / withRch.length) : null;
-  const avgLike = total ? Math.round(posts.reduce((a,p) => a + p.likes, 0) / total) : 0;
-  const avgCmt  = total ? Math.round(posts.reduce((a,p) => a + p.comments, 0) / total) : 0;
+  const total    = posts.length;
+  const withRch  = posts.filter(p => p.reach !== null);
+  const avgRch   = withRch.length ? Math.round(withRch.reduce((a,p)=>a+p.reach,0)/withRch.length) : null;
+  const avgLike  = total ? Math.round(posts.reduce((a,p)=>a+p.likes,0)/total) : 0;
+  const avgCmt   = total ? Math.round(posts.reduce((a,p)=>a+p.comments,0)/total) : 0;
 
   document.getElementById('summaryRow').innerHTML = [
-    [total,              '本月貼文'],
+    [total,                        '本月貼文'],
     [avgRch !== null ? fmt(avgRch) : '—', '平均觸及'],
-    [fmt(avgLike),       '平均按讚'],
-    [fmt(avgCmt),        '平均留言'],
-  ].map(([v, l]) => `
+    [fmt(avgLike),                 '平均按讚'],
+    [fmt(avgCmt),                  '平均留言'],
+  ].map(([v,l]) => `
     <div class="summary-card">
       <div class="summary-val">${v}</div>
       <div class="summary-lbl">${l}</div>
@@ -528,62 +549,62 @@ function render(posts) {
     return;
   }
 
-  document.getElementById('postList').innerHTML = s.map((p, i) => {
-    const rankCls  = i < 3 ? `rank-${i+1}` : '';
-    const isRatio  = p.platform === 'IG' && p.reach > 0;
-    const loading  = p.insightsLoading;
-    const rch      = p.reach  !== null ? fmt(p.reach)  : (loading ? '…' : '—');
-    const sv       = p.saves  !== null ? fmt(p.saves)  : (loading ? '…' : '—');
-    const sh       = p.shares !== null ? fmt(p.shares) : (loading ? '…' : '—');
-    const sc       = p.score  !== null ? (isRatio ? `${p.score}%` : p.score) : (loading ? '…' : '—');
-    const thumbHtml = p.thumb
-      ? `<img class="post-thumb" src="${esc(p.thumb)}" loading="lazy" onerror="this.style.display='none'">`
-      : `<div class="post-thumb-ph">${p.platform === 'IG' ? '📷' : '📘'}</div>`;
-    const textPrev = (p.text || '（無文案）').replace(/\n/g,' ').slice(0, 90);
+  const [top, ...rest] = s;
+  const isRatioTop = top.platform === 'IG' && top.reach > 0;
+  const topScore   = top.score !== null ? (isRatioTop ? `${top.score}%` : top.score) : (top.insightsLoading ? '…' : '—');
 
-    return `
-<div class="post-item ${rankCls}">
-  <div class="rank-wrap">
-    <span class="rank-num">#${i+1}</span>
-    ${thumbHtml}
-  </div>
-  <div class="post-info">
-    <div class="post-text">${esc(textPrev)}</div>
-    <div class="post-date">${fmtDate(p.date)}</div>
-  </div>
-  <div class="post-metrics">
-    <div class="metric">
-      <div class="metric-icon">👁</div>
-      <div class="metric-val">${rch}</div>
-      <div class="metric-lbl">觸及</div>
+  const heroHtml = `
+<div class="hero-wrap">
+  <div class="hero-crown">👑 本月冠軍</div>
+  ${top.thumb
+    ? `<img class="hero-thumb" src="${esc(top.thumb)}" loading="lazy" onerror="this.style.fontSize='44px';this.outerHTML='<div class=hero-thumb>${top.platform==='IG'?'📷':'📘'}</div>'">`
+    : `<div class="hero-thumb">${top.platform==='IG'?'📷':'📘'}</div>`}
+  <div class="hero-right">
+    <div>
+      <div class="hero-tag">${esc(ACCOUNTS[curAcc].name)} · ${fmtDate(top.date)}</div>
+      <div class="hero-text">${esc((top.text||'（無文案）').replace(/\n/g,' '))}</div>
     </div>
-    <div class="metric">
-      <div class="metric-icon">❤️</div>
-      <div class="metric-val">${fmt(p.likes)}</div>
-      <div class="metric-lbl">讚</div>
-    </div>
-    <div class="metric">
-      <div class="metric-icon">💬</div>
-      <div class="metric-val">${fmt(p.comments)}</div>
-      <div class="metric-lbl">留言</div>
-    </div>
-    <div class="metric">
-      <div class="metric-icon">🔖</div>
-      <div class="metric-val">${sv}</div>
-      <div class="metric-lbl">收藏</div>
-    </div>
-    <div class="metric">
-      <div class="metric-icon">🔄</div>
-      <div class="metric-val">${sh}</div>
-      <div class="metric-lbl">分享</div>
-    </div>
-    <div class="score-badge">
-      <div class="score-val">${sc}</div>
-      <div class="score-lbl">${isRatio ? '互動率' : '互動分'}</div>
+    <div class="hero-metrics">
+      <div class="hero-m"><div class="hero-mv">${top.reach!==null?fmt(top.reach):(top.insightsLoading?'…':'—')}</div><div class="hero-ml">👁 觸及</div></div>
+      <div class="hero-m"><div class="hero-mv">${fmt(top.likes)}</div><div class="hero-ml">❤️ 讚</div></div>
+      <div class="hero-m"><div class="hero-mv">${fmt(top.comments)}</div><div class="hero-ml">💬 留言</div></div>
+      <div class="hero-m"><div class="hero-mv">${top.saves!==null?fmt(top.saves):(top.insightsLoading?'…':'—')}</div><div class="hero-ml">🔖 收藏</div></div>
+      <div class="hero-m"><div class="hero-mv">${top.shares!==null?fmt(top.shares):'—'}</div><div class="hero-ml">🔄 分享</div></div>
+      <div class="hero-score">
+        <div class="hero-sv">${topScore}</div>
+        <div class="hero-sl">${isRatioTop?'互動率':'互動分'}</div>
+      </div>
     </div>
   </div>
 </div>`;
-  }).join('');
+
+  const listHtml = rest.length ? `
+<div class="post-list">
+${rest.map((p, i) => {
+  const rank = i + 2;
+  const rankCls = rank === 2 ? 'rank-2' : rank === 3 ? 'rank-3' : '';
+  const isRatio = p.platform === 'IG' && p.reach > 0;
+  const sc = p.score !== null ? (isRatio ? `${p.score}%` : p.score) : (p.insightsLoading ? '…' : '—');
+  return `
+<div class="post-row ${rankCls}">
+  <div class="post-rank">#${rank}</div>
+  ${thumbHtml(p, 40)}
+  <div class="post-info">
+    <div class="post-text">${esc((p.text||'（無文案）').replace(/\n/g,' '))}</div>
+    <div class="post-date">${fmtDate(p.date)}</div>
+  </div>
+  <div class="post-metrics">
+    <div class="post-m"><div class="post-mv">${p.reach!==null?fmt(p.reach):(p.insightsLoading?'…':'—')}</div><div class="post-ml">👁</div></div>
+    <div class="post-m"><div class="post-mv">${fmt(p.likes)}</div><div class="post-ml">❤️</div></div>
+    <div class="post-m"><div class="post-mv">${fmt(p.comments)}</div><div class="post-ml">💬</div></div>
+    <div class="post-m"><div class="post-mv">${p.saves!==null?fmt(p.saves):(p.insightsLoading?'…':'—')}</div><div class="post-ml">🔖</div></div>
+    <div class="post-score">${sc}</div>
+  </div>
+</div>`;
+}).join('')}
+</div>` : '';
+
+  document.getElementById('postList').innerHTML = heroHtml + listHtml;
 }
 
 function showLoading() {
@@ -591,7 +612,6 @@ function showLoading() {
   document.getElementById('postList').innerHTML =
     `<div class="loading-wrap"><div class="spinner"></div><div>載入數據中…</div></div>`;
 }
-
 function showError(msg) {
   document.getElementById('postList').innerHTML =
     `<div class="empty-state"><div style="font-size:28px;margin-bottom:10px">⚠️</div>${esc(msg)}</div>`;
