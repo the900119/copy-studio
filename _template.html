@@ -1901,11 +1901,24 @@ async function generateDirect() {
     await generateFromXHSNote(extractXHSNoteId(url), '', 'video');
     return;
   }
-  showLoad('search-loading', '正在生成文案（約 30–60 秒）...');
+  showLoad('search-loading', '① 正在抓取逐字稿（約 30–60 秒）...');
   try {
     const r = await fetch(WH_GENERATE, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ platform: directPlatform, url, text }) });
-    showDrafts(await r.json());
-  } catch(e) { hideLoad('search-loading'); alert('生成失敗：' + e.message); }
+    if (!r.ok) { const e = await r.json(); hideLoad('search-loading'); alert('抓取失敗：' + (e.detail || r.status)); return; }
+    const d = await r.json();
+    hideLoad('search-loading');
+    // 帶入 Step 04
+    document.getElementById('pro-topic').value  = d.title || url;
+    document.getElementById('pro-extra').value  = '【原影片逐字稿】\n' + (d.transcript || '');
+    currentTranscript = d.transcript || '';
+    switchTab('pro');
+    document.getElementById('pro-output').style.display = 'none';
+    setTimeout(() => {
+      document.getElementById('pro-topic').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setStatus('pro-save-status', '✅ 逐字稿已帶入！選好 Hook / 骨架後點「一鍵生成」', 'success');
+      setTimeout(() => setStatus('pro-save-status', '', ''), 6000);
+    }, 300);
+  } catch(e) { hideLoad('search-loading'); alert('抓取失敗：' + e.message); }
 }
 
 async function confirmSave() {
